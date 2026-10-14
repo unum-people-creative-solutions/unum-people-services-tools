@@ -2,6 +2,8 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GuiaPortfolio, EXEMPLO_PORTFOLIO } from '../GuiaPortfolio';
 import PortfolioView from '../../../app/portfolio-analises/PortfolioView';
+import { quadranteDe } from '../../ServiceCharts';
+import type { Service } from '../../../types';
 
 const TOPICOS = [
   'Para que serve',
@@ -63,6 +65,11 @@ describe('GuiaPortfolio', () => {
         sim.slice(0, servico.sim[eixo]).forEach((botao) => fireEvent.click(botao));
         fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
       }
+      // Resumo do drawer antes de salvar: as notas que o guia cita
+      expect(screen.getByText(`Esforço: ${servico.notas.esforco}%`)).toBeInTheDocument();
+      expect(screen.getByText(`Complexidade: ${servico.notas.complexidade}%`)).toBeInTheDocument();
+      expect(screen.getByText(`Padronização: ${servico.notas.padronizacao}%`)).toBeInTheDocument();
+      expect(screen.getByText(`Lucratividade: ${servico.notas.lucratividade}%`)).toBeInTheDocument();
       fireEvent.change(screen.getByPlaceholderText(/Ex: Consultoria Técnica/i), { target: { value: servico.nome } });
       fireEvent.click(screen.getByRole('button', { name: /salvar serviço/i }));
     }
@@ -70,5 +77,13 @@ describe('GuiaPortfolio', () => {
     // A ferramenta mostra a atratividade com uma casa decimal e ponto
     expect(screen.getAllByText('79.2%').length).toBeGreaterThan(0);
     expect(screen.getAllByText('25.0%').length).toBeGreaterThan(0);
+
+    // Quadrantes: as notas exatas que a ferramenta gravou, na regra dos gráficos
+    const gravados: Service[] = JSON.parse(window.localStorage.getItem('portfolio_services') ?? '[]');
+    for (const servico of EXEMPLO_PORTFOLIO.servicos) {
+      const s = gravados.find((g) => g.nome === servico.nome)!;
+      expect(quadranteDe(s.esforco, s.complexidade, 'operacao')).toBe(servico.operacao);
+      expect(quadranteDe(s.padronizacao, s.lucratividade, 'decisao')).toBe(servico.decisao);
+    }
   });
 });
