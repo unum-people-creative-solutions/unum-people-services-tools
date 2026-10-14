@@ -11,7 +11,7 @@ export const porcentagem = (valor: number, casas = 0) =>
 
 export function Guia({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <section data-guia aria-labelledby="guia-titulo" className="mt-16 mb-12 max-w-3xl mx-auto">
+    <section data-guia aria-labelledby="guia-titulo" className="mt-16 mb-12 max-w-prose mx-auto">
       <h2
         id="guia-titulo"
         className="text-2xl md:text-3xl font-black text-brand-blue tracking-tighter mb-10 text-balance"
