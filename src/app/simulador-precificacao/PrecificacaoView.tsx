@@ -20,7 +20,7 @@ import {
   Settings
 } from 'lucide-react';
 
-export default function PrecificacaoView() {
+export default function PrecificacaoView({ children }: { children?: React.ReactNode }) {
   const { data, updateCustosFixos, updateCapacidade, updateServico, isLoaded, calculations } = usePricing();
   const [isHelpOpen, setIsHelpOpen] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
@@ -37,17 +37,7 @@ export default function PrecificacaoView() {
   const idHorasEst = React.useId();
   const idImpostos = React.useId();
 
-  React.useEffect(() => {
-    if (isLoaded) {
-      const hasSeenModal = localStorage.getItem('unum_pricing_welcome_seen');
-      if (!hasSeenModal) {
-        setTimeout(() => setIsHelpOpen(true), 0);
-      }
-    }
-  }, [isLoaded]);
-
   const closeHelp = () => {
-    localStorage.setItem('unum_pricing_welcome_seen', 'true');
     setIsHelpOpen(false);
   };
 
@@ -149,8 +139,6 @@ export default function PrecificacaoView() {
               </p>
             </div>
           </header>
-
-          <AdUnit className="mb-10" slot="1270666901" />
 
           {!isLoaded ? (
             <div className="py-20 flex items-center justify-center bg-white/50 rounded-3xl border-2 border-dashed border-gray-100">
@@ -483,8 +471,12 @@ export default function PrecificacaoView() {
                   CONHECER UNUM PEOPLE
                 </a>
               </div>
+
+              <AdUnit className="my-10" slot="1270666901" />
             </>
           )}
+
+          {children}
         </div>
       </main>
 

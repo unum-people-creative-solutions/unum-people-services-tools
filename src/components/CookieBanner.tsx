@@ -35,8 +35,8 @@ export function CookieBanner() {
                 Privacidade e Cookies
               </h3>
               <p className="text-brand-grey text-sm leading-relaxed max-w-2xl">
-                Utilizamos cookies e tecnologias similares para melhorar sua experiência. Seus dados estratégicos são armazenados localmente no seu dispositivo e não em nossos servidores. Ao continuar, você concorda com nossa{' '}
-                <Link href="/privacidade" className="text-brand-blue font-bold hover:underline">
+                Utilizamos cookies e tecnologias similares para melhorar sua experiência e para exibir anúncios do Google, que podem ser personalizados. Seus dados estratégicos são armazenados localmente no seu dispositivo e não em nossos servidores. Ao continuar, você concorda com nossa{' '}
+                <Link href="/privacidade#anuncios" className="text-brand-blue font-bold hover:underline">
                   Política de Privacidade
                 </Link>.
               </p>

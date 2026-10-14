@@ -1,4 +1,5 @@
 import PrecificacaoView from './PrecificacaoView';
+import { GuiaPrecificacao } from '../../components/guias/GuiaPrecificacao';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <PrecificacaoView />;
+  return (
+    <PrecificacaoView>
+      <GuiaPrecificacao />
+    </PrecificacaoView>
+  );
 }

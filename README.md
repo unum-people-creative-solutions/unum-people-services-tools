@@ -35,7 +35,7 @@ O ecossistema de ferramentas da **Unum People** foi projetado para eliminar o "a
 - **Ícones:** Lucide React
 - **Gráficos:** Recharts
 - **Testes:** Vitest + React Testing Library
-- **Monetização:** Google AdSense (Integração otimizada para visibilidade constante)
+- **Monetização:** Google AdSense, só depois do conteúdo (ver abaixo)
 
 ## 📦 Desenvolvimento
 
@@ -63,6 +63,21 @@ npm run start
 ```bash
 npm run lint    # Verificação de padrões e tipos
 npm test        # Execução da suíte de testes unitários
+```
+
+## 📰 Conteúdo e anúncios (AdSense)
+
+O AdSense reprovou o site por "conteúdo de baixo valor" em 2026. Estas regras existem para não repetir isso (TECH-DESIGN `adsense-aprovacao` no `unum-people-docs`):
+
+- **Cada ferramenta tem um guia escrito** em `src/components/guias/`, renderizado no servidor e passado à View como `children`. Ele sai no HTML mesmo enquanto a ferramenta mostra "Carregando...". O exemplo de cada guia vem de uma constante `EXEMPLO_*`, e o teste alimenta a ferramenta real com ela: se uma fórmula mudar, o teste do guia quebra até o texto ser atualizado.
+- **Anúncio só depois do conteúdo.** Nenhum anúncio na home, que é tela de navegação, nem acima da ferramenta. O slot `1270666901` fica entre a ferramenta e o guia, só depois de carregada, e o `7715444307` fica depois do guia.
+- **A política de privacidade** (`/privacidade#anuncios`) tem o conteúdo obrigatório do AdSense sobre cookies de anúncio do Google. Não remova.
+
+Para conferir o HTML como o Google recebe, sem rodar JavaScript:
+
+```bash
+npm run build && npm run start
+bash scripts/verificar-adsense.sh http://localhost:3000   # sai com 0 se tudo ok
 ```
 
 ## 🎨 Identidade Visual
