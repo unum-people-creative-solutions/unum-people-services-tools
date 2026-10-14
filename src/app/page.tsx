@@ -2,8 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { AdUnit } from '../components/AdUnit';
-import { LayoutGrid, ArrowRight, BarChart3, Target, Calculator } from 'lucide-react';
+import { LayoutGrid, ArrowRight, BarChart3, Calculator } from 'lucide-react';
 
 export const metadata = {
   title: 'Tools | Unum People',
@@ -34,14 +33,6 @@ const tools = [
     icon: BarChart3,
     color: 'bg-brand-blue',
     status: 'Disponível'
-  },
-  {
-    title: 'Mapeador de Benchmark de Aquisição',
-    description: 'Compare suas métricas de marketing com as referências do mercado para identificar gaps.',
-    href: '#',
-    icon: Target,
-    color: 'bg-brand-grey',
-    status: 'Em breve'
   }
 ];
 
@@ -106,7 +97,18 @@ export default function Home() {
             ))}
           </div>
 
-          <AdUnit className="mt-20" slot="7715444307" />
+          <section className="mt-20 max-w-3xl mx-auto text-center space-y-6">
+            <p className="text-brand-grey text-base md:text-lg leading-relaxed">
+              Ferramentas gratuitas para profissionais autônomos e pequenos negócios de serviço decidirem com números: quais serviços priorizar, quanto cobrar e quanto investir em anúncios. Quem faz é a Unum People, que cria páginas com WhatsApp e CRM para pequenos negócios. Os dados que você digita ficam no seu navegador e não são enviados para os nossos servidores.
+            </p>
+            <a
+              href="https://unumpeople.com.br/sobre"
+              className="inline-flex items-center gap-2 text-brand-blue font-bold text-sm uppercase tracking-widest hover:gap-4 transition-all"
+            >
+              Conheça a Unum People
+              <ArrowRight size={18} />
+            </a>
+          </section>
         </div>
       </main>
 

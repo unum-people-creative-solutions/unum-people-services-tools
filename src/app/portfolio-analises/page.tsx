@@ -1,4 +1,5 @@
 import PortfolioView from './PortfolioView';
+import { GuiaPortfolio } from '../../components/guias/GuiaPortfolio';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <PortfolioView />;
+  return (
+    <PortfolioView>
+      <GuiaPortfolio />
+    </PortfolioView>
+  );
 }

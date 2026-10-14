@@ -51,6 +51,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/50 uppercase tracking-widest font-semibold">
           <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
             <p>© 2026 Unum People. Todos os direitos reservados.</p>
+            <a href="https://unumpeople.com.br/sobre" className="hover:text-white transition-colors">Sobre</a>
+            <a href="https://unumpeople.com.br/contato" className="hover:text-white transition-colors">Contato</a>
+            <a href="https://unumpeople.com.br/termos" className="hover:text-white transition-colors">Termos</a>
             <a href="/privacidade" className="hover:text-white transition-colors">Privacidade</a>
           </div>
           <p>People to People (P2P) Ecosystem</p>

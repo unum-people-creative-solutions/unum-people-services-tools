@@ -65,6 +65,16 @@ const MATRIX_INFO = {
   }
 };
 
+// Quadrante de um serviço numa matriz: 50% ou mais conta como alto.
+// Exportada para o guia do portfólio conferir os quadrantes do exemplo.
+export const quadranteDe = (x: number, y: number, id: 'operacao' | 'decisao') => {
+  const quadrants = MATRIX_INFO[id].quadrants;
+  if (x >= 50 && y >= 50) return quadrants.tr;
+  if (x < 50 && y >= 50) return quadrants.tl;
+  if (x >= 50 && y < 50) return quadrants.br;
+  return quadrants.bl;
+};
+
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { payload: Service; value: number }[];
@@ -74,21 +84,13 @@ interface CustomTooltipProps {
 export function ServiceCharts({ services, highlightedId }: ServiceChartsProps) {
   const [hoveredInfo, setHoveredInfo] = useState<'operacao' | 'decisao' | null>(null);
 
-  const getQuadrantName = (x: number, y: number, id: 'operacao' | 'decisao') => {
-    const quadrants = MATRIX_INFO[id].quadrants;
-    if (x >= 50 && y >= 50) return quadrants.tr;
-    if (x < 50 && y >= 50) return quadrants.tl;
-    if (x >= 50 && y < 50) return quadrants.br;
-    return quadrants.bl;
-  };
-
   const CustomTooltip = ({ active, payload, id }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const x = payload[0].value;
       const y = payload[1].value;
       const info = MATRIX_INFO[id as 'operacao' | 'decisao'];
-      const quadrant = getQuadrantName(x, y, id as 'operacao' | 'decisao');
+      const quadrant = quadranteDe(x, y, id as 'operacao' | 'decisao');
 
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg min-w-[180px]">

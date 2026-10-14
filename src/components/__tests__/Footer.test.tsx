@@ -19,4 +19,12 @@ describe('Footer', () => {
     const unumLink = links.find(link => link.getAttribute('href') === 'https://unumpeople.com.br/');
     expect(unumLink).toBeDefined();
   });
+
+  it('liga as páginas institucionais', () => {
+    render(<Footer />);
+    expect(screen.getByRole('link', { name: 'Sobre' })).toHaveAttribute('href', 'https://unumpeople.com.br/sobre');
+    expect(screen.getByRole('link', { name: 'Contato' })).toHaveAttribute('href', 'https://unumpeople.com.br/contato');
+    expect(screen.getByRole('link', { name: 'Termos' })).toHaveAttribute('href', 'https://unumpeople.com.br/termos');
+    expect(screen.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
+  });
 });
