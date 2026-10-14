@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ServiceCharts } from '../ServiceCharts';
+import { ServiceCharts, quadranteDe } from '../ServiceCharts';
 import { describe, it, expect, vi } from 'vitest';
 import { Service } from '../../types';
 
@@ -37,5 +37,21 @@ describe('ServiceCharts', () => {
     
     fireEvent.mouseLeave(container);
     expect(screen.queryByText(/Analisa o esforço vs complexidade técnica/i)).not.toBeInTheDocument();
+  });
+});
+
+// Corte dos quadrantes: 50% ou mais conta como alto (guia do portfólio, RF-17)
+describe('quadranteDe', () => {
+  it.each([
+    [50, 50, 'operacao', 'Crítico'],
+    [49, 50, 'operacao', 'Especialista'],
+    [50, 49, 'operacao', 'Operacional'],
+    [49, 49, 'operacao', 'Eficiente'],
+    [50, 50, 'decisao', 'Estrela'],
+    [49, 50, 'decisao', 'Oportunidade'],
+    [50, 49, 'decisao', 'Escala'],
+    [49, 49, 'decisao', 'Revisar'],
+  ] as const)('(%i, %i) na matriz %s é %s', (x, y, matriz, esperado) => {
+    expect(quadranteDe(x, y, matriz)).toBe(esperado);
   });
 });
