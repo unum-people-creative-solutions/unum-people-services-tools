@@ -84,6 +84,23 @@ describe('PrecificacaoView', () => {
     expect(screen.getByText(/Atenção: O preço sugerido está abaixo do piso aceitável/i)).toBeInTheDocument();
   });
 
+  it('margem de exatamente 20% não mostra o aviso de margem apertada (guia: "a partir de 20%")', async () => {
+    render(<PrecificacaoView />);
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    // Sem custos fixos nem imposto: custo base = R$ 80 de material; preço R$ 100 → margem 20%
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/Materiais Diretos/i), { target: { value: '80' } });
+      fireEvent.change(screen.getByLabelText(/Quanto deseja cobrar\?/i), { target: { value: '100' } });
+      vi.runAllTimers();
+    });
+
+    expect(screen.getByText('20,00%')).toBeInTheDocument();
+    expect(screen.queryByText(/Margem Apertada/i)).not.toBeInTheDocument();
+  });
+
   it('enquanto carrega, mostra o guia e só o anúncio que vem depois dele', () => {
     render(<PrecificacaoView><p>GUIA-TESTE</p></PrecificacaoView>);
 
