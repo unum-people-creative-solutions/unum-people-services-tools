@@ -113,6 +113,21 @@ describe('ViabilidadeView', () => {
     expect(screen.getByText(/Margem de contribuição negativa/i)).toBeInTheDocument();
   });
 
+  it('fechamento exigido de exatamente 20% ainda é viável (arriscado só acima de 20%)', () => {
+    render(<ViabilidadeView />);
+    fireEvent.click(screen.getByText(/Tenho um orçamento/i).closest('button')!);
+    fireEvent.change(screen.getByLabelText(/Ticket Médio/i), { target: { value: '200' } });
+    fireEvent.change(screen.getByLabelText(/Custo Variável/i), { target: { value: '100' } });
+    fireEvent.change(screen.getByLabelText(/CPC Médio/i), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText(/Taxa de Conversão da LP/i), { target: { value: '5' } });
+    fireEvent.change(screen.getByLabelText(/Orçamento da Campanha/i), { target: { value: '1000' } });
+    fireEvent.click(screen.getByText(/Gerar Diagnóstico/i));
+
+    // margem 100 → 10 vendas; 1.000 cliques × 5% = 50 oportunidades; 10 ÷ 50 = 20%
+    expect(screen.getByText(/Este é um cenário viável e saudável/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Este cenário é arriscado/i)).not.toBeInTheDocument();
+  });
+
   describe('arredonda pelo valor exato, sem ruído de ponto flutuante', () => {
     const preencherBase = (ticket: string, custo: string, cpc: string, conversao: string) => {
       fireEvent.change(screen.getByLabelText(/Ticket Médio/i), { target: { value: ticket } });
@@ -142,6 +157,17 @@ describe('ViabilidadeView', () => {
 
       // 64,35 − 4,35 = 60 (em ponto flutuante: 59,999…), e 600 ÷ 60 = 10
       expect(textoDaTela()).toContain('transformar 10 dessas oportunidades');
+    });
+
+    it('orçamento: R$ 110 a R$ 1,10 por clique dá 100 cliques', () => {
+      render(<ViabilidadeView />);
+      fireEvent.click(screen.getByText(/Tenho um orçamento/i).closest('button')!);
+      preencherBase('300', '60', '1,10', '10');
+      fireEvent.change(screen.getByLabelText(/Orçamento da Campanha/i), { target: { value: '110' } });
+      fireEvent.click(screen.getByText(/Gerar Diagnóstico/i));
+
+      // 110 ÷ 1,1 = 100 (em ponto flutuante: 99,999…)
+      expect(screen.getByText('Visitantes').nextElementSibling).toHaveTextContent(/^100$/);
     });
 
     it('meta: 5 clientes a R$ 2 por clique, 5% de conversão e 20% de fechamento dão 500 cliques e 25 oportunidades', () => {
