@@ -133,7 +133,7 @@ export function GuiaPrecificacao() {
             mas sobra pouco para imprevistos, investimento e crescimento.
           </li>
           <li>
-            <strong>Margem acima de 20%:</strong> a faixa que a ferramenta considera saudável.
+            <strong>Margem a partir de 20%:</strong> a faixa que a ferramenta considera saudável.
           </li>
           <li>
             <strong>Custo fixo por hora:</strong> é o número que mais ajuda no dia a dia. Todo serviço
