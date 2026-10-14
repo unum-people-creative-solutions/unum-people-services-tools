@@ -23,6 +23,7 @@ describe('GuiaViabilidade', () => {
     render(<GuiaViabilidade />);
     expect(screen.getByRole('heading', { level: 2, name: /Guia da Calculadora de Viabilidade/ })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(TOPICOS);
+    expect(screen.getByRole('region', { name: /Guia da Calculadora de Viabilidade/ }).tagName).toBe('SECTION');
   });
 
   it('tem pelo menos 600 palavras', () => {

@@ -86,6 +86,8 @@ describe('PortfolioView', () => {
     expect(anuncios).toHaveLength(1);
     expect(anuncios[0]).toHaveAttribute('data-ad-slot', '7715444307');
     expect(vemDepois(guia, anuncios[0])).toBe(true);
+    expect(screen.getByRole('main')).toContainElement(guia);
+    expect(vemDepois(anuncios[0], screen.getByTestId('footer'))).toBe(true);
   });
 
   it('carregada, põe um anúncio entre a ferramenta e o guia e outro depois do guia', () => {
@@ -109,6 +111,8 @@ describe('PortfolioView', () => {
     expect(vemDepois(fimDaFerramenta, meio)).toBe(true);
     expect(vemDepois(meio, guia)).toBe(true);
     expect(vemDepois(guia, fim)).toBe(true);
+    expect(screen.getByRole('main')).toContainElement(guia);
+    expect(vemDepois(fim, screen.getByTestId('footer'))).toBe(true);
   });
 
   it('não abre a ajuda sozinha na primeira visita, e o botão Ajuda abre', () => {

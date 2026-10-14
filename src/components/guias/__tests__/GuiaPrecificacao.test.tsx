@@ -31,6 +31,7 @@ describe('GuiaPrecificacao', () => {
     render(<GuiaPrecificacao />);
     expect(screen.getByRole('heading', { level: 2, name: /Guia do Simulador de Precificação/ })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(TOPICOS);
+    expect(screen.getByRole('region', { name: /Guia do Simulador de Precificação/ }).tagName).toBe('SECTION');
   });
 
   it('tem pelo menos 600 palavras', () => {

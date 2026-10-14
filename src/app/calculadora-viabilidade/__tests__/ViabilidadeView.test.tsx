@@ -202,5 +202,7 @@ describe('ViabilidadeView', () => {
     expect(vemDepois(ultimaOpcao, meio)).toBe(true);
     expect(vemDepois(meio, guia)).toBe(true);
     expect(vemDepois(guia, fim)).toBe(true);
+    expect(screen.getByRole('main')).toContainElement(guia);
+    expect(vemDepois(fim, screen.getByTestId('footer'))).toBe(true);
   });
 });

@@ -25,13 +25,20 @@ describe('Header', () => {
     expect(within(nav).getByRole('link', { name: 'Viabilidade' })).toHaveAttribute('href', '/calculadora-viabilidade');
   });
 
-  it('marca só a ferramenta da rota atual', () => {
-    rota.atual = '/simulador-precificacao';
+  it.each([
+    ['/portfolio-analises', 'Portfólio'],
+    ['/simulador-precificacao', 'Precificação'],
+    ['/calculadora-viabilidade', 'Viabilidade'],
+  ])('em %s, marca só "%s"', (caminho, atual) => {
+    rota.atual = caminho;
     render(<Header />);
     const nav = screen.getByRole('navigation', { name: 'Ferramentas' });
-    expect(within(nav).getByRole('link', { name: 'Precificação' })).toHaveAttribute('aria-current', 'page');
-    expect(within(nav).getByRole('link', { name: 'Portfólio' })).not.toHaveAttribute('aria-current');
-    expect(within(nav).getByRole('link', { name: 'Viabilidade' })).not.toHaveAttribute('aria-current');
+    const marcado = within(nav).getByRole('link', { name: atual });
+    expect(marcado).toHaveAttribute('aria-current', 'page');
+    within(nav)
+      .getAllByRole('link')
+      .filter((link) => link !== marcado)
+      .forEach((link) => expect(link).not.toHaveAttribute('aria-current'));
   });
 
   it('não marca nenhuma ferramenta fora delas', () => {

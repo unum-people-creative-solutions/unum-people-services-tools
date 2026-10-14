@@ -27,6 +27,7 @@ describe('Home', () => {
   it('apresenta para quem são as ferramentas e quem as faz', () => {
     render(<Home />);
     expect(screen.getByText(/profissionais autônomos e pequenos negócios de serviço/i)).toBeInTheDocument();
+    expect(screen.getByText(/Quem faz é a Unum People/)).toBeInTheDocument();
     expect(screen.getByText(/ficam no seu navegador/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Conheça a Unum People' })).toHaveAttribute(
       'href',

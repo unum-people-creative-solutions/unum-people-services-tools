@@ -26,6 +26,7 @@ describe('Política de Privacidade', () => {
       /permite que o Google e os parceiros dele exibam anúncios para você com base nas suas visitas a este site e\/ou a outros sites na internet/i,
     );
     expect(texto).toMatch(/desativar a publicidade personalizada/i);
+    expect(texto).toMatch(/recusar o uso de cookies de publicidade personalizada de outros fornecedores/i);
     expect(texto).toMatch(/outras redes de anúncios certificadas pelo Google/i);
   });
 

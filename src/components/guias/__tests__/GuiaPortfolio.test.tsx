@@ -32,6 +32,7 @@ describe('GuiaPortfolio', () => {
     render(<GuiaPortfolio />);
     expect(screen.getByRole('heading', { level: 2, name: /Guia do Mapeamento Estratégico de Portfólio/ })).toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(TOPICOS);
+    expect(screen.getByRole('region', { name: /Guia do Mapeamento Estratégico de Portfólio/ }).tagName).toBe('SECTION');
   });
 
   it('tem pelo menos 600 palavras', () => {
