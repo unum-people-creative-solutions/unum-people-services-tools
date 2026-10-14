@@ -84,7 +84,7 @@ export function GuiaPrecificacao() {
             diretos + deslocamento.
           </li>
           <li>
-            <strong>Piso Aceitável</strong> = custo base ÷ (1 − alíquota de imposto). O imposto é
+            <strong>Piso Aceitável</strong>{' '}= custo base ÷ (1 − alíquota de imposto). O imposto é
             calculado &quot;por dentro&quot;: incide sobre o preço final, como acontece na nota fiscal, e
             não sobre o custo.
           </li>
