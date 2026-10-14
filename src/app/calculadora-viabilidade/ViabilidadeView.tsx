@@ -47,7 +47,7 @@ const INITIAL_FORM_DATA: FormData = {
   taxaFechamento: 0,
 };
 
-export default function ViabilidadeView() {
+export default function ViabilidadeView({ children }: { children?: React.ReactNode }) {
   const [step, setStep] = useState<Step>('CHOOSE_PATH');
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
@@ -681,13 +681,15 @@ export default function ViabilidadeView() {
             </div>
           </header>
 
-          <AdUnit className="mb-8" slot="1270666901" />
-
           <section className="min-h-[400px]">
             {step === 'CHOOSE_PATH' && renderStep1()}
             {step === 'FILL_FORM' && renderStep2()}
             {step === 'DIAGNOSIS' && renderDiagnosis()}
           </section>
+
+          <AdUnit className="mb-8" slot="1270666901" />
+
+          {children}
         </div>
       </main>
 

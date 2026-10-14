@@ -13,6 +13,14 @@ vi.mock('../../components/AdUnit', () => ({
   AdUnit: () => <div data-testid="ad-unit" />
 }));
 
+// true quando `depois` vem depois de `antes` na ordem do documento
+const vemDepois = (antes: Element, depois: Element) =>
+  Boolean(antes.compareDocumentPosition(depois) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+// Os blocos do AdSense renderizados pelo AdUnit real, na ordem do documento
+const anunciosNaTela = () => Array.from(document.querySelectorAll('ins[data-ad-slot]'));
+
+
 describe('PrecificacaoView', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -70,5 +78,38 @@ describe('PrecificacaoView', () => {
     });
 
     expect(screen.getByText(/Atenção: O preço sugerido está abaixo do piso aceitável/i)).toBeInTheDocument();
+  });
+
+  it('enquanto carrega, mostra o guia e só o anúncio que vem depois dele', () => {
+    render(<PrecificacaoView><p>GUIA-TESTE</p></PrecificacaoView>);
+
+    const guia = screen.getByText('GUIA-TESTE');
+    const anuncios = anunciosNaTela();
+    expect(anuncios).toHaveLength(1);
+    expect(anuncios[0]).toHaveAttribute('data-ad-slot', '7715444307');
+    expect(vemDepois(guia, anuncios[0])).toBe(true);
+  });
+
+  it('carregada, põe um anúncio entre a ferramenta e o guia e outro depois do guia', () => {
+    render(<PrecificacaoView><p>GUIA-TESTE</p></PrecificacaoView>);
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    const titulo = screen.getByRole('heading', { level: 1 });
+    const campo = screen.getByLabelText(/Pró-labore/i);
+    const fimDaFerramenta = screen.getByRole('link', { name: /CONHECER UNUM PEOPLE/i });
+    const guia = screen.getByText('GUIA-TESTE');
+    const anuncios = anunciosNaTela();
+
+    expect(anuncios).toHaveLength(2);
+    const [meio, fim] = anuncios;
+    expect(meio).toHaveAttribute('data-ad-slot', '1270666901');
+    expect(fim).toHaveAttribute('data-ad-slot', '7715444307');
+    expect(vemDepois(titulo, meio)).toBe(true);
+    expect(vemDepois(campo, meio)).toBe(true);
+    expect(vemDepois(fimDaFerramenta, meio)).toBe(true);
+    expect(vemDepois(meio, guia)).toBe(true);
+    expect(vemDepois(guia, fim)).toBe(true);
   });
 });

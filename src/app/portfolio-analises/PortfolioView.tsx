@@ -11,7 +11,7 @@ import { Footer } from '../../components/Footer';
 import { AdUnit } from '../../components/AdUnit';
 import { LayoutGrid } from 'lucide-react';
 
-export default function PortfolioView() {
+export default function PortfolioView({ children }: { children?: React.ReactNode }) {
   const { services, addService, removeService, isLoaded } = useServices();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -62,8 +62,6 @@ export default function PortfolioView() {
             </button>
           </header>
 
-          <AdUnit className="mb-8" slot="1270666901" />
-
           {!isLoaded ? (
             <div className="min-h-[400px] flex items-center justify-center">
               <div className="animate-pulse flex flex-col items-center">
@@ -101,8 +99,12 @@ export default function PortfolioView() {
                   CONHECER UNUM PEOPLE
                 </a>
               </div>
+
+              <AdUnit className="mb-8" slot="1270666901" />
             </>
           )}
+
+          {children}
         </div>
       </main>
 
