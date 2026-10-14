@@ -1,4 +1,5 @@
 import ViabilidadeView from './ViabilidadeView';
+import { GuiaViabilidade } from '../../components/guias/GuiaViabilidade';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <ViabilidadeView />;
+  return (
+    <ViabilidadeView>
+      <GuiaViabilidade />
+    </ViabilidadeView>
+  );
 }
