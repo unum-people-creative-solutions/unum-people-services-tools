@@ -45,4 +45,18 @@ describe('CookieBanner', () => {
     expect(screen.queryByText(/utilizamos cookies/i)).not.toBeInTheDocument();
     expect(window.localStorage.getItem('unum_cookie_consent')).toBe('true');
   });
+
+  it('cita os anúncios do Google e leva à seção de anúncios da política', () => {
+    render(<CookieBanner />);
+
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
+
+    expect(screen.getByText(/anúncios do Google/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Política de Privacidade' })).toHaveAttribute(
+      'href',
+      '/privacidade#anuncios',
+    );
+  });
 });

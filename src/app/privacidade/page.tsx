@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { ShieldCheck, Lock, Eye, FileText } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, FileText, Megaphone } from 'lucide-react';
 
 export const metadata = {
   title: 'Política de Privacidade | Unum People',
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
               Política de Privacidade
             </h1>
             <p className="text-brand-grey font-medium uppercase tracking-widest text-xs">
-              Última atualização: Maio de 2026
+              Última atualização: Outubro de 2026
             </p>
           </header>
 
@@ -63,6 +63,36 @@ export default function PrivacyPage() {
                 <li>Analisar o uso técnico para correções de bugs.</li>
                 <li>Melhorar a experiência do usuário.</li>
               </ul>
+            </section>
+
+            <section id="anuncios" className="mb-10 scroll-mt-28">
+              <div className="flex items-center gap-3 mb-4 text-brand-blue">
+                <Megaphone size={24} />
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">Anúncios e cookies</h2>
+              </div>
+              <div className="space-y-4 text-brand-grey leading-relaxed">
+                <p>
+                  Este site exibe anúncios do Google AdSense. Fornecedores terceiros, incluindo o Google, usam cookies para exibir anúncios com base em visitas anteriores do usuário a este site ou a outros sites.
+                </p>
+                <p>
+                  O uso de cookies de publicidade permite que o Google e os parceiros dele exibam anúncios para você com base nas suas visitas a este site e/ou a outros sites na internet.
+                </p>
+                <p>
+                  Você pode desativar a publicidade personalizada nas{' '}
+                  <a href="https://adssettings.google.com" className="text-brand-blue font-bold hover:underline">Configurações de anúncios do Google</a>.
+                  Também pode recusar o uso de cookies de publicidade personalizada de outros fornecedores em{' '}
+                  <a href="https://www.aboutads.info" className="text-brand-blue font-bold hover:underline">www.aboutads.info</a>.
+                </p>
+                <p>
+                  Outras redes de anúncios certificadas pelo Google também podem exibir anúncios aqui, com cookies próprios. A{' '}
+                  <a href="https://support.google.com/adsense/answer/94149" className="text-brand-blue font-bold hover:underline">lista de redes certificadas</a>{' '}
+                  fica na Central de Ajuda do Google AdSense, e cada rede explica no próprio site como recusar os cookies dela.
+                </p>
+                <p>
+                  Para entender o que o Google faz com essas informações, veja{' '}
+                  <a href="https://policies.google.com/technologies/ads" className="text-brand-blue font-bold hover:underline">Como o Google usa cookies em publicidade</a>.
+                </p>
+              </div>
             </section>
 
             <section className="mb-10">
