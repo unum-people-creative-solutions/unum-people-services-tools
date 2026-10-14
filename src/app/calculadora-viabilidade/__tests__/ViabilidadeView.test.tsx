@@ -113,6 +113,51 @@ describe('ViabilidadeView', () => {
     expect(screen.getByText(/Margem de contribuição negativa/i)).toBeInTheDocument();
   });
 
+  describe('arredonda pelo valor exato, sem ruído de ponto flutuante', () => {
+    const preencherBase = (ticket: string, custo: string, cpc: string, conversao: string) => {
+      fireEvent.change(screen.getByLabelText(/Ticket Médio/i), { target: { value: ticket } });
+      fireEvent.change(screen.getByLabelText(/Custo Variável/i), { target: { value: custo } });
+      fireEvent.change(screen.getByLabelText(/CPC Médio/i), { target: { value: cpc } });
+      fireEvent.change(screen.getByLabelText(/Taxa de Conversão da LP/i), { target: { value: conversao } });
+    };
+    const textoDaTela = () => (document.body.textContent ?? '').replace(/ /g, ' ');
+
+    it('orçamento: R$ 500 a R$ 1,50 por clique com 3% de conversão dá 10 oportunidades', () => {
+      render(<ViabilidadeView />);
+      fireEvent.click(screen.getByText(/Tenho um orçamento/i).closest('button')!);
+      preencherBase('300', '60', '1,50', '3');
+      fireEvent.change(screen.getByLabelText(/Orçamento da Campanha/i), { target: { value: '500' } });
+      fireEvent.click(screen.getByText(/Gerar Diagnóstico/i));
+
+      // 500 ÷ 1,5 × 0,03 = 10 (em ponto flutuante: 9,999…)
+      expect(textoDaTela()).toContain('cerca de 10 oportunidades');
+    });
+
+    it('orçamento: R$ 600 com margem de R$ 60 pede 10 vendas, não 11', () => {
+      render(<ViabilidadeView />);
+      fireEvent.click(screen.getByText(/Tenho um orçamento/i).closest('button')!);
+      preencherBase('64,35', '4,35', '1', '10');
+      fireEvent.change(screen.getByLabelText(/Orçamento da Campanha/i), { target: { value: '600' } });
+      fireEvent.click(screen.getByText(/Gerar Diagnóstico/i));
+
+      // 64,35 − 4,35 = 60 (em ponto flutuante: 59,999…), e 600 ÷ 60 = 10
+      expect(textoDaTela()).toContain('transformar 10 dessas oportunidades');
+    });
+
+    it('meta: 5 clientes a R$ 2 por clique, 5% de conversão e 20% de fechamento dão 500 cliques e 25 oportunidades', () => {
+      render(<ViabilidadeView />);
+      fireEvent.click(screen.getByText(/Tenho uma meta/i).closest('button')!);
+      preencherBase('300', '60', '2', '5');
+      fireEvent.change(screen.getByLabelText(/Meta de Clientes/i), { target: { value: '5' } });
+      fireEvent.change(screen.getByLabelText(/Taxa de Fechamento \(Vendas\)/i), { target: { value: '20' } });
+      fireEvent.click(screen.getByText(/Gerar Diagnóstico/i));
+
+      // 5 × 2 ÷ (0,05 × 0,2) = 1.000; 1.000 ÷ 2 = 500 cliques; 500 × 0,05 = 25
+      expect(textoDaTela()).toContain('aproximadamente 25 oportunidades');
+      expect(screen.getByText('Visitantes').nextElementSibling).toHaveTextContent(/^500$/);
+    });
+  });
+
   it('põe um anúncio entre a ferramenta e o guia e outro depois do guia', () => {
     render(<ViabilidadeView><p>GUIA-TESTE</p></ViabilidadeView>);
 

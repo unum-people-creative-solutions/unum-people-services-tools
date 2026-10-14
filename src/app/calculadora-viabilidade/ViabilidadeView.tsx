@@ -37,6 +37,11 @@ interface FormData {
   taxaFechamento: number;
 }
 
+// Taxas e centavos viram frações sem representação exata em ponto flutuante
+// (500 ÷ 1,5 × 0,03 dá 9,999…), e o Math.floor/ceil mostrava 9 onde a conta
+// exata dá 10. Arredondar para 6 casas antes de truncar tira esse ruído.
+const semRuido = (valor: number) => Math.round(valor * 1e6) / 1e6;
+
 const INITIAL_FORM_DATA: FormData = {
   ticketMedio: 0,
   custoVariavel: 0,
@@ -91,9 +96,9 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
       const inviavel = txVendasExigida > 20;
 
       return {
-        vendasPE: Math.ceil(vendasPE),
-        visitantes: Math.floor(visitantes),
-        leads: Math.floor(leads),
+        vendasPE: Math.ceil(semRuido(vendasPE)),
+        visitantes: Math.floor(semRuido(visitantes)),
+        leads: Math.floor(semRuido(leads)),
         txVendasExigida: txVendasExigida.toFixed(1),
         orcamento,
         ticketMedio,
@@ -112,8 +117,8 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
 
       return {
         orcamentoNecessario: orcamentoNecessario.toFixed(2),
-        visitantes: Math.floor(visitantes),
-        leads: Math.floor(leads),
+        visitantes: Math.floor(semRuido(visitantes)),
+        leads: Math.floor(semRuido(leads)),
         cac: cac.toFixed(2),
         roi: (roi * 100).toFixed(1),
         clientesMeta,
