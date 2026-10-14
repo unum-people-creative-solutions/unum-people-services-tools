@@ -3,22 +3,26 @@ import PrecificacaoView from '../PrecificacaoView';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Header e Footer para focar na lógica da view
-vi.mock('../../components/Header', () => ({
-  Header: () => <div data-testid="header" />
+vi.mock('../../../components/Header', () => ({
+  Header: ({ onOpenHelp }: { onOpenHelp?: () => void }) => (
+    <div data-testid="header">
+      <button onClick={onOpenHelp}>Ajuda</button>
+    </div>
+  )
 }));
-vi.mock('../../components/Footer', () => ({
+vi.mock('../../../components/Footer', () => ({
   Footer: () => <div data-testid="footer" />
 }));
-vi.mock('../../components/AdUnit', () => ({
-  AdUnit: () => <div data-testid="ad-unit" />
+vi.mock('../../../components/AdUnit', () => ({
+  AdUnit: ({ slot }: { slot?: string }) => <div data-testid="ad-unit" data-ad-slot={slot} />
 }));
 
 // true quando `depois` vem depois de `antes` na ordem do documento
 const vemDepois = (antes: Element, depois: Element) =>
   Boolean(antes.compareDocumentPosition(depois) & Node.DOCUMENT_POSITION_FOLLOWING);
 
-// Os blocos do AdSense renderizados pelo AdUnit real, na ordem do documento
-const anunciosNaTela = () => Array.from(document.querySelectorAll('ins[data-ad-slot]'));
+// Os blocos de anúncio (AdUnit simulado), na ordem do documento
+const anunciosNaTela = () => screen.queryAllByTestId('ad-unit');
 
 
 describe('PrecificacaoView', () => {
