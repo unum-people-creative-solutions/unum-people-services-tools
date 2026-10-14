@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useServices } from '../../hooks/useServices';
 import { ServiceCharts } from '../../components/ServiceCharts';
 import { ServiceList } from '../../components/ServiceList';
@@ -17,17 +17,7 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isLoaded) {
-      const hasSeenModal = localStorage.getItem('unum_welcome_seen');
-      if (!hasSeenModal) {
-        setTimeout(() => setIsHelpOpen(true), 0);
-      }
-    }
-  }, [isLoaded]);
-
   const closeHelp = () => {
-    localStorage.setItem('unum_welcome_seen', 'true');
     setIsHelpOpen(false);
   };
 

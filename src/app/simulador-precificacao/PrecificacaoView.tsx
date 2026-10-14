@@ -37,17 +37,7 @@ export default function PrecificacaoView({ children }: { children?: React.ReactN
   const idHorasEst = React.useId();
   const idImpostos = React.useId();
 
-  React.useEffect(() => {
-    if (isLoaded) {
-      const hasSeenModal = localStorage.getItem('unum_pricing_welcome_seen');
-      if (!hasSeenModal) {
-        setTimeout(() => setIsHelpOpen(true), 0);
-      }
-    }
-  }, [isLoaded]);
-
   const closeHelp = () => {
-    localStorage.setItem('unum_pricing_welcome_seen', 'true');
     setIsHelpOpen(false);
   };
 

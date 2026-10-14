@@ -112,4 +112,21 @@ describe('PrecificacaoView', () => {
     expect(vemDepois(meio, guia)).toBe(true);
     expect(vemDepois(guia, fim)).toBe(true);
   });
+
+  it('não abre a ajuda sozinha na primeira visita, e o botão Ajuda abre', () => {
+    render(<PrecificacaoView />);
+    // Duas rodadas: o carregamento do localStorage agenda um timer, e o
+    // efeito que reage ao carregamento poderia agendar outro.
+    act(() => {
+      vi.runAllTimers();
+    });
+    act(() => {
+      vi.runAllTimers();
+    });
+
+    expect(screen.queryByRole('button', { name: /Entendi, Prosseguir/i })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ajuda' }));
+    expect(screen.getByRole('button', { name: /Entendi, Prosseguir/i })).toBeInTheDocument();
+  });
 });
