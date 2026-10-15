@@ -13,6 +13,13 @@ describe('Footer', () => {
     expect(screen.getByText(/© 2026 Unum People/i)).toBeInTheDocument();
   });
 
+  it('mostra a logo texto à esquerda e só o símbolo à direita', () => {
+    render(<Footer />);
+    expect(screen.getByRole('img', { name: 'Unum People' })).toHaveAttribute('src', '/images/logo_texto.png');
+    expect(screen.getByRole('img', { name: 'Símbolo Unum People' })).toHaveAttribute('src', '/images/logo_simbolo.png');
+    expect(screen.queryByRole('heading', { name: 'Unum People' })).not.toBeInTheDocument();
+  });
+
   it('deve conter links para a Unum People', () => {
     render(<Footer />);
     const links = screen.getAllByRole('link');
