@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     images: ['/images/logo_texto.png'],
   },
   other: {
-    'google-adsense-account': 'ca-pub-7103356380607005',
+    'google-adsense-account': 'ca-pub-6348382549206741',
   },
 };
 
@@ -75,7 +75,7 @@ export default function RootLayout({
       <head>
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7103356380607005"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6348382549206741"
           crossOrigin="anonymous"
         />
       </head>
