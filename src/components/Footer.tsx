@@ -12,9 +12,17 @@ export function Footer() {
               href="https://unumpeople.com.br/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-block hover:opacity-80 transition-opacity"
+              className="inline-block hover:opacity-80 transition-opacity mb-3"
             >
-              <h3 className="text-lg font-bold mb-2">Unum People</h3>
+              <div className="relative w-72 h-15 brightness-0 invert">
+                <Image 
+                  src="/images/logo_texto.png" 
+                  alt="Unum People" 
+                  fill
+                  className="object-contain object-left"
+                  sizes="288px"
+                />
+              </div>
             </a>
             <p className="text-sm text-white/70 max-w-sm leading-relaxed mb-2">
               O caminho mais curto entre você e o seu cliente.
@@ -25,24 +33,15 @@ export function Footer() {
               href="https://unumpeople.com.br/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+              className="inline-block hover:opacity-80 transition-opacity"
             >
-              <div className="relative w-12 h-12 brightness-0 invert">
+              <div className="relative w-16 h-16 brightness-0 invert">
                 <Image 
                   src="/images/logo_simbolo.png" 
-                  alt="Unum Simbolo" 
+                  alt="Símbolo Unum People" 
                   fill
                   className="object-contain"
-                  sizes="48px"
-                />
-              </div>
-              <div className="relative w-28 h-6 brightness-0 invert">
-                <Image 
-                  src="/images/logo_texto.png" 
-                  alt="Unum People" 
-                  fill
-                  className="object-contain"
-                  sizes="112px"
+                  sizes="64px"
                 />
               </div>
             </a>
