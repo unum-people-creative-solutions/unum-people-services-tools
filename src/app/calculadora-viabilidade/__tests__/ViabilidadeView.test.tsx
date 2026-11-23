@@ -115,7 +115,7 @@ describe('Vale a pena anunciar?', () => {
         'Material, frete, taxa da maquininha. Se deixar em zero, o resultado fica bom demais.',
       );
       expect(screen.getByLabelText('Quanto custa cada clique')).toHaveAccessibleDescription(
-        'No painel aparece como "CPC médio".',
+        'Na sua plataforma de anúncios aparece como "CPC médio".',
       );
       expect(screen.getByLabelText('De cada 100 que clicam, quantos chamam você')).toHaveAccessibleDescription(
         'No WhatsApp, por formulário ou ligação.',

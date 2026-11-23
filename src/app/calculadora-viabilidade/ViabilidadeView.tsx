@@ -227,7 +227,7 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
         <Bloco numero={2} titulo="Seu anúncio" apoio="Use os números do painel do anúncio, se já tiver.">
           <Campo
             rotulo="Quanto custa cada clique"
-            ajuda={'No painel aparece como "CPC médio".'}
+            ajuda={'Na sua plataforma de anúncios aparece como "CPC médio".'}
             prefixo="R$"
             valor={entradas.cpc}
             onChange={(cpc) => mudar({ cpc })}
