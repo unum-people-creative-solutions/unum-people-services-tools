@@ -1,63 +1,19 @@
-'use client';
+import Link from 'next/link';
 
-import Image from 'next/image';
+const linkClasses = 'inline-flex min-h-11 items-center text-ui-muted no-underline hover:text-ui-brand-purple';
 
 export function Footer() {
   return (
-    <footer className="brand-gradient text-white py-12 mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-white/10 pb-8 mb-8">
-          <div>
-            <a 
-              href="https://unumpeople.com.br/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block hover:opacity-80 transition-opacity mb-3"
-            >
-              <div className="relative w-72 h-15 brightness-0 invert">
-                <Image 
-                  src="/images/logo_texto.png" 
-                  alt="Unum People" 
-                  fill
-                  className="object-contain object-left"
-                  sizes="288px"
-                />
-              </div>
-            </a>
-            <p className="text-sm text-white/70 max-w-sm leading-relaxed mb-2">
-              O caminho mais curto entre você e o seu cliente.
-            </p>
-          </div>
-          <div className="flex md:justify-end">
-            <a 
-              href="https://unumpeople.com.br/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-block hover:opacity-80 transition-opacity"
-            >
-              <div className="relative w-16 h-16 brightness-0 invert">
-                <Image 
-                  src="/images/logo_simbolo.png" 
-                  alt="Símbolo Unum People" 
-                  fill
-                  className="object-contain"
-                  sizes="64px"
-                />
-              </div>
-            </a>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/50 uppercase tracking-widest font-semibold">
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-            <p>© 2026 Unum People. Todos os direitos reservados.</p>
-            <a href="https://unumpeople.com.br/sobre" className="hover:text-white transition-colors">Sobre</a>
-            <a href="https://unumpeople.com.br/contato" className="hover:text-white transition-colors">Contato</a>
-            <a href="https://unumpeople.com.br/termos" className="hover:text-white transition-colors">Termos</a>
-            <p>Seus dados ficam neste aparelho.</p>
-            <a href="/privacidade" className="hover:text-white transition-colors">Privacidade</a>
-          </div>
-          <p>People to People (P2P) Ecosystem</p>
-        </div>
+    <footer className="mt-auto border-t border-ui-line bg-ui-bg">
+      <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 px-5 pb-7 pt-6 text-[13px] text-ui-muted">
+        <span>Seus dados ficam neste aparelho.</span>
+        <nav aria-label="Rodapé" className="flex flex-wrap gap-x-[18px] gap-y-2">
+          <Link href="/privacidade" className={linkClasses}>Privacidade</Link>
+          <a href="https://unumpeople.com.br/sobre" className={linkClasses}>Sobre a Unum People</a>
+          <a href="https://unumpeople.com.br/contato" className={linkClasses}>Contato</a>
+          <a href="https://unumpeople.com.br/termos" className={linkClasses}>Termos</a>
+        </nav>
+        <span>© 2026 Unum People</span>
       </div>
     </footer>
   );

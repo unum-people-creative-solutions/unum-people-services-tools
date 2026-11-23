@@ -79,8 +79,13 @@ export function usePricing() {
     }));
   };
 
+  const reset = () => {
+    setData(DEFAULT_PRICING_DATA);
+  };
+
   // Cálculos
-  const totalCustosFixos = Object.values(data.custosFixos).reduce((a, b) => a + b, 0);
+  const { aluguel, energia, internet, contador, softwares, equipe, proLabore, outras } = data.custosFixos;
+  const totalCustosFixos = aluguel + energia + internet + contador + softwares + equipe + proLabore + (outras ?? 0);
   
   const horasFaturaveis = 
     (data.capacidade.diasTrabalhados * data.capacidade.horasDiarias) * 
@@ -107,6 +112,7 @@ export function usePricing() {
     updateCustosFixos,
     updateCapacidade,
     updateServico,
+    reset,
     isLoaded,
     calculations: {
       totalCustosFixos,

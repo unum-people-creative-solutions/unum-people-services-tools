@@ -5,6 +5,8 @@ export interface Service {
   complexidade: number;
   padronizacao: number;
   lucratividade: number;
+  /** As 24 respostas (true = sim), na ordem das perguntas de QUESTIONS. Ausente em serviços cadastrados antes. */
+  respostas?: boolean[];
 }
 
 export interface PricingData {
@@ -17,6 +19,8 @@ export interface PricingData {
     softwares: number;
     equipe: number;
     proLabore: number;
+    /** Guia do MEI (DAS) e qualquer conta fixa sem campo próprio. Dados antigos não têm. */
+    outras?: number;
   };
   // Capacidade Produtiva
   capacidade: {
@@ -45,7 +49,7 @@ export interface Question {
 export const QUESTIONS: Record<StepKey, Question[]> = {
   esforco: [
     { id: 'e1', text: 'A execução operacional do serviço consome, no total, mais de 8 horas de trabalho ativo (o equivalente a um turno completo de um profissional)?' },
-    { id: 'e2', text: 'O processo exige a alocação de três ou more pessoas (seja de forma simultânea ou em etapas de repasse) para ser concluído do início ao fim?' },
+    { id: 'e2', text: 'O processo exige a alocação de três ou mais pessoas (seja de forma simultânea ou em etapas de repasse) para ser concluído do início ao fim?' },
     { id: 'e3', text: 'O processo de alinhamento, coleta de requisitos, orçamentos complexos ou medições consome mais de 2 horas de trabalho antes do início efetivo da produção?' },
     { id: 'e4', text: 'A conclusão do serviço obriga o deslocamento físico da equipe para fora da base da empresa (ex: instalações em clientes, montagens externas)?' },
     { id: 'e5', text: 'A execução exige a configuração demorada de maquinário primário, paralisação de outros setores ou uso de equipamentos que impedem que outros serviços sejam feitos ao mesmo tempo?' },
