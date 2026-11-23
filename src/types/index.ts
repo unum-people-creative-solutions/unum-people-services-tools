@@ -19,6 +19,8 @@ export interface PricingData {
     softwares: number;
     equipe: number;
     proLabore: number;
+    /** Guia do MEI (DAS) e qualquer conta fixa sem campo próprio. Dados antigos não têm. */
+    outras?: number;
   };
   // Capacidade Produtiva
   capacidade: {

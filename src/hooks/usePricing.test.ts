@@ -31,6 +31,28 @@ describe('usePricing', () => {
     expect(result.current.calculations.totalCustosFixos).toBe(1200);
   });
 
+  it('soma "outras" (guia do MEI) às contas fixas; dado antigo sem o campo vale 0', () => {
+    window.localStorage.setItem(
+      'pricing_data',
+      JSON.stringify({
+        custosFixos: { aluguel: 1000, energia: 200, internet: 0, contador: 0, softwares: 0, equipe: 0, proLabore: 0 },
+        capacidade: { diasTrabalhados: 22, horasDiarias: 8, percentualOciosidade: 20 },
+        servico: { nome: '', horasEstimadas: 0, materiaisDiretos: 0, deslocamento: 0, impostosPercentual: 0, precoDesejado: 0 },
+      }),
+    );
+    const { result } = renderHook(() => usePricing());
+    act(() => {
+      vi.runAllTimers();
+    });
+    expect(result.current.calculations.totalCustosFixos).toBe(1200);
+
+    act(() => {
+      result.current.updateCustosFixos({ outras: 66 });
+    });
+    expect(result.current.calculations.totalCustosFixos).toBe(1266);
+    expect(JSON.parse(window.localStorage.getItem('pricing_data') as string).custosFixos.outras).toBe(66);
+  });
+
   it('deve calcular as horas faturáveis corretamente', () => {
     const { result } = renderHook(() => usePricing());
     

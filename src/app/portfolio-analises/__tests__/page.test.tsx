@@ -13,7 +13,7 @@ describe('página de Quais serviços compensam', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Quais serviços compensam' })).toBeInTheDocument();
     const detalhes = screen.getByText('Como funciona esta conta').closest('details') as HTMLDetailsElement;
     expect(detalhes.open).toBe(false);
-    expect(detalhes).toHaveTextContent('Guia do Mapeamento Estratégico de Portfólio');
+    expect(detalhes).toHaveTextContent('Como descobrir quais serviços compensam');
   });
 
   it('usa o título e a descrição da spec (RF-F3b-11), sem repetir o sufixo do site', () => {

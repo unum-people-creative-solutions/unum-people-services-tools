@@ -24,7 +24,8 @@ const cartaoVisivel = (visivel: boolean) => {
 };
 
 const CHAVE = 'pricing_data';
-const OUTRAS_CONTAS = '+ Outras contas (internet, contador, programas, funcionários)';
+const OUTRAS_CONTAS = '+ Outras contas (internet, contador, programas, funcionários, DAS)';
+const DAS = 'Guia do MEI (DAS) e outras contas';
 
 // Exemplo do guia (CA-F2-04): contas fixas 4.400, 22 dias, 8 h, 20% parado,
 // serviço de 3 h, material 40, transporte 20, imposto 6%
@@ -127,6 +128,7 @@ describe('Quanto cobrar pelo serviço', () => {
       'Contador',
       'Programas e assinaturas',
       'Salários de funcionários',
+      'Guia do MEI (DAS) e outras contas',
       'Dias por mês',
       'Horas por dia',
       'Tempo sem vender',
@@ -144,7 +146,11 @@ describe('Quanto cobrar pelo serviço', () => {
     it.each([
       ['Quanto você tira para viver', 'Seu salário (pró-labore). Sem ele, o preço só paga as contas e você trabalha de graça.'],
       ['Tempo sem vender', 'Orçamento, deslocamento, espera, burocracia. Se não souber, deixe 20%.'],
-      ['Imposto na nota', 'MEI: deixe 0% e coloque a guia mensal (DAS) nas contas fixas.'],
+      ['Guia do MEI (DAS) e outras contas', 'A guia mensal do MEI e qualquer conta fixa que não esteja acima.'],
+      [
+        'Imposto na nota',
+        'MEI: deixe 0% e coloque a guia mensal (DAS) em "Guia do MEI (DAS) e outras contas".',
+      ],
     ])('o campo "%s" liga a ajuda por aria-describedby', (rotulo, ajuda) => {
       montar();
       const campo = screen.getByLabelText(rotulo);
@@ -153,12 +159,16 @@ describe('Quanto cobrar pelo serviço', () => {
       expect(campo).toHaveAccessibleDescription(ajuda);
     });
 
-    it('o recolhível "Outras contas" guarda os quatro campos e só eles', () => {
+    it('o recolhível "Outras contas" guarda os cinco campos e só eles, com o DAS depois dos salários', () => {
       montar();
       const detalhes = outrasContas();
-      ['Internet e telefone', 'Contador', 'Programas e assinaturas', 'Salários de funcionários'].forEach((r) =>
+      ['Internet e telefone', 'Contador', 'Programas e assinaturas', 'Salários de funcionários', DAS].forEach((r) =>
         expect(within(detalhes).getByLabelText(r)).toBeInTheDocument(),
       );
+      const ordem = within(detalhes)
+        .getAllByRole('textbox')
+        .map((c) => (c as HTMLInputElement).labels?.[0]?.textContent);
+      expect(ordem.slice(-2)).toEqual(['Salários de funcionários', DAS]);
       expect(within(detalhes).queryByLabelText('Aluguel e condomínio')).not.toBeInTheDocument();
       expect(within(detalhes).queryByLabelText('Quanto você tira para viver')).not.toBeInTheDocument();
     });
@@ -316,13 +326,20 @@ describe('Quanto cobrar pelo serviço', () => {
       expect(outrasContas().open).toBe(true);
     });
 
-    it.each(['contador', 'softwares', 'equipe'])('abre sozinho se só "%s" estiver preenchido', (chave) => {
+    it.each(['contador', 'softwares', 'equipe', 'outras'])('abre sozinho se só "%s" estiver preenchido', (chave) => {
       guardar({
         ...EXEMPLO,
         custosFixos: { aluguel: 0, energia: 0, internet: 0, contador: 0, softwares: 0, equipe: 0, proLabore: 0, [chave]: 10 },
       });
       montar();
       expect(outrasContas().open).toBe(true);
+    });
+
+    it('com só o DAS preenchido, "Outras contas" abre sozinho (RF-F4-14)', () => {
+      guardar({ ...EXEMPLO, custosFixos: { ...EXEMPLO.custosFixos, internet: 0, contador: 0, softwares: 0, outras: 66 } });
+      montar();
+      expect(outrasContas().open).toBe(true);
+      expect(screen.getByLabelText(DAS)).toHaveValue('66,00');
     });
 
     it('com os quatro em zero, abre fechado (mesmo com aluguel e pró-labore)', () => {
@@ -549,5 +566,72 @@ describe('Quanto cobrar — cobrar exatamente o mínimo mostrado', () => {
     montar();
     const resultado = screen.getByRole('heading', { name: 'Seu resultado' }).closest('section') as HTMLElement;
     expect(within(resultado).getByText('Prejuízo')).toBeInTheDocument();
+  });
+});
+
+// CA-F4-09 (spec f4-guias, emenda de 23/11/2026): o campo do DAS entra em toda a conta.
+// Com R$ 66 de DAS sobre o exemplo: total 4.466,00; conta fixa por hora 4.466 ÷ 140,8 = 31,71875;
+// custo do serviço 31,71875 × 3 + 60 = 155,15625; preço mínimo 155,15625 ÷ 0,94 = 165,0598;
+// cobrando 250: sobra 250 × 0,94 − 155,15625 = 79,84 (31,94 de cada R$ 100).
+describe('Quanto cobrar: guia do MEI (DAS) e outras contas', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    observadores = [];
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  const comDas = (outras: number, preco = 0) => ({
+    ...comPreco(preco),
+    custosFixos: { ...EXEMPLO.custosFixos, outras },
+  });
+
+  it('com R$ 66 de DAS, o total, a conta fixa por hora e o preço mínimo mudam', () => {
+    guardar(comDas(66));
+    montar();
+    expect(valorDe('Total por mês')).toHaveTextContent('R$ 4.466,00');
+    expect(valorDe('Horas que você vende')).toHaveTextContent('140,8 h');
+    expect(valorDe('Conta fixa por hora')).toHaveTextContent('R$ 31,72');
+    expect(screen.getByText('Preço mínimo deste serviço').parentElement).toHaveTextContent('R$ 165,06');
+  });
+
+  it('com R$ 66 de DAS e preço de R$ 250, a sobra e o "de cada R$ 100" mudam', () => {
+    guardar(comDas(66, 250));
+    montar();
+    const status = within(cartao()).getByRole('status');
+    expect(within(status).getByText('De cada R$ 100, sobram R$ 31,94.')).toBeInTheDocument();
+    expect(within(status).getByText('Sobra no bolso').nextElementSibling).toHaveTextContent('R$ 79,84');
+  });
+
+  it('digitar o DAS no campo muda o total e grava "outras" no mesmo pricing_data', () => {
+    guardar(EXEMPLO);
+    montar();
+    digitar(DAS, 66);
+    expect(valorDe('Total por mês')).toHaveTextContent('R$ 4.466,00');
+    expect(guardado().custosFixos.outras).toBe(66);
+    expect(Object.keys(guardado())).toEqual(['custosFixos', 'capacidade', 'servico']);
+  });
+
+  it('o exemplo sem DAS continua com os mesmos números (4.400,00; 31,25; 163,56)', () => {
+    guardar(EXEMPLO);
+    montar();
+    expect(screen.getByLabelText(DAS)).toHaveValue('0,00');
+    expect(valorDe('Total por mês')).toHaveTextContent('R$ 4.400,00');
+    expect(valorDe('Conta fixa por hora')).toHaveTextContent('R$ 31,25');
+    expect(screen.getByText('Preço mínimo deste serviço').parentElement).toHaveTextContent('R$ 163,56');
+  });
+
+  it('um dado antigo, sem "outras", abre sem erro e sem NaN', () => {
+    const erro = vi.spyOn(console, 'error').mockImplementation(() => {});
+    guardar(EXEMPLO);
+    expect(guardado().custosFixos).not.toHaveProperty('outras');
+    montar();
+    expect(screen.getByLabelText(DAS)).toHaveValue('0,00');
+    expect(cartao()).not.toHaveTextContent('NaN');
+    expect(erro).not.toHaveBeenCalled();
+    erro.mockRestore();
   });
 });

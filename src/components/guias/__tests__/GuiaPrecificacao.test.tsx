@@ -2,23 +2,55 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GuiaPrecificacao, EXEMPLO_PRECIFICACAO } from '../GuiaPrecificacao';
 import PrecificacaoView from '../../../app/simulador-precificacao/PrecificacaoView';
+import { regrasDoGuia, textoDe, topico } from './regras';
 
-const TOPICOS = [
-  'Para que serve',
-  'Como a conta é feita',
-  'Exemplo com números',
-  'Como ler o resultado',
-  'Erros comuns',
-  'Perguntas frequentes',
-  'Aviso',
-  'Quem fez',
-];
+regrasDoGuia({
+  nome: 'GuiaPrecificacao',
+  guia: () => <GuiaPrecificacao />,
+  titulo: 'Como calcular o preço do seu serviço',
+  rotulosDoPasso: [
+    'Aluguel e condomínio',
+    'Luz e água',
+    'Quanto você tira para viver',
+    'Guia do MEI (DAS) e outras contas',
+    'Dias por mês',
+    'Horas por dia',
+    'Tempo sem vender',
+    'Horas que leva',
+    'Material',
+    'Transporte e extras',
+    'Imposto na nota',
+    'Quanto você quer cobrar?',
+  ],
+  selos: ['Falta pouco', 'Saudável', 'Sobra pouco', 'Prejuízo'],
+  perguntas: ['Meus dados ficam salvos?', /MEI/, /\bDAS\b/, '“Guia do MEI (DAS) e outras contas”'],
+});
 
-// O Intl formata moeda com espaço não separável (U+00A0)
-const textoDe = (el: Element) => (el.textContent ?? '').replace(/ /g, ' ');
-const contarPalavras = (el: Element) => textoDe(el).split(/\s+/).filter(Boolean).length;
+describe('GuiaPrecificacao: campo do DAS (RF-F4-17)', () => {
+  const RESPOSTA = 'Guia do MEI (DAS) e outras contas';
 
-describe('GuiaPrecificacao', () => {
+  it('o passo a passo e a resposta de MEI apontam para o campo pelo nome literal', () => {
+    render(<GuiaPrecificacao />);
+    expect(textoDe(topico('Passo a passo'))).toContain(`“${RESPOSTA}”`);
+    const faq = topico('Perguntas frequentes');
+    const mei = Array.from(faq.querySelectorAll('dt')).find((dt) => /MEI/.test(dt.textContent ?? ''));
+    expect(mei).toBeDefined();
+    expect(textoDe(mei!.nextElementSibling as Element)).toContain(`“${RESPOSTA}”`);
+  });
+
+  it('o rótulo citado existe na tela do "Quanto cobrar"', () => {
+        window.localStorage.clear();
+    vi.useFakeTimers();
+    render(<PrecificacaoView />);
+    act(() => {
+      vi.runAllTimers();
+    });
+    vi.useRealTimers();
+    expect(screen.getByLabelText(RESPOSTA)).toBeInTheDocument();
+  });
+});
+
+describe('GuiaPrecificacao: exemplo e ferramenta real', () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.useFakeTimers();
@@ -27,31 +59,19 @@ describe('GuiaPrecificacao', () => {
     vi.useRealTimers();
   });
 
-  it('tem um título e os oito tópicos, na ordem', () => {
-    render(<GuiaPrecificacao />);
-    expect(screen.getByRole('heading', { level: 2, name: /Guia do Simulador de Precificação/ })).toBeInTheDocument();
-    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(TOPICOS);
-    expect(screen.getByRole('region', { name: /Guia do Simulador de Precificação/ }).tagName).toBe('SECTION');
-  });
-
-  it('tem pelo menos 600 palavras', () => {
-    const { container } = render(<GuiaPrecificacao />);
-    expect(contarPalavras(container)).toBeGreaterThanOrEqual(600);
-  });
-
   it('mostra no exemplo os resultados do simulador', () => {
     render(<GuiaPrecificacao />);
-    const exemplo = textoDe(screen.getByRole('heading', { name: 'Exemplo com números' }).parentElement!);
+    const exemplo = textoDe(topico('Exemplo com números'));
     expect(exemplo).toContain('R$ 4.400,00');
-    expect(exemplo).toContain('140,8 horas faturáveis');
+    expect(exemplo).toContain('140,8 horas');
     expect(exemplo).toContain('R$ 31,25');
     expect(exemplo).toContain('R$ 153,75');
     expect(exemplo).toContain('R$ 163,56');
     expect(exemplo).toContain('R$ 81,25');
-    expect(exemplo).toContain('32,5%');
+    expect(exemplo).toContain('R$ 32,50');
   });
 
-  it('com as entradas do exemplo, o simulador real mostra o mesmo piso, lucro e margem', async () => {
+  it('com as entradas do exemplo, o simulador real mostra o mesmo preço mínimo, sobra e margem', async () => {
     const e = EXEMPLO_PRECIFICACAO;
     render(<PrecificacaoView />);
     act(() => {
@@ -88,5 +108,36 @@ describe('GuiaPrecificacao', () => {
     expect(tela).toContain('R$ 163,56');
     expect(tela).toContain('R$ 81,25');
     expect(tela).toContain('sobram R$ 32,50'); // F2 RF-F2-18: margem de 32,5% dita como "de cada R$ 100"
+  });
+
+  it('com o preço abaixo do mínimo, a ferramenta mostra o prejuízo que o guia cita', async () => {
+    const e = EXEMPLO_PRECIFICACAO;
+    render(<PrecificacaoView />);
+    act(() => {
+      vi.runAllTimers();
+    });
+    const preencher = async (rotulo: RegExp, valor: number) => {
+      await act(async () => {
+        fireEvent.change(screen.getByLabelText(rotulo), { target: { value: String(valor) } });
+        vi.runAllTimers();
+      });
+    };
+    await preencher(/Aluguel e condomínio/i, e.custosFixos.aluguel);
+    await preencher(/Luz e água/i, e.custosFixos.energia);
+    await preencher(/Internet e telefone/i, e.custosFixos.internet);
+    await preencher(/Contador/i, e.custosFixos.contador);
+    await preencher(/Programas e assinaturas/i, e.custosFixos.softwares);
+    await preencher(/Quanto você tira para viver/i, e.custosFixos.proLabore);
+    await preencher(/Dias por mês/i, e.capacidade.diasTrabalhados);
+    await preencher(/Horas por dia/i, e.capacidade.horasDiarias);
+    await preencher(/Tempo sem vender/i, e.capacidade.percentualOciosidade);
+    await preencher(/Horas que leva/i, e.servico.horasEstimadas);
+    await preencher(/Material/i, e.servico.materiaisDiretos);
+    await preencher(/Transporte e extras/i, e.servico.deslocamento);
+    await preencher(/Imposto na nota/i, e.servico.impostosPercentual);
+    await preencher(/Quanto você quer cobrar/i, e.abaixoDoMinimo.preco);
+
+    expect(textoDe(document.body)).toContain('Você perde R$ 12,75 em cada venda');
+    expect(screen.getByText('Prejuízo')).toBeInTheDocument();
   });
 });

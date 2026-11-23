@@ -13,7 +13,7 @@ describe('página de Quanto cobrar pelo serviço', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Quanto cobrar pelo serviço' })).toBeInTheDocument();
     const detalhes = screen.getByText('Como funciona esta conta').closest('details') as HTMLDetailsElement;
     expect(detalhes.open).toBe(false);
-    expect(detalhes).toHaveTextContent('Guia do Simulador de Precificação');
+    expect(detalhes).toHaveTextContent('Como calcular o preço do seu serviço');
   });
 
   it('usa o título e a descrição da spec (RF-F2-25), sem repetir o sufixo do site', () => {
