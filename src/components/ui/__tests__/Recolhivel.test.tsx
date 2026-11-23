@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import { Recolhivel } from '../Recolhivel';
 
 describe('Recolhivel', () => {
@@ -21,5 +21,26 @@ describe('Recolhivel', () => {
     expect(screen.getByRole('group')).not.toHaveAttribute('open');
     rerender(<Recolhivel titulo="Outras contas" aberto><p>x</p></Recolhivel>);
     expect(screen.getByRole('group')).toHaveAttribute('open');
+  });
+
+  it('avisa só quando abre (onAbrir), não quando fecha', () => {
+    const aoAbrir = vi.fn();
+    render(<Recolhivel titulo="Como funciona esta conta" onAbrir={aoAbrir}><p>guia</p></Recolhivel>);
+    const grupo = screen.getByRole('group');
+
+    grupo.setAttribute('open', '');
+    fireEvent(grupo, new Event('toggle'));
+    expect(aoAbrir).toHaveBeenCalledTimes(1);
+
+    grupo.removeAttribute('open');
+    fireEvent(grupo, new Event('toggle'));
+    expect(aoAbrir).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem onAbrir, abrir não quebra', () => {
+    render(<Recolhivel titulo="Guia"><p>x</p></Recolhivel>);
+    const grupo = screen.getByRole('group');
+    grupo.setAttribute('open', '');
+    expect(() => fireEvent(grupo, new Event('toggle'))).not.toThrow();
   });
 });

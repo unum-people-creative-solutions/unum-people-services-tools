@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { BarChart3, ChevronRight, CircleDollarSign, Megaphone } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { Convite } from '../components/ui/Convite';
+import { ConviteDaHome, VisitaDaHome } from '../components/MedicaoDaHome';
 
 export const metadata: Metadata = {
   title: { absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer' },
@@ -36,6 +36,7 @@ const contasDoNegocio = [
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
+      <VisitaDaHome />
       <Header />
 
       <main className="flex-1">
@@ -91,11 +92,7 @@ export default function Home() {
             </p>
           </section>
 
-          <Convite
-            texto="Quer que seus clientes achem você?"
-            link="Faça uma página com o seu WhatsApp →"
-            href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=home"
-          />
+          <ConviteDaHome />
         </div>
       </main>
 

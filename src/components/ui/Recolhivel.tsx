@@ -7,6 +7,8 @@ interface RecolhivelProps {
   aberto?: boolean;
   /** `simples` (sem moldura), `linha` (filete em cima) ou `cartao` (moldura própria). */
   variante?: 'simples' | 'linha' | 'cartao';
+  /** Chamado quando a pessoa abre (não quando fecha). */
+  onAbrir?: () => void;
   children: React.ReactNode;
 }
 
@@ -16,9 +18,15 @@ const porVariante = {
   cartao: 'rounded-xl border border-ui-line bg-ui-bg px-5 py-1',
 } as const;
 
-export function Recolhivel({ titulo, aberto, variante = 'simples', children }: RecolhivelProps) {
+export function Recolhivel({ titulo, aberto, variante = 'simples', onAbrir, children }: RecolhivelProps) {
   return (
-    <details open={aberto} className={clsx(porVariante[variante])}>
+    <details
+      open={aberto}
+      onToggle={(e) => {
+        if (e.currentTarget.open) onAbrir?.();
+      }}
+      className={clsx(porVariante[variante])}
+    >
       <summary
         className={clsx(
           'flex cursor-pointer items-center text-[15px] font-medium text-ui-brand-blue',
