@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { usePricing } from '../../hooks/usePricing';
+import { useMedicao } from '../../hooks/useMedicao';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { Botao } from '../../components/ui/Botao';
@@ -24,7 +25,7 @@ const valor = (n: number | undefined) => n || 0;
 const algumOutroPreenchido = ({ custosFixos }: Precificacao['data']) =>
   [custosFixos.internet, custosFixos.contador, custosFixos.softwares, custosFixos.equipe, custosFixos.outras].some((n) => valor(n) > 0);
 
-function Simulador({ pricing }: { pricing: Precificacao }) {
+function Simulador({ pricing, marcar, comecou }: { pricing: Precificacao; marcar: ReturnType<typeof useMedicao>['marcar']; comecou: boolean }) {
   const { data, calculations, updateCustosFixos, updateCapacidade, updateServico, reset } = pricing;
   const { custosFixos, capacidade, servico } = data;
 
@@ -58,6 +59,11 @@ function Simulador({ pricing }: { pricing: Precificacao }) {
       frase = `De cada R$ 100, sobram ${sobramDe100}.`;
     }
   }
+
+  // O resultado tem número quando não falta nenhuma hora: aí o preço mínimo aparece.
+  React.useEffect(() => {
+    if (!semHoras && comecou) marcar('resultado');
+  }, [semHoras, comecou, marcar]);
 
   const precoMinimo = formatarReais(calculations.pisoAceitavel);
   const custoDoServico =
@@ -284,9 +290,14 @@ function Simulador({ pricing }: { pricing: Precificacao }) {
 
 export default function PrecificacaoView({ children }: { children?: React.ReactNode }) {
   const pricing = usePricing();
+  const { marcar, comecou } = useMedicao('quanto-cobrar');
+  React.useEffect(() => {
+    marcar('visita');
+  }, [marcar]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
+    // O onChange dos campos sobe até aqui: a primeira mudança de qualquer campo marca "comecou".
+    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink" onChange={() => marcar('comecou')}>
       <Header ferramenta />
 
       <main className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-5 px-5 pb-28 pt-2">
@@ -300,13 +311,13 @@ export default function PrecificacaoView({ children }: { children?: React.ReactN
         </div>
 
         {pricing.isLoaded ? (
-          <Simulador pricing={pricing} />
+          <Simulador pricing={pricing} marcar={marcar} comecou={comecou} />
         ) : (
           <p className="m-0 py-10 text-center text-sm text-ui-muted">Carregando a calculadora…</p>
         )}
 
         {children && (
-          <Recolhivel titulo="Como funciona esta conta" variante="cartao">
+          <Recolhivel titulo="Como funciona esta conta" variante="cartao" onAbrir={() => marcar('guia')}>
             <div>{children}</div>
           </Recolhivel>
         )}
@@ -315,6 +326,7 @@ export default function PrecificacaoView({ children }: { children?: React.ReactN
           texto="Já sabe o seu preço?"
           link="Mostre numa página com botão de WhatsApp →"
           href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=quanto-cobrar"
+          onClick={() => marcar('convite')}
         />
       </main>
 

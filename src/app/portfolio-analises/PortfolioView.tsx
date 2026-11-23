@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useServices } from '../../hooks/useServices';
+import { useMedicao } from '../../hooks/useMedicao';
 import { ServiceCharts } from '../../components/ServiceCharts';
 import { ServiceList } from '../../components/ServiceList';
 import { ServiceDrawer } from '../../components/ServiceDrawer';
@@ -19,6 +20,16 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
   const [editando, setEditando] = useState<Service | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
+  const { marcar, comecou } = useMedicao('servicos-compensam');
+  React.useEffect(() => {
+    marcar('visita');
+  }, [marcar]);
+  // O resultado são os gráficos e a lista, que só existem com ao menos um serviço.
+  const temResultado = isLoaded && services.length > 0;
+  React.useEffect(() => {
+    if (temResultado && comecou) marcar('resultado');
+  }, [temResultado, comecou, marcar]);
+
   const abrirNovo = () => {
     setEditando(null);
     setIsDrawerOpen(true);
@@ -30,7 +41,8 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
+    // O onChange dos campos da gaveta sobe até aqui: a primeira mudança marca "comecou".
+    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink" onChange={() => marcar('comecou')}>
       <Header ferramenta />
 
       <main className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-5 px-5 pb-10 pt-2">
@@ -55,6 +67,7 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
               onEdit={abrirEdicao}
               onRemove={removeService}
               onHover={setHighlightedId}
+              onBaixar={() => marcar('planilha')}
             />
           </>
         ) : (
@@ -62,7 +75,7 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
         )}
 
         {children && (
-          <Recolhivel titulo="Como funciona esta conta" variante="cartao">
+          <Recolhivel titulo="Como funciona esta conta" variante="cartao" onAbrir={() => marcar('guia')}>
             <div>{children}</div>
           </Recolhivel>
         )}
@@ -71,6 +84,7 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
           texto="Já sabe o que vender mais?"
           link="Mostre esses serviços numa página com o seu WhatsApp →"
           href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=servicos-compensam"
+          onClick={() => marcar('convite')}
         />
       </main>
 

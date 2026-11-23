@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { ShieldCheck, Lock, Eye, FileText } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, FileText, BarChart3 } from 'lucide-react';
 
 export const metadata = {
   title: 'Política de Privacidade | Unum People',
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
                 <h2 className="text-2xl font-bold m-0 text-brand-blue">Em poucas palavras</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                As ferramentas da Unum People funcionam no seu navegador. O que você digita fica guardado neste aparelho e não é enviado para nós. Este site não tem anúncios e não usa cookies de rastreamento.
+                As ferramentas da Unum People funcionam no seu navegador. O que você digita fica guardado neste aparelho e não é enviado para nós. Este site não tem anúncios e não usa cookies de rastreamento. Contamos só quantas vezes as ferramentas são usadas, sem saber quem usou.
               </p>
             </section>
 
@@ -52,6 +52,16 @@ export default function PrivacyPage() {
               </p>
               <p className="text-brand-grey leading-relaxed">
                 Esses dados ficam só neste aparelho e neste navegador. Para apagar, limpe os dados de navegação do seu navegador.
+              </p>
+            </section>
+
+            <section className="mb-10">
+              <div className="flex items-center gap-3 mb-4 text-brand-blue">
+                <BarChart3 size={24} />
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">O que contamos</h2>
+              </div>
+              <p className="text-brand-grey leading-relaxed">
+                Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.
               </p>
             </section>
 

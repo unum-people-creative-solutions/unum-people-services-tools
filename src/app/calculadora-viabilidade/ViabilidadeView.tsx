@@ -12,6 +12,7 @@ import { EstadoDoResultado } from '../../components/ui/EstadoDoResultado';
 import { BarraDoResultado } from '../../components/ui/BarraDoResultado';
 import { Recolhivel } from '../../components/ui/Recolhivel';
 import { Convite } from '../../components/ui/Convite';
+import { useMedicao } from '../../hooks/useMedicao';
 import { formatarNumero, formatarReais } from '../../utils/numeros';
 import { calcular, ENTRADAS_VAZIAS, type Caminho, type Conta, type Entradas, type MotivoDaFalta } from './calculo';
 
@@ -179,6 +180,15 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
   const mudar = (parcial: Partial<Entradas>) => setEntradas((atual) => ({ ...atual, ...parcial }));
   const conta = calcular(caminho, entradas);
 
+  const { marcar, comecou } = useMedicao('vale-anunciar');
+  const temResultado = conta.tipo !== 'falta';
+  React.useEffect(() => {
+    marcar('visita');
+  }, [marcar]);
+  React.useEffect(() => {
+    if (temResultado && comecou) marcar('resultado');
+  }, [temResultado, comecou, marcar]);
+
   const custoMaiorQueOPreco = entradas.custo > 0 && entradas.custo >= entradas.preco;
   const sobraPorVenda = entradas.preco > 0 && !custoMaiorQueOPreco ? formatarReais(entradas.preco - Math.max(entradas.custo, 0)) : '—';
 
@@ -190,7 +200,8 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
+    // O onChange dos campos sobe até aqui: a primeira mudança de qualquer campo marca "comecou".
+    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink" onChange={() => marcar('comecou')}>
       <Header ferramenta />
 
       <main className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-5 px-5 pb-28 pt-2">
@@ -344,7 +355,7 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
         </section>
 
         {children && (
-          <Recolhivel titulo="Como funciona esta conta" variante="cartao">
+          <Recolhivel titulo="Como funciona esta conta" variante="cartao" onAbrir={() => marcar('guia')}>
             <div>{children}</div>
           </Recolhivel>
         )}
@@ -353,6 +364,7 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
           texto="Vai anunciar?"
           link="Mande os cliques para uma página com o seu WhatsApp →"
           href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=vale-anunciar"
+          onClick={() => marcar('convite')}
         />
       </main>
 

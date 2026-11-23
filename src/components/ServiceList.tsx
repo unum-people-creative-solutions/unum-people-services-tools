@@ -13,6 +13,8 @@ interface ServiceListProps {
   onEdit: (service: Service) => void;
   onRemove: (id: string) => void;
   onHover: (id: string | null) => void;
+  /** Avisa o clique em "Baixar planilha (CSV)" (medição de uso). */
+  onBaixar?: () => void;
 }
 
 // Trabalho = média de esforço e dificuldade; Retorno = média de repetição e lucro;
@@ -46,7 +48,7 @@ function Medida({ rotulo, valor, cor }: { rotulo: string; valor: number; cor: st
   );
 }
 
-export function ServiceList({ services, onEdit, onRemove, onHover }: ServiceListProps) {
+export function ServiceList({ services, onEdit, onRemove, onHover, onBaixar }: ServiceListProps) {
   const [confirmandoId, setConfirmandoId] = React.useState<string | null>(null);
   const botoesApagar = React.useRef<Record<string, HTMLButtonElement | null>>({});
   const devolverFocoA = React.useRef<string | null>(null);
@@ -73,7 +75,14 @@ export function ServiceList({ services, onEdit, onRemove, onHover }: ServiceList
       titulo="Seus serviços, do que mais compensa ao que menos compensa"
       apoio="A nota geral vai de 0 a 100: quanto maior, mais o serviço compensa."
     >
-      <Botao variante="contorno" onClick={() => exportToCSV(services)} className="gap-2 self-start">
+      <Botao
+        variante="contorno"
+        onClick={() => {
+          onBaixar?.();
+          exportToCSV(services);
+        }}
+        className="gap-2 self-start"
+      >
         <Download size={18} aria-hidden="true" />
         Baixar planilha (CSV)
       </Botao>

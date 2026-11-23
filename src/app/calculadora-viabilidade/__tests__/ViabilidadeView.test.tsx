@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ViabilidadeView from '../ViabilidadeView';
+import { desligarMedicao, ligarMedicao } from '../../../test/medicao';
 
 const JA_SEI = 'Já sei quanto vou gastar';
 const QUERO_CLIENTES = 'Quero um número de clientes';
@@ -60,6 +61,7 @@ describe('Vale a pena anunciar?', () => {
     setItem = vi.spyOn(window.localStorage, 'setItem');
   });
   afterEach(() => {
+    desligarMedicao();
     vi.restoreAllMocks();
   });
 
@@ -549,6 +551,8 @@ describe('Vale a pena anunciar?', () => {
     });
 
     it('não guarda nada no aparelho', () => {
+      // RF-MU-13: com a medição ligada (variável + sendBeacon), continua sem guardar nada
+      ligarMedicao();
       montar();
       preencherClientes(5, 30);
       escolher(JA_SEI);

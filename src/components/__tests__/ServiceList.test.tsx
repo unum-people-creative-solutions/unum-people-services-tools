@@ -117,6 +117,20 @@ describe('ServiceList', () => {
     expect(exportToCSV).toHaveBeenCalledWith([A, B]);
   });
 
+  it('"Baixar planilha (CSV)" avisa o onBaixar opcional, uma vez por clique, e baixa mesmo sem ele', () => {
+    const aoBaixar = vi.fn();
+    montar([A, B], { onBaixar: aoBaixar });
+    fireEvent.click(screen.getByRole('button', { name: 'Baixar planilha (CSV)' }));
+    expect(aoBaixar).toHaveBeenCalledTimes(1);
+    expect(exportToCSV).toHaveBeenCalledTimes(1);
+  });
+
+  it('sem onBaixar o botão continua baixando', () => {
+    montar([A, B]);
+    fireEvent.click(screen.getByRole('button', { name: 'Baixar planilha (CSV)' }));
+    expect(exportToCSV).toHaveBeenCalledTimes(1);
+  });
+
   it('avisa qual serviço está em foco para o gráfico destacar o ponto', () => {
     const onHover = vi.fn();
     montar([A], { onHover });
