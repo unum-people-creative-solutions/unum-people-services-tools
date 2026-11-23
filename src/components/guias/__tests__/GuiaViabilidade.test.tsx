@@ -23,6 +23,27 @@ regrasDoGuia({
   perguntas: ['Meus dados ficam salvos?', 'De onde tiro esse número?'],
 });
 
+// Lacuna 4 do Verifier da F4: "quantos chamam" não vem da plataforma de anúncios (ela só informa o
+// clique); vem da contagem de mensagens, formulários e ligações dividida pelos cliques.
+describe('GuiaViabilidade: de onde vem cada número', () => {
+  it('o erro comum e a pergunta frequente mandam contar as chamadas e dividir pelos cliques', () => {
+    render(<GuiaViabilidade />);
+    const erros = textoDe(topico('Erros comuns'));
+    expect(erros).toMatch(/mensagens, formulários e ligações e divida pelos cliques/);
+    expect(erros).not.toMatch(/plataforma de anúncios/);
+    const faq = textoDe(topico('Perguntas frequentes'));
+    expect(faq).toMatch(/mensagens, formulários e ligações e divida pelos cliques/);
+  });
+
+  it('a plataforma de anúncios é a fonte só do clique (CPC)', () => {
+    const { container } = render(<GuiaViabilidade />);
+    const faq = textoDe(topico('Perguntas frequentes'));
+    expect(faq).toMatch(/preço do clique vem da sua plataforma de anúncios/);
+    expect(faq).toMatch(/só dá o clique/);
+    expect(textoDe(container)).not.toMatch(/número da sua plataforma/);
+  });
+});
+
 describe('GuiaViabilidade: exemplo e ferramenta real', () => {
   it('mostra no exemplo os resultados dos dois caminhos', () => {
     render(<GuiaViabilidade />);

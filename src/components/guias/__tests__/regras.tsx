@@ -41,8 +41,22 @@ export const TERMOS_PROIBIDOS = [
   'Raio-X',
 ];
 
-// O Intl formata moeda com espaço não separável (U+00A0)
-export const textoDe = (el: Element) => (el.textContent ?? '').replace(/ /g, ' ');
+const BLOCOS = 'h1, h2, h3, h4, p, ul, ol, li, dl, dt, dd, div, section';
+
+// `textContent` cola o fim de um bloco no começo do próximo ("Aviso" + "Os resultados" vira uma
+// palavra só), o que esconde palavras na contagem e a fronteira de palavra dos termos proibidos
+// (lacunas 1 e 2 do Verifier da F4). Aqui cada bloco fica separado por um espaço; o texto em linha
+// (strong, link) continua colado, como o leitor vê.
+// O Intl também formata moeda com espaço não separável (U+00A0).
+export const textoDe = (el: Element) => {
+  const copia = el.cloneNode(true) as Element;
+  const doc = el.ownerDocument;
+  for (const bloco of [copia, ...copia.querySelectorAll(BLOCOS)]) {
+    bloco.insertBefore(doc.createTextNode(' '), bloco.firstChild);
+    bloco.appendChild(doc.createTextNode(' '));
+  }
+  return (copia.textContent ?? '').replace(/\u00a0/g, ' ');
+};
 export const contarPalavras = (el: Element) => textoDe(el).split(/\s+/).filter(Boolean).length;
 
 export const topico = (nome: string) =>

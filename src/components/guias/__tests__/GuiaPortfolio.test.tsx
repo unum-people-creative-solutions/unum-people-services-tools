@@ -38,6 +38,21 @@ regrasDoGuia({
   perguntas: ['Meus dados ficam salvos?'],
 });
 
+// Lacuna 4 do Verifier da F4: os quatro títulos "Dá muito trabalho?" etc. são os títulos dos passos,
+// não as seis perguntas de cada passo.
+describe('GuiaPortfolio: o segundo passo descreve os passos da tela', () => {
+  it('diz quatro passos, seis perguntas em cada um, e chama os títulos de títulos', () => {
+    render(<GuiaPortfolio />);
+    const itens = within(topico('Passo a passo')).getAllByRole('listitem');
+    const passo2 = textoDe(itens[1]);
+    expect(passo2).toMatch(/quatro passos/);
+    expect(passo2).toMatch(/seis perguntas de “Sim” ou “Não” em cada um/);
+    expect(passo2).toMatch(/títulos dos passos/);
+    // os títulos não são apresentados como "as seis perguntas"
+    expect(passo2).not.toMatch(/seis perguntas[^.]*“Dá muito trabalho\?”/);
+  });
+});
+
 describe('GuiaPortfolio: exemplo e ferramenta real', () => {
   beforeEach(() => {
     window.localStorage.clear();

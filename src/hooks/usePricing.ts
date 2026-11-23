@@ -84,7 +84,8 @@ export function usePricing() {
   };
 
   // Cálculos
-  const totalCustosFixos = Object.values(data.custosFixos).reduce((a, b) => a + b, 0);
+  const { aluguel, energia, internet, contador, softwares, equipe, proLabore, outras } = data.custosFixos;
+  const totalCustosFixos = aluguel + energia + internet + contador + softwares + equipe + proLabore + (outras ?? 0);
   
   const horasFaturaveis = 
     (data.capacidade.diasTrabalhados * data.capacidade.horasDiarias) * 

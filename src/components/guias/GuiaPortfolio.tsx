@@ -39,12 +39,11 @@ export function GuiaPortfolio() {
     <Guia titulo="Como descobrir quais serviços compensam">
       <Topico titulo="Para que serve">
         <p>
-          Nem todo serviço ajuda o negócio do mesmo jeito. Alguns dão muito trabalho e pouco lucro. Outros se
-          repetem com facilidade e deixam bom lucro.
+          Nem todo serviço ajuda o negócio do mesmo jeito. Alguns dão muito trabalho e pouco lucro. Outros se repetem fácil e deixam bom lucro.
         </p>
         <p>
           Esta ferramenta compara os seus serviços e mostra em quais vale a pena apostar. Serve para quem
-          vende mais de um serviço e precisa decidir o que priorizar, ajustar ou deixar de oferecer.
+          vende mais de um serviço e precisa decidir o que priorizar ou deixar de oferecer.
         </p>
       </Topico>
 
@@ -52,15 +51,16 @@ export function GuiaPortfolio() {
         <ListaNumerada>
           <li>Toque em “Adicionar serviço”.</li>
           <li>
-            Responda “Sim” ou “Não” a seis perguntas em cada passo: “Dá muito trabalho?”, “É difícil de
-            fazer?”, “Dá para repetir sempre igual?” e “Dá lucro?”. Pergunta sem resposta conta como “não”.
+            São quatro passos, com seis perguntas de “Sim” ou “Não” em cada um. Os títulos dos passos são “Dá
+            muito trabalho?”, “É difícil de fazer?”, “Dá para repetir sempre igual?” e “Dá lucro?”.
+            Pergunta sem resposta conta como “não”.
           </li>
           <li>
             No último passo, “Como se chama este serviço?”, dê um nome. O “Resumo da pontuação” mostra a nota
             de “Esforço”, “Dificuldade”, “Repetição” e “Lucro”. Cada nota é a parte das respostas “sim”: 3 de
             6 dão 50%. Toque em “Salvar serviço”.
           </li>
-          <li>Repita com os outros serviços. Com três ou mais, a comparação ajuda mais.</li>
+          <li>Repita com os outros serviços.</li>
           <li>
             Veja a lista e os gráficos. Na lista, o “Trabalho” é a média de esforço e dificuldade, e o
             “Retorno” é a média de repetição e lucro. A “Nota geral” é a média entre o quanto o serviço é leve
@@ -88,8 +88,8 @@ export function GuiaPortfolio() {
           porque 50% de lucro já conta como alto.
         </p>
         <p>
-          A leitura: o adesivo é o serviço para colocar na frente da divulgação. A fachada dá lucro, mas
-          prende a equipe. Antes de vender mais fachadas, vale padronizar o que der.
+          A leitura: o adesivo vai na frente da divulgação. A fachada dá lucro, mas prende a equipe, e antes
+          de vender mais vale padronizar.
         </p>
       </Topico>
 
@@ -128,15 +128,15 @@ export function GuiaPortfolio() {
         </Lista>
         <p>
           Na lista, quanto menor o “Trabalho” e maior o “Retorno”, melhor. A “Nota geral” vai de 0 a 100 e
-          ordena os serviços do que mais compensa ao que menos compensa.
+          ordena os serviços, do que mais compensa ao que menos.
         </p>
       </Topico>
 
       <Topico titulo="Erros comuns">
         <Lista>
           <li>
-            <strong>Responder pelo serviço ideal.</strong> Pense nos últimos pedidos, não no que aconteceria
-            se tudo desse certo.
+            <strong>Responder pelo serviço ideal.</strong> Pense nos últimos pedidos, não em tudo dar
+            certo.
           </li>
           <li>
             <strong>Juntar serviços diferentes num só.</strong> Uma instalação pode ser simples numa vitrine
@@ -155,7 +155,7 @@ export function GuiaPortfolio() {
             {
               pergunta: 'Meus dados ficam salvos?',
               resposta:
-                'Ficam só neste aparelho, no navegador, para você voltar depois. Em outro aparelho, ou se você limpar os dados do navegador, a lista some. Nada do que você digita é enviado para nós.',
+                'Ficam só neste aparelho, no navegador. Em outro aparelho, ou se você limpar os dados do navegador, a lista some. Nada do que você digita é enviado para nós.',
             },
             {
               pergunta: 'Quantos serviços devo cadastrar?',
@@ -165,7 +165,7 @@ export function GuiaPortfolio() {
             {
               pergunta: 'Posso levar o resultado para uma planilha?',
               resposta:
-                'Sim. O botão “Baixar planilha (CSV)”, acima da lista, baixa um arquivo com as notas de cada serviço.',
+                'Sim. O botão “Baixar planilha (CSV)”, acima da lista, baixa um arquivo com as notas.',
             },
           ]}
         />
@@ -173,8 +173,7 @@ export function GuiaPortfolio() {
 
       <Topico titulo="Aviso">
         <p>
-          Os resultados são estimativas feitas com as respostas que você dá. Eles não medem o lucro de
-          verdade e não substituem um contador.
+          Os resultados são estimativas feitas com as respostas que você dá. Não medem o lucro de verdade nem substituem um contador.
         </p>
       </Topico>
     </Guia>

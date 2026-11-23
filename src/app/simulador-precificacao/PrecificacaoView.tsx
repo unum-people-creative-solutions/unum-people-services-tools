@@ -22,7 +22,7 @@ type Precificacao = ReturnType<typeof usePricing>;
 const valor = (n: number | undefined) => n || 0;
 
 const algumOutroPreenchido = ({ custosFixos }: Precificacao['data']) =>
-  [custosFixos.internet, custosFixos.contador, custosFixos.softwares, custosFixos.equipe].some((n) => valor(n) > 0);
+  [custosFixos.internet, custosFixos.contador, custosFixos.softwares, custosFixos.equipe, custosFixos.outras].some((n) => valor(n) > 0);
 
 function Simulador({ pricing }: { pricing: Precificacao }) {
   const { data, calculations, updateCustosFixos, updateCapacidade, updateServico, reset } = pricing;
@@ -86,7 +86,7 @@ function Simulador({ pricing }: { pricing: Precificacao }) {
           onChange={(proLabore) => updateCustosFixos({ proLabore })}
         />
         <Recolhivel
-          titulo="+ Outras contas (internet, contador, programas, funcionários)"
+          titulo="+ Outras contas (internet, contador, programas, funcionários, DAS)"
           variante="linha"
           aberto={outrasAbertas}
         >
@@ -114,6 +114,13 @@ function Simulador({ pricing }: { pricing: Precificacao }) {
               prefixo="R$"
               valor={valor(custosFixos.equipe)}
               onChange={(equipe) => updateCustosFixos({ equipe })}
+            />
+            <Campo
+              rotulo="Guia do MEI (DAS) e outras contas"
+              ajuda="A guia mensal do MEI e qualquer conta fixa que não esteja acima."
+              prefixo="R$"
+              valor={valor(custosFixos.outras)}
+              onChange={(outras) => updateCustosFixos({ outras })}
             />
           </div>
         </Recolhivel>
@@ -180,7 +187,7 @@ function Simulador({ pricing }: { pricing: Precificacao }) {
         {/* Imposto com a largura toda: a ajuda dele não desalinha a grade (conferência visual da F2). */}
         <Campo
           rotulo="Imposto na nota"
-          ajuda="MEI: deixe 0% e coloque a guia mensal (DAS) nas contas fixas."
+          ajuda={'MEI: deixe 0% e coloque a guia mensal (DAS) em "Guia do MEI (DAS) e outras contas".'}
           sufixo="%"
           valor={valor(servico.impostosPercentual)}
           onChange={(impostosPercentual) => updateServico({ impostosPercentual })}

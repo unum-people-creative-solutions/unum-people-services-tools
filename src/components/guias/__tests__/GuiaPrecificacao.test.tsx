@@ -12,6 +12,7 @@ regrasDoGuia({
     'Aluguel e condomínio',
     'Luz e água',
     'Quanto você tira para viver',
+    'Guia do MEI (DAS) e outras contas',
     'Dias por mês',
     'Horas por dia',
     'Tempo sem vender',
@@ -22,7 +23,31 @@ regrasDoGuia({
     'Quanto você quer cobrar?',
   ],
   selos: ['Falta pouco', 'Saudável', 'Sobra pouco', 'Prejuízo'],
-  perguntas: ['Meus dados ficam salvos?', /MEI/, /\bDAS\b/],
+  perguntas: ['Meus dados ficam salvos?', /MEI/, /\bDAS\b/, '“Guia do MEI (DAS) e outras contas”'],
+});
+
+describe('GuiaPrecificacao: campo do DAS (RF-F4-17)', () => {
+  const RESPOSTA = 'Guia do MEI (DAS) e outras contas';
+
+  it('o passo a passo e a resposta de MEI apontam para o campo pelo nome literal', () => {
+    render(<GuiaPrecificacao />);
+    expect(textoDe(topico('Passo a passo'))).toContain(`“${RESPOSTA}”`);
+    const faq = topico('Perguntas frequentes');
+    const mei = Array.from(faq.querySelectorAll('dt')).find((dt) => /MEI/.test(dt.textContent ?? ''));
+    expect(mei).toBeDefined();
+    expect(textoDe(mei!.nextElementSibling as Element)).toContain(`“${RESPOSTA}”`);
+  });
+
+  it('o rótulo citado existe na tela do "Quanto cobrar"', () => {
+        window.localStorage.clear();
+    vi.useFakeTimers();
+    render(<PrecificacaoView />);
+    act(() => {
+      vi.runAllTimers();
+    });
+    vi.useRealTimers();
+    expect(screen.getByLabelText(RESPOSTA)).toBeInTheDocument();
+  });
 });
 
 describe('GuiaPrecificacao: exemplo e ferramenta real', () => {

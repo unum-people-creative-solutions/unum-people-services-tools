@@ -36,19 +36,19 @@ export function GuiaViabilidade() {
     <Guia titulo="Como saber se vale a pena anunciar">
       <Topico titulo="Para que serve">
         <p>
-          Antes de pagar por anúncio no Google ou no Instagram, vale saber quantas vendas o anúncio precisa
-          trazer para se pagar. Esta ferramenta responde de dois jeitos.
+          Antes de pagar por anúncio no Google ou no Instagram, vale saber quantas vendas ele precisa
+          trazer para se pagar.
         </p>
         <p>
-          Se você já sabe quanto quer gastar, ela diz quantas vendas são necessárias. Se você quer um número
-          de clientes, ela diz quanto precisa investir e quanto cada cliente vai custar.
+          Se já sabe quanto quer gastar, esta ferramenta diz quantas vendas são necessárias. Se quer um
+          número de clientes, diz quanto investir e quanto cada um custa.
         </p>
       </Topico>
 
       <Topico titulo="Passo a passo">
         <ListaNumerada>
           <li>
-            Escolha o que você quer descobrir: “Já sei quanto vou gastar” ou “Quero um número de clientes”.
+            Escolha o que descobrir: “Já sei quanto vou gastar” ou “Quero um número de clientes”.
           </li>
           <li>
             Em “Sua venda”, preencha “Preço médio de cada venda” e “Quanto custa entregar essa venda”. Conte
@@ -60,16 +60,15 @@ export function GuiaViabilidade() {
             você”. Chamar é mandar mensagem, preencher o formulário ou ligar.
           </li>
           <li>
-            Se você escolheu gastar, preencha “Quanto você quer gastar em anúncio”. A ferramenta divide esse
-            valor pela sobra por venda e acha as vendas para o anúncio se pagar, sempre arredondando para
-            cima. Divide também pelo preço do clique e acha os cliques.
+            Se escolheu gastar, preencha “Quanto você quer gastar em anúncio”. A ferramenta divide esse
+            valor pela sobra por venda e acha as vendas para o anúncio se pagar, sempre arredondando para cima. Divide também pelo preço do clique para achar os cliques.
           </li>
           <li>
-            Se você escolheu clientes, preencha “Quantos clientes novos você quer” e “De cada 10 que chamam,
+            Se escolheu clientes, preencha “Quantos clientes novos você quer” e “De cada 10 que chamam,
             quantos compram”. A ferramenta calcula quantos cliques você precisa e quanto investir.
           </li>
           <li>
-            Leia o “Seu resultado”. Para conferir cada conta, abra “Ver a conta passo a passo”.
+            Leia o “Seu resultado”. Para conferir as contas, abra “Ver a conta passo a passo”.
           </li>
         </ListaNumerada>
       </Topico>
@@ -88,7 +87,7 @@ export function GuiaViabilidade() {
           selo é “Arriscado”.
         </p>
         <p>
-          Agora o caminho dos clientes: {e.meta.clientes} clientes, com {porcentagem(e.meta.compram)} de quem
+          No caminho dos clientes: {e.meta.clientes} clientes, com {porcentagem(e.meta.compram)} de quem
           chama comprando. Você investe cerca de {brl(e.meta.investimento)}, com os mesmos{' '}
           {e.orcamento.cliques} cliques e {e.orcamento.pessoas} pessoas. Cada cliente novo custa{' '}
           {brl(e.meta.cac)}.
@@ -106,11 +105,12 @@ export function GuiaViabilidade() {
           </li>
           <li>
             <strong>“Dá para pagar”:</strong> você precisa vender para até 20% de quem chama, ou 1 em cada 5.
+
            
           </li>
           <li>
             <strong>“Arriscado”:</strong> você precisa vender para mais de 20% de quem chama. Antes de
-            gastar, veja se dá para subir o preço, baixar o custo ou conseguir cliques mais baratos.
+            gastar, veja se dá para subir o preço, baixar o custo ou pagar menos por clique.
           </li>
           <li>
             <strong>“Se paga”:</strong> as vendas deixam mais do que o anúncio custou. “Cada cliente novo
@@ -127,16 +127,15 @@ export function GuiaViabilidade() {
       <Topico titulo="Erros comuns">
         <Lista>
           <li>
-            <strong>Deixar o custo da venda em zero.</strong> Aí qualquer anúncio parece bom, mas o anúncio
-            é pago com o que sobra, não com o preço cheio.
+            <strong>Deixar o custo da venda em zero.</strong> Aí qualquer anúncio parece bom, mas ele se paga com o que sobra.
           </li>
           <li>
-            <strong>Chutar quantos chamam.</strong> Use o número da sua plataforma de anúncios. Sem histórico, comece com um
-            número baixo e refaça a conta depois das primeiras semanas.
+            <strong>Chutar quantos chamam.</strong> Conte as mensagens, formulários e ligações e divida pelos
+            cliques. Sem histórico, comece com um número baixo e refaça a conta depois.
           </li>
           <li>
             <strong>Julgar o anúncio em poucos dias.</strong> Com poucos cliques, o resultado muda muito.
-            Espere juntar algumas centenas de cliques.
+            Espere centenas de cliques.
           </li>
         </Lista>
       </Topico>
@@ -147,12 +146,12 @@ export function GuiaViabilidade() {
             {
               pergunta: 'De onde tiro esse número?',
               resposta:
-                'O preço do clique aparece na sua plataforma de anúncios (como “CPC médio”). Para saber quantos chamam, conte as mensagens, formulários e ligações e divida pelos cliques. Sem histórico, a plataforma mostra uma estimativa quando você monta o anúncio.',
+                'O preço do clique vem da sua plataforma de anúncios (como “CPC médio”), com uma estimativa mesmo sem histórico. Ela só dá o clique: para saber quantos chamam, conte as mensagens, formulários e ligações e divida pelos cliques.',
             },
             {
               pergunta: 'Meus dados ficam salvos?',
               resposta:
-                'Não. A ferramenta não guarda nada: ao fechar ou recarregar a página, os números somem. E nada do que você digita sai do seu aparelho.',
+                'Não. A ferramenta não guarda nada: ao fechar ou recarregar a página, os números somem. Nada do que você digita sai do seu aparelho.',
             },
           ]}
         />
@@ -161,7 +160,7 @@ export function GuiaViabilidade() {
       <Topico titulo="Aviso">
         <p>
           Os resultados são estimativas feitas com os números que você informa e não garantem o resultado do
-          anúncio. Eles não substituem a orientação de um contador.
+          anúncio. Não substituem a orientação de um contador.
         </p>
       </Topico>
     </Guia>

@@ -51,12 +51,11 @@ export function GuiaPrecificacao() {
     <Guia titulo="Como calcular o preço do seu serviço">
       <Topico titulo="Para que serve">
         <p>
-          Esta ferramenta mostra o menor preço que você pode cobrar sem ter prejuízo. Ela serve para quem
-          vende serviço, como técnico, designer, fotógrafo ou cabeleireiro.
+          Esta ferramenta mostra o menor preço que você pode cobrar sem ter prejuízo. Serve para quem vende
+          serviço, como técnico, designer ou fotógrafo.
         </p>
         <p>
-          Use para montar sua primeira tabela de preços ou para conferir se um preço antigo ainda se paga.
-          Quer saber se um anúncio se paga com esse preço? Veja{' '}
+          Use para montar sua tabela de preços ou conferir se um preço antigo ainda se paga. Quer saber se um anúncio se paga? Veja{' '}
           <Link href="/calculadora-viabilidade" className={classeDoLink}>
             Vale a pena anunciar?
           </Link>
@@ -67,28 +66,26 @@ export function GuiaPrecificacao() {
         <ListaNumerada>
           <li>
             Em “Contas fixas do mês”, preencha “Aluguel e condomínio”, “Luz e água” e “Quanto você tira para
-            viver”. Se tiver mais contas, abra “+ Outras contas”. O “Total por mês” é a soma de tudo.
+            viver”. Se tiver mais contas, abra “+ Outras contas”. Se for MEI, ponha a guia mensal em “Guia do
+            MEI (DAS) e outras contas”. O “Total por mês” é a soma de tudo.
           </li>
           <li>
             Em “Seu tempo de trabalho”, preencha “Dias por mês”, “Horas por dia” e “Tempo sem vender”. A
-            ferramenta multiplica os dias pelas horas e tira o tempo sem vender. O resultado são as “Horas
-            que você vende”.
+            ferramenta multiplica os dias pelas horas e tira o tempo sem vender: são as “Horas que você
+            vende”.
           </li>
           <li>
-            Ela divide o total das contas por essas horas e mostra a “Conta fixa por hora”. É quanto cada
-            hora custa só para manter o negócio de pé.
+            Ela divide o total das contas por essas horas e mostra a “Conta fixa por hora”. É quanto cada hora custa para manter o negócio.
           </li>
           <li>
             Em “Sobre o serviço”, preencha “Horas que leva”, “Material”, “Transporte e extras” e “Imposto na
-            nota”. O custo do serviço é a conta fixa por hora vezes as horas que ele leva, mais o material e
-            o transporte.
+            nota”. O custo do serviço é a conta fixa por hora vezes as horas dele, mais material e transporte.
           </li>
           <li>
-            O “Preço mínimo deste serviço” é esse custo com o imposto já incluído. O imposto é um pedaço do
-            preço que você cobra, não um acréscimo sobre o custo.
+            O “Preço mínimo deste serviço” é esse custo com o imposto já incluído. O imposto é um pedaço do preço, não um acréscimo ao custo.
           </li>
           <li>
-            Em “Quanto você quer cobrar?”, digite o preço que tem em mente. Veja o selo e quanto “Sobra no
+            Em “Quanto você quer cobrar?”, digite o preço que pensa em cobrar. Veja o selo e quanto “Sobra no
             bolso”.
           </li>
         </ListaNumerada>
@@ -123,17 +120,16 @@ export function GuiaPrecificacao() {
       <Topico titulo="Como ler o resultado">
         <Lista>
           <li>
-            <strong>“Falta pouco”:</strong> ainda falta preencher algo, em geral as horas do serviço.
+            <strong>“Falta pouco”:</strong> faltam dados, em geral as horas do serviço.
           </li>
           <li>
             <strong>“Saudável”:</strong> de cada R$ 100 cobrados, sobram R$ 20 ou mais.
           </li>
           <li>
-            <strong>“Sobra pouco”:</strong> sobram menos de R$ 20 de cada R$ 100. O serviço se paga, mas
-            falta folga para imprevistos.
+            <strong>“Sobra pouco”:</strong> sobram menos de R$ 20 de cada R$ 100. Falta folga para imprevistos.
           </li>
           <li>
-            <strong>“Prejuízo”:</strong> o preço está abaixo do mínimo, e você perde dinheiro em cada venda.
+            <strong>“Prejuízo”:</strong> o preço está abaixo do mínimo, e cada venda perde dinheiro.
             No exemplo, cobrar {brl(e.abaixoDoMinimo.preco)} faz o técnico perder{' '}
             {brl(e.abaixoDoMinimo.prejuizo)} por manutenção.
           </li>
@@ -164,17 +160,17 @@ export function GuiaPrecificacao() {
             {
               pergunta: 'Meus dados ficam salvos?',
               resposta:
-                'Ficam só neste aparelho, no navegador, para você continuar depois. Em outro aparelho, ou se você limpar os dados do navegador, os números somem. Nada do que você digita é enviado para nós.',
+                'Ficam só neste aparelho, no navegador. Em outro aparelho, ou se você limpar os dados do navegador, os números somem. Nada do que você digita é enviado para nós.',
             },
             {
               pergunta: 'Sou MEI. O que coloco em “Imposto na nota”?',
               resposta:
-                'Deixe 0%. O MEI paga um valor fixo por mês (a guia DAS), então some esse valor a uma das suas contas fixas.',
+                'Deixe 0%. O MEI paga um valor fixo por mês (a guia DAS). Coloque esse valor em “Guia do MEI (DAS) e outras contas”, dentro de “+ Outras contas”.',
             },
             {
               pergunta: 'Quanto coloco em “Tempo sem vender”?',
               resposta:
-                'Se não souber, deixe 20%. Para achar o seu número, anote por uma ou duas semanas quantas horas foram de serviço vendido.',
+                'Se não souber, deixe 20%. Para achar o seu número, anote por uma semana quantas horas foram de serviço vendido.',
             },
           ]}
         />
