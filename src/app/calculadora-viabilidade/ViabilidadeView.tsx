@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { AdUnit } from '../../components/AdUnit';
 import { WelcomeModal } from '../../components/WelcomeModal';
 import { CurrencyInput } from '../../components/CurrencyInput';
 import { NumericFormat } from 'react-number-format';
@@ -692,13 +691,9 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
             {step === 'DIAGNOSIS' && renderDiagnosis()}
           </section>
 
-          <AdUnit className="mb-8" slot="1270666901" />
-
           {children}
         </div>
       </main>
-
-      <AdUnit className="mb-8" slot="7715444307" />
 
       <WelcomeModal
         isOpen={isHelpOpen}

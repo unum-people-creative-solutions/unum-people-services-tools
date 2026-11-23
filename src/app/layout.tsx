@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
-import { CookieBanner } from '../components/CookieBanner';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -48,9 +47,6 @@ export const metadata: Metadata = {
     description: 'Inteligência estratégica para o seu negócio.',
     images: ['/images/logo_texto.png'],
   },
-  other: {
-    'google-adsense-account': 'ca-pub-6348382549206741',
-  },
 };
 
 const jsonLd = {
@@ -72,13 +68,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6348382549206741"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className={`${poppins.variable} font-sans antialiased bg-brand-white`} suppressHydrationWarning>
         <Script
           id="json-ld"
@@ -86,7 +75,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
-        <CookieBanner />
       </body>
     </html>
   );

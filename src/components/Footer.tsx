@@ -53,6 +53,7 @@ export function Footer() {
             <a href="https://unumpeople.com.br/sobre" className="hover:text-white transition-colors">Sobre</a>
             <a href="https://unumpeople.com.br/contato" className="hover:text-white transition-colors">Contato</a>
             <a href="https://unumpeople.com.br/termos" className="hover:text-white transition-colors">Termos</a>
+            <p>Seus dados ficam neste aparelho.</p>
             <a href="/privacidade" className="hover:text-white transition-colors">Privacidade</a>
           </div>
           <p>People to People (P2P) Ecosystem</p>
