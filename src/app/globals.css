@@ -94,3 +94,9 @@ body {
   background-clip: text;
   color: transparent;
 }
+
+/* A barra fixa do resultado (BarraDoResultado) ocupa o rodapé da tela: a rolagem
+   reserva esse espaço para que o campo focado nunca fique escondido atrás dela. */
+html {
+  scroll-padding-bottom: 6rem;
+}

@@ -71,3 +71,12 @@ describe('Poppins aplicada de fato (RF-F2-02)', () => {
     expect(html).toContain('poppins.variable');
   });
 });
+
+// Conferência visual da F3a (23/11/2026): no celular, a barra fixa do resultado
+// cobria campos perto do rodapé da tela (o toque caía na barra). A rolagem precisa
+// reservar o espaço da barra, para o campo focado ficar sempre acima dela.
+describe('barra fixa não cobre campos (RF-F2-22)', () => {
+  it('o <html> reserva espaço embaixo na rolagem (scroll-padding-bottom)', () => {
+    expect(css).toMatch(/html\s*\{[^}]*scroll-padding-bottom\s*:\s*(6rem|96px)/);
+  });
+});
