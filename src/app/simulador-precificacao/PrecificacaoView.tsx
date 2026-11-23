@@ -4,477 +4,311 @@ import React from 'react';
 import { usePricing } from '../../hooks/usePricing';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { WelcomeModal } from '../../components/WelcomeModal';
-import { CurrencyInput } from '../../components/CurrencyInput';
-import { 
-  Calculator, 
-  TrendingUp, 
-  Clock, 
-  DollarSign, 
-  AlertCircle,
-  Info,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Settings
-} from 'lucide-react';
+import { Botao } from '../../components/ui/Botao';
+import { Campo, CampoTexto } from '../../components/ui/Campo';
+import { Bloco } from '../../components/ui/Bloco';
+import { Subtotal } from '../../components/ui/Subtotal';
+import { EstadoDoResultado, type Estado } from '../../components/ui/EstadoDoResultado';
+import { BarraDoResultado } from '../../components/ui/BarraDoResultado';
+import { Recolhivel } from '../../components/ui/Recolhivel';
+import { Convite } from '../../components/ui/Convite';
+import { formatarNumero, formatarReais } from '../../utils/numeros';
 
-export default function PrecificacaoView({ children }: { children?: React.ReactNode }) {
-  const { data, updateCustosFixos, updateCapacidade, updateServico, isLoaded, calculations } = usePricing();
-  const [isHelpOpen, setIsHelpOpen] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+const ID_RESULTADO = 'resultado';
 
-  React.useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
+type Precificacao = ReturnType<typeof usePricing>;
 
-  const idDias = React.useId();
-  const idHoras = React.useId();
-  const idOciosidade = React.useId();
-  const idNome = React.useId();
-  const idHorasEst = React.useId();
-  const idImpostos = React.useId();
+// Dados antigos do localStorage podem não trazer todos os campos
+const valor = (n: number | undefined) => n || 0;
 
-  const closeHelp = () => {
-    setIsHelpOpen(false);
-  };
+const algumOutroPreenchido = ({ custosFixos }: Precificacao['data']) =>
+  [custosFixos.internet, custosFixos.contador, custosFixos.softwares, custosFixos.equipe].some((n) => valor(n) > 0);
 
-  const formatCurrency = (value: number) => {
-    if (!mounted) return '...';
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
+function Simulador({ pricing }: { pricing: Precificacao }) {
+  const { data, calculations, updateCustosFixos, updateCapacidade, updateServico, reset } = pricing;
+  const { custosFixos, capacidade, servico } = data;
 
-  const formatNumber = (value: number) => {
-    if (!mounted) return '...';
-    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-  };
+  // Decidido uma vez, quando os dados já carregaram: abre sozinho se alguma dessas contas
+  // tem valor e depois não fecha na cara de quem está digitando.
+  const [outrasAbertas] = React.useState(() => algumOutroPreenchido(data));
+  const [confirmando, setConfirmando] = React.useState(false);
 
-  const getStatusColor = (margin: number) => {
-    if (margin <= 0) return 'text-red-600 bg-red-50 border-red-100';
-    if (margin < 20) return 'text-yellow-600 bg-yellow-50 border-yellow-100';
-    return 'text-green-600 bg-green-50 border-green-100';
-  };
+  const semHoras = valor(servico.horasEstimadas) <= 0 || calculations.horasFaturaveis <= 0;
+  const temPreco = valor(servico.precoDesejado) > 0;
+  // O estado segue os valores em centavos, como a tela mostra: cobrar exatamente o
+  // preço mínimo exibido (arredondado) não pode aparecer como "perde R$ 0,00".
+  const lucroEmCentavos = Math.round(calculations.lucroNominal * 100) / 100;
+  const margem = lucroEmCentavos === 0 ? 0 : calculations.margemLucroReal;
 
-  const getStatusIcon = (margin: number) => {
-    if (margin <= 0) return <XCircle className="text-red-500" size={24} />;
-    if (margin < 20) return <AlertTriangle className="text-yellow-500" size={24} />;
-    return <CheckCircle2 className="text-green-500" size={24} />;
-  };
+  let estado: Estado | null = null;
+  let frase: string | undefined;
+  if (semHoras) {
+    estado = 'falta';
+    frase = 'Preencha as horas do serviço para ver o preço mínimo.';
+  } else if (temPreco) {
+    const sobramDe100 = formatarReais(margem);
+    if (lucroEmCentavos < 0) {
+      estado = 'prejuizo';
+      frase = `Esse preço está abaixo do mínimo. Você perde ${formatarReais(Math.abs(calculations.lucroNominal))} em cada venda.`;
+    } else if (margem < 20) {
+      estado = 'sobra-pouco';
+      frase = `De cada R$ 100, sobram ${sobramDe100}. Tente cobrar um pouco mais ou gastar menos.`;
+    } else {
+      estado = 'saudavel';
+      frase = `De cada R$ 100, sobram ${sobramDe100}.`;
+    }
+  }
+
+  const precoMinimo = formatarReais(calculations.pisoAceitavel);
+  const custoDoServico =
+    calculations.custoFixoPorHora * valor(servico.horasEstimadas) + calculations.custosVariaveisDiretos;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50/30">
-      <Header 
-        onOpenHelp={() => setIsHelpOpen(true)} 
-        toolName="Simulador de Precificação"
-      />
-      
-      {/* Help Modal Content for Pricing */}
-      <WelcomeModal 
-        isOpen={isHelpOpen} 
-        onClose={closeHelp} 
-        title="Como usar o Simulador"
-        description="Elimine o 'achismo' e descubra sua margem real."
-        icon={<Calculator size={24} />}
-        customContent={
-          <div className="space-y-6">
-            <div className="grid gap-4">
-              <div className="flex gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <DollarSign className="text-brand-blue" size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-brand-blue text-sm uppercase">1. Custos Fixos</h4>
-                  <p className="text-xs text-brand-grey leading-relaxed">Insira tudo o que você paga para manter a empresa aberta, incluindo seu próprio salário (Pró-labore).</p>
-                </div>
-              </div>
+    <>
+      <Bloco numero={1} titulo="Contas fixas do mês" apoio="O que você paga todo mês, vendendo ou não.">
+        <Campo
+          rotulo="Aluguel e condomínio"
+          prefixo="R$"
+          valor={valor(custosFixos.aluguel)}
+          onChange={(aluguel) => updateCustosFixos({ aluguel })}
+        />
+        <Campo
+          rotulo="Luz e água"
+          prefixo="R$"
+          valor={valor(custosFixos.energia)}
+          onChange={(energia) => updateCustosFixos({ energia })}
+        />
+        <Campo
+          rotulo="Quanto você tira para viver"
+          ajuda="Seu salário (pró-labore). Sem ele, o preço só paga as contas e você trabalha de graça."
+          prefixo="R$"
+          valor={valor(custosFixos.proLabore)}
+          onChange={(proLabore) => updateCustosFixos({ proLabore })}
+        />
+        <Recolhivel
+          titulo="+ Outras contas (internet, contador, programas, funcionários)"
+          variante="linha"
+          aberto={outrasAbertas}
+        >
+          <div className="flex flex-col gap-[18px] pt-2">
+            <Campo
+              rotulo="Internet e telefone"
+              prefixo="R$"
+              valor={valor(custosFixos.internet)}
+              onChange={(internet) => updateCustosFixos({ internet })}
+            />
+            <Campo
+              rotulo="Contador"
+              prefixo="R$"
+              valor={valor(custosFixos.contador)}
+              onChange={(contador) => updateCustosFixos({ contador })}
+            />
+            <Campo
+              rotulo="Programas e assinaturas"
+              prefixo="R$"
+              valor={valor(custosFixos.softwares)}
+              onChange={(softwares) => updateCustosFixos({ softwares })}
+            />
+            <Campo
+              rotulo="Salários de funcionários"
+              prefixo="R$"
+              valor={valor(custosFixos.equipe)}
+              onChange={(equipe) => updateCustosFixos({ equipe })}
+            />
+          </div>
+        </Recolhivel>
+        <Subtotal
+          destaque
+          linhas={[{ rotulo: 'Total por mês', valor: formatarReais(calculations.totalCustosFixos) }]}
+        />
+      </Bloco>
 
-              <div className="flex gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <Clock className="text-brand-blue" size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-brand-blue text-sm uppercase">2. Capacidade Produtiva</h4>
-                  <p className="text-xs text-brand-grey leading-relaxed">Defina quanto tempo você realmente tem para produzir, descontando reuniões e burocracias.</p>
-                </div>
-              </div>
+      <Bloco numero={2} titulo="Seu tempo de trabalho" apoio="Quantas horas você consegue vender no mês.">
+        <div className="grid grid-cols-2 gap-3">
+          <Campo
+            rotulo="Dias por mês"
+            valor={valor(capacidade.diasTrabalhados)}
+            onChange={(diasTrabalhados) => updateCapacidade({ diasTrabalhados })}
+          />
+          <Campo
+            rotulo="Horas por dia"
+            valor={valor(capacidade.horasDiarias)}
+            onChange={(horasDiarias) => updateCapacidade({ horasDiarias })}
+          />
+        </div>
+        <Campo
+          rotulo="Tempo sem vender"
+          ajuda="Orçamento, deslocamento, espera, burocracia. Se não souber, deixe 20%."
+          sufixo="%"
+          valor={valor(capacidade.percentualOciosidade)}
+          onChange={(percentualOciosidade) => updateCapacidade({ percentualOciosidade })}
+        />
+        <Subtotal
+          linhas={[
+            { rotulo: 'Horas que você vende', valor: `${formatarNumero(calculations.horasFaturaveis)} h` },
+            { rotulo: 'Conta fixa por hora', valor: formatarReais(calculations.custoFixoPorHora) },
+          ]}
+        />
+      </Bloco>
 
-              <div className="flex gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <TrendingUp className="text-brand-blue" size={20} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-brand-blue text-sm uppercase">3. Resultados Reais</h4>
-                  <p className="text-xs text-brand-grey leading-relaxed">Veja o &quot;Piso Aceitável&quot; (o mínimo para não ter prejuízo) e simule preços para ver sua margem líquida.</p>
-                </div>
-              </div>
-            </div>
+      <Bloco numero={3} titulo="Sobre o serviço" apoio="Um serviço de cada vez. Ex.: manutenção de ar-condicionado.">
+        <CampoTexto
+          rotulo="Nome do serviço"
+          placeholder="Opcional"
+          valor={servico.nome ?? ''}
+          onChange={(nome) => updateServico({ nome })}
+        />
+        <div className="grid grid-cols-2 items-start gap-3">
+          <Campo
+            rotulo="Horas que leva"
+            valor={valor(servico.horasEstimadas)}
+            onChange={(horasEstimadas) => updateServico({ horasEstimadas })}
+          />
+          <Campo
+            rotulo="Material"
+            prefixo="R$"
+            valor={valor(servico.materiaisDiretos)}
+            onChange={(materiaisDiretos) => updateServico({ materiaisDiretos })}
+          />
+          <Campo
+            rotulo="Transporte e extras"
+            prefixo="R$"
+            valor={valor(servico.deslocamento)}
+            onChange={(deslocamento) => updateServico({ deslocamento })}
+          />
+        </div>
+        {/* Imposto com a largura toda: a ajuda dele não desalinha a grade (conferência visual da F2). */}
+        <Campo
+          rotulo="Imposto na nota"
+          ajuda="MEI: deixe 0% e coloque a guia mensal (DAS) nas contas fixas."
+          sufixo="%"
+          valor={valor(servico.impostosPercentual)}
+          onChange={(impostosPercentual) => updateServico({ impostosPercentual })}
+        />
+      </Bloco>
 
-            <div className="p-4 bg-brand-blue/5 rounded-xl border border-brand-blue/10">
-              <div className="flex items-center gap-2 mb-2 text-brand-blue">
-                <AlertCircle size={16} />
-                <span className="text-xs font-black uppercase tracking-widest">Dica de Ouro</span>
-              </div>
-              <p className="text-xs text-brand-blue/80 leading-relaxed font-medium">
-                O simulador calcula impostos &quot;por dentro&quot;, como o fisco faz. Isso garante que sua margem seja calculada sobre o valor final de venda, evitando o erro comum de aplicar a taxa sobre o custo.
-              </p>
+      <section
+        id={ID_RESULTADO}
+        aria-labelledby="titulo-resultado"
+        className="flex flex-col gap-4 rounded-xl border-2 border-ui-brand-blue bg-ui-bg p-5 shadow-[0_12px_32px_-8px_rgb(20_20_43/0.14)]"
+      >
+        <h2 id="titulo-resultado" className="m-0 text-lg font-semibold text-ui-ink">
+          Seu resultado
+        </h2>
+
+        {!semHoras && (
+          <div className="flex flex-col gap-0.5">
+            <span className="text-sm text-ui-muted">Preço mínimo deste serviço</span>
+            <strong className="text-[34px] font-bold tracking-[-0.035em] text-ui-ink [font-variant-numeric:tabular-nums]">
+              {precoMinimo}
+            </strong>
+            <span className="text-[13px] leading-[1.45] text-ui-muted">Abaixo disso, cada venda dá prejuízo.</span>
+          </div>
+        )}
+
+        <Campo
+          rotulo="Quanto você quer cobrar?"
+          prefixo="R$"
+          tamanho="grande"
+          valor={valor(servico.precoDesejado)}
+          onChange={(precoDesejado) => updateServico({ precoDesejado })}
+        />
+
+        {estado && (
+          <EstadoDoResultado estado={estado} frase={frase}>
+            {(estado === 'saudavel' || estado === 'sobra-pouco') && (
+              <dl className="m-0 flex items-baseline justify-between text-[15px] text-ui-ink">
+                <dt>Sobra no bolso</dt>
+                <dd className="m-0 font-bold [font-variant-numeric:tabular-nums]">
+                  {formatarReais(calculations.lucroNominal)}
+                </dd>
+              </dl>
+            )}
+          </EstadoDoResultado>
+        )}
+
+        {!semHoras && (
+          <Recolhivel titulo="Ver a conta passo a passo">
+            <Subtotal
+              linhas={[
+                {
+                  rotulo: 'Conta fixa por hora × horas do serviço',
+                  valor: formatarReais(calculations.custoFixoPorHora * valor(servico.horasEstimadas)),
+                },
+                { rotulo: '+ material e transporte', valor: formatarReais(calculations.custosVariaveisDiretos) },
+                { rotulo: '= custo do serviço', valor: formatarReais(custoDoServico) },
+                { rotulo: '÷ (1 − imposto) = preço mínimo', valor: precoMinimo },
+                ...(temPreco
+                  ? [{ rotulo: 'preço − imposto − custo = sobra no bolso', valor: formatarReais(calculations.lucroNominal) }]
+                  : []),
+              ]}
+            />
+          </Recolhivel>
+        )}
+
+        {confirmando ? (
+          <div className="flex flex-col gap-3 rounded-lg bg-ui-surface p-3.5">
+            <p className="m-0 text-[15px] font-medium text-ui-ink">Apagar tudo o que você preencheu?</p>
+            <div className="flex gap-3">
+              <Botao
+                onClick={() => {
+                  reset();
+                  setConfirmando(false);
+                }}
+              >
+                Apagar
+              </Botao>
+              <Botao variante="contorno" autoFocus onClick={() => setConfirmando(false)}>
+                Cancelar
+              </Botao>
             </div>
           </div>
-        }
-      />
-      
-      <main className="flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Calculator className="text-brand-blue" size={20} />
-                <h1 className="text-xl font-black brand-gradient-text uppercase tracking-tighter">
-                  Precificação e Margem
-                </h1>
-              </div>
-              <p className="text-brand-grey text-xs font-bold uppercase tracking-widest opacity-70">
-                Análise de Custos e Ponto de Equilíbrio
-              </p>
-            </div>
-          </header>
+        ) : (
+          <Botao variante="link" onClick={() => setConfirmando(true)}>
+            Começar de novo
+          </Botao>
+        )}
+      </section>
 
-          {!isLoaded ? (
-            <div className="py-20 flex items-center justify-center bg-white/50 rounded-3xl border-2 border-dashed border-gray-100">
-              <div className="animate-pulse flex flex-col items-center">
-                <div className="w-12 h-12 bg-brand-blue/20 rounded-full mb-4"></div>
-                <p className="text-brand-grey font-medium">Carregando simulador...</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Inputs Column */}
-                <div className="lg:col-span-8 space-y-8">
-                  
-                  {/* 1. Módulo de Custos Fixos */}
-                  <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-blue/20">
-                          <DollarSign size={20} />
-                        </div>
-                        <div>
-                          <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">Custos Fixos Mensais</h2>
-                          <p className="text-[10px] text-brand-grey font-bold uppercase opacity-60">O custo da operação aberta</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-brand-grey font-bold uppercase opacity-60 mb-1">Total Fixo</p>
-                        <p className="text-lg font-black text-brand-blue tracking-tighter">{formatCurrency(calculations.totalCustosFixos)}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {[
-                        { label: 'Aluguel / Cond.', key: 'aluguel' },
-                        { label: 'Energia / Água', key: 'energia' },
-                        { label: 'Internet / Telef.', key: 'internet' },
-                        { label: 'Contador', key: 'contador' },
-                        { label: 'Softwares (SaaS)', key: 'softwares' },
-                        { label: 'Salários Equipe', key: 'equipe' },
-                      ].map((field) => (
-                        <CurrencyInput
-                          key={field.key}
-                          label={field.label}
-                          value={data.custosFixos[field.key as keyof typeof data.custosFixos] || 0}
-                          onChange={(value) => updateCustosFixos({ [field.key]: value })}
-                        />
-                      ))}
-                      <div className="lg:col-span-1">
-                        <CurrencyInput
-                          label="Pró-labore"
-                          value={data.custosFixos.proLabore || 0}
-                          onChange={(value) => updateCustosFixos({ proLabore: value })}
-                          className="bg-brand-blue/5 border-brand-blue/10"
-                          labelClassName="text-brand-blue"
-                          icon={
-                            <div className="group cursor-help relative">
-                              <Info size={12} className="text-brand-blue/40 group-hover:text-brand-blue transition-colors" />
-                              <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-brand-grey text-[10px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl normal-case font-medium">
-                                Salário fixo do proprietário. Não confunda com o lucro da empresa!
-                              </div>
-                            </div>
-                          }
-                        />
-                      </div>
-                    </div>
-                  </section>
+      <BarraDoResultado rotulo="Preço mínimo" valor={semHoras ? 'Falta pouco' : precoMinimo} alvoId={ID_RESULTADO} />
+    </>
+  );
+}
 
-                  {/* 2. Módulo de Capacidade Produtiva */}
-                  <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-blue/20">
-                          <Clock size={20} />
-                        </div>
-                        <div>
-                          <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">Capacidade Produtiva</h2>
-                          <p className="text-[10px] text-brand-grey font-bold uppercase opacity-60">O fator tempo da empresa</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-brand-grey font-bold uppercase opacity-60 mb-1">Custo/Hora Fixo</p>
-                        <p className="text-lg font-black text-brand-blue tracking-tighter">{formatCurrency(calculations.custoFixoPorHora)}</p>
-                      </div>
-                    </div>
+export default function PrecificacaoView({ children }: { children?: React.ReactNode }) {
+  const pricing = usePricing();
 
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div>
-                        <label 
-                          htmlFor={idDias}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Dias Úteis / Mês
-                        </label>
-                        <input
-                          id={idDias}
-                          type="number"
-                          value={data.capacidade.diasTrabalhados}
-                          onChange={(e) => updateCapacidade({ diasTrabalhados: Number(e.target.value) })}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label 
-                          htmlFor={idHoras}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Horas Diárias
-                        </label>
-                        <input
-                          id={idHoras}
-                          type="number"
-                          value={data.capacidade.horasDiarias}
-                          onChange={(e) => updateCapacidade({ horasDiarias: Number(e.target.value) })}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                        />
-                      </div>
-                      <div>
-                        <label 
-                          htmlFor={idOciosidade}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Ociosidade (%)
-                        </label>
-                        <div className="relative">
-                          <input
-                            id={idOciosidade}
-                            type="number"
-                            value={data.capacidade.percentualOciosidade}
-                            onChange={(e) => updateCapacidade({ percentualOciosidade: Number(e.target.value) })}
-                            className="w-full pr-9 pl-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">%</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="px-6 pb-6">
-                      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-brand-grey uppercase tracking-widest">Total de Horas Faturáveis:</span>
-                        <span className="text-sm font-black text-brand-blue tracking-tighter">{formatNumber(calculations.horasFaturaveis)} h</span>
-                      </div>
-                    </div>
-                  </section>
+  return (
+    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
+      <Header ferramenta />
 
-                  {/* 3. Módulo de Parametrização do Serviço */}
-                  <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-blue/20">
-                          <Settings size={20} />
-                        </div>
-                        <div>
-                          <h2 className="text-sm font-black text-brand-blue uppercase tracking-widest">Parâmetros do Serviço</h2>
-                          <p className="text-[10px] text-brand-grey font-bold uppercase opacity-60">Custos específicos da execução</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      <div className="lg:col-span-2">
-                        <label 
-                          htmlFor={idNome}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Nome do Serviço / Projeto
-                        </label>
-                        <input
-                          id={idNome}
-                          type="text"
-                          value={data.servico.nome}
-                          onChange={(e) => updateServico({ nome: e.target.value })}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                          placeholder="Ex: Instalação de Ar Condicionado"
-                        />
-                      </div>
-                      <div>
-                        <label 
-                          htmlFor={idHorasEst}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Horas Estimadas
-                        </label>
-                        <div className="relative">
-                          <input
-                            id={idHorasEst}
-                            type="number"
-                            value={data.servico.horasEstimadas || ''}
-                            onChange={(e) => updateServico({ horasEstimadas: Number(e.target.value) })}
-                            className="w-full pr-9 pl-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                            placeholder="0"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">h</span>
-                        </div>
-                      </div>
-                      <CurrencyInput
-                        label="Materiais Diretos"
-                        value={data.servico.materiaisDiretos || 0}
-                        onChange={(value) => updateServico({ materiaisDiretos: value })}
-                      />
-                      <CurrencyInput
-                        label="Deslocamento / Extras"
-                        value={data.servico.deslocamento || 0}
-                        onChange={(value) => updateServico({ deslocamento: value })}
-                      />
-                      <div>
-                        <label 
-                          htmlFor={idImpostos}
-                          className="block text-[10px] font-black text-brand-grey uppercase tracking-widest mb-2"
-                        >
-                          Impostos (%)
-                        </label>
-                        <div className="relative">
-                          <input
-                            id={idImpostos}
-                            type="number"
-                            value={data.servico.impostosPercentual || ''}
-                            onChange={(e) => updateServico({ impostosPercentual: Number(e.target.value) })}
-                            className="w-full pr-9 pl-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-brand-blue focus:ring-2 focus:ring-brand-blue/10 focus:border-brand-blue outline-none transition-all"
-                            placeholder="0"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                </div>
-
-                {/* Results Column */}
-                <div className="lg:col-span-4 space-y-8">
-                  <section className="bg-brand-grey rounded-2xl shadow-2xl p-8 text-white sticky top-24">
-                    <header className="mb-8 border-b border-white/10 pb-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp size={20} className="text-brand-blue" />
-                        <h2 className="text-sm font-black uppercase tracking-widest">Painel de Resultados</h2>
-                      </div>
-                      <p className="text-[10px] text-white/50 font-bold uppercase tracking-tighter">Análise de Viabilidade em Tempo Real</p>
-                    </header>
-
-                    <div className="space-y-8">
-                      {/* Piso Aceitável */}
-                      <div>
-                        <label className="flex items-center gap-2 text-[10px] font-black text-white/40 uppercase tracking-widest mb-3">
-                          Piso Aceitável (Break-even)
-                          <div className="relative group cursor-help">
-                            <Info size={12} className="text-white/20 group-hover:text-white transition-colors" />
-                            <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-white text-[10px] text-brand-grey rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl normal-case font-medium">
-                              Valor mínimo para cobrir custos e impostos. Abaixo disso, há prejuízo.
-                            </div>
-                          </div>
-                        </label>
-                        <div className="text-3xl font-black tracking-tighter text-white">
-                          {formatCurrency(calculations.pisoAceitavel)}
-                        </div>
-                        <div className="mt-2 text-[10px] font-bold text-white/30 uppercase tracking-widest">
-                          O Ponto de Equilíbrio Real
-                        </div>
-                      </div>
-
-                      {/* Simulador de Preço */}
-                      <div className="pt-8 border-t border-white/10">
-                        <CurrencyInput
-                          label="Quanto deseja cobrar?"
-                          value={data.servico.precoDesejado || 0}
-                          onChange={(value) => updateServico({ precoDesejado: value })}
-                          labelClassName="text-white/80"
-                          className="bg-white/5 border-white/10 py-5 pl-12 pr-6 text-2xl font-black text-white focus:bg-white/10 focus:border-brand-blue placeholder:text-white/10"
-                          prefix="R$"
-                        />
-                      </div>
-
-                      {/* Margem e Lucro */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className={`p-4 rounded-2xl border transition-colors ${getStatusColor(calculations.margemLucroReal)}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[9px] font-black uppercase tracking-widest opacity-70">Margem Real</span>
-                            {getStatusIcon(calculations.margemLucroReal)}
-                          </div>
-                          <div className="text-xl font-black tracking-tighter">
-                            {formatNumber(calculations.margemLucroReal)}%
-                          </div>
-                        </div>
-
-                    <div className={`p-4 rounded-2xl border transition-colors ${getStatusColor(calculations.margemLucroReal)}`}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[9px] font-black uppercase tracking-widest opacity-70">Lucro Líquido</span>
-                        <DollarSign size={16} className="opacity-40" />
-                      </div>
-                      <div className="text-xl font-black tracking-tighter">
-                        {formatCurrency(calculations.lucroNominal)}
-                      </div>
-                    </div>
-                      </div>
-
-                      {/* Warning message if below floor */}
-                      {data.servico.precoDesejado > 0 && data.servico.precoDesejado < calculations.pisoAceitavel && (
-                        <div className="p-4 bg-red-500/20 border border-red-500/40 rounded-xl flex gap-3">
-                          <AlertCircle className="text-red-400 shrink-0" size={18} />
-                          <p className="text-[10px] font-bold text-red-200 leading-relaxed uppercase">
-                            Atenção: O preço sugerido está abaixo do piso aceitável. Esta venda gerará prejuízo para a operação.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Recommendation based on margin */}
-                      {data.servico.precoDesejado > 0 && calculations.margemLucroReal > 0 && calculations.margemLucroReal < 20 && (
-                        <div className="p-4 bg-yellow-500/20 border border-yellow-500/40 rounded-xl flex gap-3">
-                          <AlertTriangle className="text-yellow-400 shrink-0" size={18} />
-                          <p className="text-[10px] font-bold text-yellow-200 leading-relaxed uppercase">
-                            Margem Apertada: Considere otimizar processos ou aumentar o valor para atingir a margem ideal (acima de 20%).
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </section>
-                </div>
-              </div>
-
-              <div className="bg-white border-2 border-brand-blue/10 p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-brand-blue/5 mt-12">
-                <div className="space-y-2 text-center md:text-left">
-                  <h4 className="text-xl font-bold text-brand-blue">Garanta a saúde financeira da sua operação.</h4>
-                  <p className="text-gray-500 text-sm">Descubra como o Unum People pode ajudar você a otimizar seus custos e garantir previsibilidade de lucro.</p>
-                </div>
-                <a 
-                  href="https://unumpeople.com.br" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="px-8 py-4 bg-brand-blue text-white font-black rounded-xl hover:bg-opacity-90 hover:scale-105 transition-all whitespace-nowrap shadow-lg shadow-brand-blue/20 inline-block text-center"
-                >
-                  CONHECER UNUM PEOPLE
-                </a>
-              </div>
-            </>
-          )}
-
-          {children}
+      <main className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-5 px-5 pb-28 pt-2">
+        <div className="flex flex-col gap-2">
+          <h1 className="m-0 text-[28px] font-bold leading-[1.15] tracking-[-0.03em] text-ui-ink">
+            Quanto cobrar pelo serviço
+          </h1>
+          <p className="m-0 text-base leading-normal text-ui-muted">
+            Responda três blocos e veja o menor preço que não dá prejuízo. Leva uns 3 minutos.
+          </p>
         </div>
+
+        {pricing.isLoaded ? (
+          <Simulador pricing={pricing} />
+        ) : (
+          <p className="m-0 py-10 text-center text-sm text-ui-muted">Carregando a calculadora…</p>
+        )}
+
+        {children && (
+          <Recolhivel titulo="Como funciona esta conta" variante="cartao">
+            <div className="[&_[data-guia]]:mb-4 [&_[data-guia]]:mt-2">{children}</div>
+          </Recolhivel>
+        )}
+
+        <Convite
+          texto="Já sabe o seu preço?"
+          link="Mostre numa página com botão de WhatsApp →"
+          href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=quanto-cobrar"
+        />
       </main>
 
       <Footer />

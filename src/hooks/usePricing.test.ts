@@ -94,4 +94,35 @@ describe('usePricing', () => {
     expect(result.current.calculations.margemLucroReal).toBe(20);
     expect(result.current.calculations.lucroNominal).toBe(200);
   });
+  it('reset volta tudo ao padrão e regrava o localStorage no formato de sempre', () => {
+    const { result } = renderHook(() => usePricing());
+    act(() => {
+      vi.runAllTimers();
+    });
+    act(() => {
+      result.current.updateCustosFixos({ aluguel: 800, proLabore: 3000 });
+      result.current.updateCapacidade({ diasTrabalhados: 20 });
+      result.current.updateServico({ nome: 'Pintura', horasEstimadas: 3, precoDesejado: 250 });
+    });
+    expect(result.current.data.custosFixos.aluguel).toBe(800);
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.data.custosFixos.aluguel).toBe(0);
+    expect(result.current.data.custosFixos.proLabore).toBe(0);
+    expect(result.current.data.capacidade).toEqual({ diasTrabalhados: 22, horasDiarias: 8, percentualOciosidade: 20 });
+    expect(result.current.data.servico).toEqual({
+      nome: '',
+      horasEstimadas: 0,
+      materiaisDiretos: 0,
+      deslocamento: 0,
+      impostosPercentual: 0,
+      precoDesejado: 0,
+    });
+    const salvo = JSON.parse(window.localStorage.getItem('pricing_data') as string);
+    expect(salvo.capacidade.diasTrabalhados).toBe(22);
+    expect(salvo.custosFixos.aluguel).toBe(0);
+  });
 });

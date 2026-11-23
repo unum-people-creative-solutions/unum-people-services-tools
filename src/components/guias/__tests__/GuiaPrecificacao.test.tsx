@@ -65,28 +65,28 @@ describe('GuiaPrecificacao', () => {
       });
     };
 
-    await preencher(/Aluguel/i, e.custosFixos.aluguel);
-    await preencher(/Energia/i, e.custosFixos.energia);
-    await preencher(/Internet/i, e.custosFixos.internet);
+    await preencher(/Aluguel e condomínio/i, e.custosFixos.aluguel);
+    await preencher(/Luz e água/i, e.custosFixos.energia);
+    await preencher(/Internet e telefone/i, e.custosFixos.internet);
     await preencher(/Contador/i, e.custosFixos.contador);
-    await preencher(/Softwares/i, e.custosFixos.softwares);
-    await preencher(/Salários Equipe/i, e.custosFixos.equipe);
-    await preencher(/Pró-labore/i, e.custosFixos.proLabore);
-    await preencher(/Dias Úteis/i, e.capacidade.diasTrabalhados);
-    await preencher(/Horas Diárias/i, e.capacidade.horasDiarias);
-    await preencher(/Ociosidade/i, e.capacidade.percentualOciosidade);
-    await preencher(/Horas Estimadas/i, e.servico.horasEstimadas);
-    await preencher(/Materiais Diretos/i, e.servico.materiaisDiretos);
-    await preencher(/Deslocamento/i, e.servico.deslocamento);
-    await preencher(/Impostos/i, e.servico.impostosPercentual);
-    await preencher(/Quanto deseja cobrar/i, e.servico.preco);
+    await preencher(/Programas e assinaturas/i, e.custosFixos.softwares);
+    await preencher(/Salários de funcionários/i, e.custosFixos.equipe);
+    await preencher(/Quanto você tira para viver/i, e.custosFixos.proLabore);
+    await preencher(/Dias por mês/i, e.capacidade.diasTrabalhados);
+    await preencher(/Horas por dia/i, e.capacidade.horasDiarias);
+    await preencher(/Tempo sem vender/i, e.capacidade.percentualOciosidade);
+    await preencher(/Horas que leva/i, e.servico.horasEstimadas);
+    await preencher(/Material/i, e.servico.materiaisDiretos);
+    await preencher(/Transporte e extras/i, e.servico.deslocamento);
+    await preencher(/Imposto na nota/i, e.servico.impostosPercentual);
+    await preencher(/Quanto você quer cobrar/i, e.servico.preco);
 
     const tela = textoDe(document.body);
     expect(tela).toContain('R$ 4.400,00');
-    expect(tela).toContain('140,80 h');
+    expect(tela).toContain('140,8 h'); // formato da F2 (spec CA-F2-04); mesmo número
     expect(tela).toContain('R$ 31,25');
     expect(tela).toContain('R$ 163,56');
     expect(tela).toContain('R$ 81,25');
-    expect(tela).toContain('32,50%');
+    expect(tela).toContain('sobram R$ 32,50'); // F2 RF-F2-18: margem de 32,5% dita como "de cada R$ 100"
   });
 });

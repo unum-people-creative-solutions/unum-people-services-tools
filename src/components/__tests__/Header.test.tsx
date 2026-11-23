@@ -1,66 +1,40 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { Header } from '../Header';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
-// Mock next/image
-vi.mock('next/image', () => ({
-  default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
-}));
-
-const rota = vi.hoisted(() => ({ atual: '/' }));
-vi.mock('next/navigation', () => ({
-  usePathname: () => rota.atual,
-}));
-
-describe('Header', () => {
-  beforeEach(() => {
-    rota.atual = '/';
-  });
-
-  it('liga as três ferramentas em uma navegação própria', () => {
+describe('Header (RF-F2-05 e RF-F2-07)', () => {
+  it('mostra a marca "Unum People Tools" como link para a home', () => {
     render(<Header />);
-    const nav = screen.getByRole('navigation', { name: 'Ferramentas' });
-    expect(within(nav).getByRole('link', { name: 'Portfólio' })).toHaveAttribute('href', '/portfolio-analises');
-    expect(within(nav).getByRole('link', { name: 'Precificação' })).toHaveAttribute('href', '/simulador-precificacao');
-    expect(within(nav).getByRole('link', { name: 'Viabilidade' })).toHaveAttribute('href', '/calculadora-viabilidade');
+    const banner = screen.getByRole('banner');
+    const marca = screen.getByRole('link', { name: 'Unum People Tools' });
+    expect(banner).toContainElement(marca);
+    expect(marca).toHaveAttribute('href', '/');
   });
 
-  it.each([
-    ['/portfolio-analises', 'Portfólio'],
-    ['/simulador-precificacao', 'Precificação'],
-    ['/calculadora-viabilidade', 'Viabilidade'],
-  ])('em %s, marca só "%s"', (caminho, atual) => {
-    rota.atual = caminho;
+  it('não tem mais a barra de abas Portfólio / Precificação / Viabilidade', () => {
     render(<Header />);
-    const nav = screen.getByRole('navigation', { name: 'Ferramentas' });
-    const marcado = within(nav).getByRole('link', { name: atual });
-    expect(marcado).toHaveAttribute('aria-current', 'page');
-    within(nav)
-      .getAllByRole('link')
-      .filter((link) => link !== marcado)
-      .forEach((link) => expect(link).not.toHaveAttribute('aria-current'));
+    expect(screen.queryByRole('navigation', { name: 'Ferramentas' })).not.toBeInTheDocument();
+    for (const aba of ['Portfólio', 'Precificação', 'Viabilidade']) {
+      expect(screen.queryByRole('link', { name: aba })).not.toBeInTheDocument();
+    }
   });
 
-  it('não marca nenhuma ferramenta fora delas', () => {
+  it('na home e na privacidade não mostra "Todas as ferramentas"', () => {
     render(<Header />);
-    const nav = screen.getByRole('navigation', { name: 'Ferramentas' });
-    within(nav).getAllByRole('link').forEach((link) => {
-      expect(link).not.toHaveAttribute('aria-current');
-    });
+    expect(screen.queryByRole('link', { name: /Todas as ferramentas/ })).not.toBeInTheDocument();
   });
 
-  it('deve renderizar o nome da ferramenta se fornecido', () => {
-    render(<Header toolName="Teste Tool" />);
-    expect(screen.getByText('Teste Tool')).toBeInTheDocument();
+  it('nas páginas de ferramenta, mostra "Todas as ferramentas" levando para a home, depois do cabeçalho', () => {
+    render(<Header ferramenta />);
+    const link = screen.getByRole('link', { name: 'Todas as ferramentas' });
+    expect(link).toHaveAttribute('href', '/');
+    const banner = screen.getByRole('banner');
+    expect(banner).not.toContainElement(link);
+    expect(Boolean(banner.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
   });
 
-  it('deve chamar onOpenHelp quando o botão de ajuda for clicado', () => {
-    const onOpenHelp = vi.fn();
-    render(<Header onOpenHelp={onOpenHelp} />);
-    
-    const helpButton = screen.getByRole('button', { name: /ajuda/i });
-    fireEvent.click(helpButton);
-    
-    expect(onOpenHelp).toHaveBeenCalledTimes(1);
+  it('não leva mais o botão Ajuda nem o nome da ferramenta (a ajuda mora no miolo da ferramenta)', () => {
+    render(<Header ferramenta />);
+    expect(screen.queryByRole('button', { name: /ajuda/i })).not.toBeInTheDocument();
   });
 });

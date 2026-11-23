@@ -79,6 +79,10 @@ export function usePricing() {
     }));
   };
 
+  const reset = () => {
+    setData(DEFAULT_PRICING_DATA);
+  };
+
   // Cálculos
   const totalCustosFixos = Object.values(data.custosFixos).reduce((a, b) => a + b, 0);
   
@@ -107,6 +111,7 @@ export function usePricing() {
     updateCustosFixos,
     updateCapacidade,
     updateServico,
+    reset,
     isLoaded,
     calculations: {
       totalCustosFixos,

@@ -1,44 +1,45 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { Footer } from '../Footer';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
-// Mock next/image
-vi.mock('next/image', () => ({
-  default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
-}));
-
-describe('Footer', () => {
-  it('deve renderizar o texto de direitos autorais', () => {
-    render(<Footer />);
-    expect(screen.getByText(/© 2026 Unum People/i)).toBeInTheDocument();
-  });
-
-  it('mostra a logo texto à esquerda e só o símbolo à direita', () => {
-    render(<Footer />);
-    expect(screen.getByRole('img', { name: 'Unum People' })).toHaveAttribute('src', '/images/logo_texto.png');
-    expect(screen.getByRole('img', { name: 'Símbolo Unum People' })).toHaveAttribute('src', '/images/logo_simbolo.png');
-    expect(screen.queryByRole('heading', { name: 'Unum People' })).not.toBeInTheDocument();
-  });
-
-  it('deve conter links para a Unum People', () => {
-    render(<Footer />);
-    const links = screen.getAllByRole('link');
-    const unumLink = links.find(link => link.getAttribute('href') === 'https://unumpeople.com.br/');
-    expect(unumLink).toBeDefined();
-  });
-
-  it('liga as páginas institucionais', () => {
-    render(<Footer />);
-    expect(screen.getByRole('link', { name: 'Sobre' })).toHaveAttribute('href', 'https://unumpeople.com.br/sobre');
-    expect(screen.getByRole('link', { name: 'Contato' })).toHaveAttribute('href', 'https://unumpeople.com.br/contato');
-    expect(screen.getByRole('link', { name: 'Termos' })).toHaveAttribute('href', 'https://unumpeople.com.br/termos');
-    expect(screen.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
-  });
-
-  it('avisa que os dados ficam no aparelho e leva à privacidade', () => {
+describe('Footer (RF-F2-06)', () => {
+  it('abre com o aviso de que os dados ficam no aparelho', () => {
     render(<Footer />);
     expect(screen.getByText('Seus dados ficam neste aparelho.')).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: 'Privacidade' })).toHaveLength(1);
-    expect(screen.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
+  });
+
+  it('liga Privacidade, Sobre a Unum People, Contato e Termos, nesta ordem', () => {
+    render(<Footer />);
+    const nav = screen.getByRole('navigation', { name: 'Rodapé' });
+    const links = within(nav).getAllByRole('link');
+    expect(links.map((l) => l.textContent)).toEqual(['Privacidade', 'Sobre a Unum People', 'Contato', 'Termos']);
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '/privacidade',
+      'https://unumpeople.com.br/sobre',
+      'https://unumpeople.com.br/contato',
+      'https://unumpeople.com.br/termos',
+    ]);
+  });
+
+  it('fecha com "© 2026 Unum People"', () => {
+    render(<Footer />);
+    expect(screen.getByText('© 2026 Unum People')).toBeInTheDocument();
+  });
+
+  it('a ordem é aviso, links, direitos autorais', () => {
+    render(<Footer />);
+    const aviso = screen.getByText('Seus dados ficam neste aparelho.');
+    const nav = screen.getByRole('navigation', { name: 'Rodapé' });
+    const direitos = screen.getByText('© 2026 Unum People');
+    const depois = (a: Element, b: Element) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(depois(aviso, nav)).toBe(true);
+    expect(depois(nav, direitos)).toBe(true);
+  });
+
+  it('não tem mais o P2P nem as logos', () => {
+    render(<Footer />);
+    expect(screen.queryByText(/People to People/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/P2P/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });
