@@ -4,11 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependências externas
 vi.mock('../../../components/Header', () => ({
-  Header: ({ onOpenHelp }: { onOpenHelp?: () => void }) => (
-    <div data-testid="header">
-      <button onClick={onOpenHelp}>Ajuda</button>
-    </div>
-  )
+  Header: () => <div data-testid="header" />
 }));
 vi.mock('../../../components/Footer', () => ({
   Footer: () => <div data-testid="footer" />

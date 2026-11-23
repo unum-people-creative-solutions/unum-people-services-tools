@@ -8,7 +8,7 @@ import { ServiceDrawer } from '../../components/ServiceDrawer';
 import { WelcomeModal } from '../../components/WelcomeModal';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, HelpCircle } from 'lucide-react';
 
 export default function PortfolioView({ children }: { children?: React.ReactNode }) {
   const { services, addService, removeService, isLoaded } = useServices();
@@ -22,14 +22,22 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50/30">
-      <Header 
-        onOpenHelp={() => setIsHelpOpen(true)} 
-        toolName="Ferramenta de Portfólio"
-      />
+      <Header ferramenta />
       <WelcomeModal isOpen={isHelpOpen} onClose={closeHelp} />
       
       <main className="flex-1 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
+          <div className="mb-4 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsHelpOpen(true)}
+              className="flex min-h-11 items-center gap-2 text-sm font-medium text-brand-grey transition-colors hover:text-brand-blue"
+            >
+              <HelpCircle size={18} aria-hidden="true" />
+              Ajuda
+            </button>
+          </div>
+
           <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">

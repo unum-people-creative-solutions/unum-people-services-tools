@@ -3,8 +3,11 @@ import { GuiaPrecificacao } from '../../components/guias/GuiaPrecificacao';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Simulador de Precificação e Margem de Lucro',
-  description: 'Calcule o lucro real de seus serviços considerando custos fixos, variáveis, impostos e margem líquida.',
+  title: {
+    absolute: 'Quanto cobrar pelo serviço — calculadora grátis | Unum People Tools',
+  },
+  description:
+    'Descubra o menor preço que não dá prejuízo e quanto sobra no bolso. Calculadora grátis para MEI e autônomos, sem cadastro.',
 };
 
 export default function Page() {

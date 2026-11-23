@@ -5,7 +5,7 @@ import './globals.css';
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
 });
 
@@ -67,8 +67,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <body className={`${poppins.variable} font-sans antialiased bg-brand-white`} suppressHydrationWarning>
+    <html lang="pt-BR" className={poppins.variable}>
+      <body className="font-sans antialiased bg-brand-white" suppressHydrationWarning>
         <Script
           id="json-ld"
           type="application/ld+json"

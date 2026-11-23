@@ -20,7 +20,8 @@ import {
   Lightbulb,
   PieChart,
   Target,
-  Zap
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 
 type Step = 'CHOOSE_PATH' | 'FILL_FORM' | 'DIAGNOSIS';
@@ -649,13 +650,21 @@ export default function ViabilidadeView({ children }: { children?: React.ReactNo
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50/30">
-      <Header 
-        onOpenHelp={() => setIsHelpOpen(true)}
-        toolName="Calculadora de Viabilidade"
-      />
+      <Header ferramenta />
       
       <main className="flex-1 p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-4 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsHelpOpen(true)}
+              className="flex min-h-11 items-center gap-2 text-sm font-medium text-brand-grey transition-colors hover:text-brand-blue"
+            >
+              <HelpCircle size={18} aria-hidden="true" />
+              Ajuda
+            </button>
+          </div>
+
           <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">

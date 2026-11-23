@@ -1,114 +1,101 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { BarChart3, ChevronRight, CircleDollarSign, Megaphone } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { LayoutGrid, ArrowRight, BarChart3, Calculator } from 'lucide-react';
+import { Convite } from '../components/ui/Convite';
 
-export const metadata = {
-  title: 'Tools | Unum People',
-  description: 'Ferramentas inteligentes da Unum People para análise estratégica, ROI de campanhas e lucratividade de serviços.',
+export const metadata: Metadata = {
+  title: { absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer' },
+  description:
+    'Calculadoras grátis para MEI e pequenos negócios: quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
 };
 
-const tools = [
+const contasDoNegocio = [
   {
-    title: 'Análise de Portfólio',
-    description: 'Mapeamento estratégico de serviços com foco em escalabilidade e rentabilidade.',
-    href: '/portfolio-analises',
-    icon: LayoutGrid,
-    color: 'bg-brand-blue',
-    status: 'Disponível'
-  },
-  {
-    title: 'Simulador de Precificação',
-    description: 'Elimine o achismo ao cobrar. Calcule o ponto de equilíbrio e margem de lucro real.',
+    nome: 'Quanto cobrar pelo serviço',
+    frase: 'Descubra o menor preço sem prejuízo e quanto sobra no bolso.',
     href: '/simulador-precificacao',
-    icon: Calculator,
-    color: 'bg-brand-blue',
-    status: 'Disponível'
+    icone: CircleDollarSign,
   },
   {
-    title: 'Viabilidade de Campanhas',
-    description: 'Calcule o esforço necessário para obter retorno em anúncios antes de investir.',
+    nome: 'Vale a pena anunciar?',
+    frase: 'Veja quantas vendas pagam o anúncio antes de gastar.',
     href: '/calculadora-viabilidade',
-    icon: BarChart3,
-    color: 'bg-brand-blue',
-    status: 'Disponível'
-  }
+    icone: Megaphone,
+  },
+  {
+    nome: 'Quais serviços compensam',
+    frase: 'Compare o que dá lucro com o que dá trabalho demais.',
+    href: '/portfolio-analises',
+    icone: BarChart3,
+  },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-brand-white">
+    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
       <Header />
-      
-      <main className="flex-1 p-4 md:p-8">
-        <div className="max-w-7xl mx-auto py-12 md:py-20">
-          <header className="mb-16 text-center">
-            <h1 className="text-4xl md:text-6xl font-black brand-gradient-text uppercase tracking-tighter mb-6">
-              Ecossistema de <br /> Inteligência Estratégica
+
+      <main className="flex-1">
+        <section className="bg-ui-canvas">
+          <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 px-5 pb-9 pt-6 md:pb-14 md:pt-10">
+            <h1 className="m-0 text-4xl font-bold leading-[1.1] tracking-[-0.035em] text-white md:text-[52px]">
+              Unum People{' '}
+              <span className="bg-[linear-gradient(90deg,#4d7cff_0%,#b06cff_55%,#ff7a45_100%)] bg-clip-text text-transparent">
+                Tools
+              </span>
             </h1>
-            <p className="text-brand-grey text-lg md:text-xl max-w-2xl mx-auto font-medium">
-              Ferramentas diretas para você focar no que importa: o seu cliente.
+            <p className="m-0 text-lg leading-[1.45] text-white md:text-xl">
+              Ferramentas grátis para o seu negócio crescer.
             </p>
-          </header>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tools.map((tool) => (
-              <div 
-                key={tool.title}
-                className={`group relative bg-white p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 ${
-                  tool.href !== '#' ? 'hover:shadow-xl hover:-translate-y-1' : 'opacity-75'
-                }`}
-              >
-                <div className={`brand-gradient w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-brand-blue/10`}>
-                  <tool.icon size={32} />
-                </div>
-                
-                <div className="mb-4">
-                  <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                    tool.status === 'Disponível' ? 'bg-brand-orange/10 text-brand-orange' : 'bg-gray-100 text-gray-400'
-                  }`}>
-                    {tool.status}
-                  </span>
-                </div>
-
-                <h2 className="text-2xl font-bold text-brand-blue mb-4">
-                  {tool.title}
-                </h2>
-                
-                <p className="text-brand-grey text-base leading-relaxed mb-10 h-20">
-                  {tool.description}
-                </p>
-
-                {tool.href !== '#' ? (
-                  <Link 
-                    href={tool.href}
-                    className="inline-flex items-center gap-2 text-brand-blue font-bold text-sm uppercase tracking-widest group-hover:gap-4 transition-all"
-                  >
-                    Acessar Ferramenta
-                    <ArrowRight size={18} />
-                  </Link>
-                ) : (
-                  <span className="text-gray-400 font-bold text-sm uppercase tracking-widest cursor-not-allowed">
-                    Em Breve
-                  </span>
-                )}
-              </div>
-            ))}
+            <p className="m-0 text-sm leading-normal text-ui-muted-on-canvas">
+              Sem cadastro. O que você digita fica neste aparelho.
+            </p>
           </div>
+        </section>
 
-          <section className="mt-20 max-w-3xl mx-auto text-center space-y-6">
-            <p className="text-brand-grey text-base md:text-lg leading-relaxed">
-              Ferramentas gratuitas para profissionais autônomos e pequenos negócios de serviço decidirem com números: quais serviços priorizar, quanto cobrar e quanto investir em anúncios. Quem faz é a Unum People, que cria páginas com WhatsApp e CRM para pequenos negócios. Os dados que você digita ficam no seu navegador e não são enviados para os nossos servidores.
-            </p>
-            <a
-              href="https://unumpeople.com.br/sobre"
-              className="inline-flex items-center gap-2 text-brand-blue font-bold text-sm uppercase tracking-widest hover:gap-4 transition-all"
-            >
-              Conheça a Unum People
-              <ArrowRight size={18} />
-            </a>
+        <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-8 px-5 pb-2 pt-7 md:pt-10">
+          <section aria-labelledby="g-contas" className="flex flex-col gap-3">
+            <h2 id="g-contas" className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-ui-muted">
+              Contas do negócio
+            </h2>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {contasDoNegocio.map(({ nome, frase, href, icone: Icone }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="flex min-h-11 items-center gap-3.5 rounded-xl border border-ui-line bg-ui-bg p-4 text-ui-ink no-underline shadow-[0_1px_2px_rgb(20_20_43/0.06)] hover:border-ui-line-strong"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="flex size-11 flex-none items-center justify-center rounded-[10px] bg-[#eef0fb] text-ui-brand-blue"
+                  >
+                    <Icone size={22} strokeWidth={2} />
+                  </span>
+                  <span className="flex flex-1 flex-col gap-0.5">
+                    <span className="text-base font-semibold tracking-[-0.01em]">{nome}</span>
+                    <span className="text-sm leading-[1.45] text-ui-muted">{frase}</span>
+                  </span>
+                  <ChevronRight size={18} aria-hidden="true" className="flex-none text-ui-line-strong" />
+                </Link>
+              ))}
+            </div>
           </section>
+
+          <section className="flex flex-col gap-2.5 rounded-xl border border-ui-line bg-ui-bg p-5">
+            <h2 className="m-0 text-base font-semibold">Feitas para quem toca o próprio negócio</h2>
+            <p className="m-0 text-sm leading-[1.55] text-ui-muted">
+              Contas simples, explicadas passo a passo, para MEI, autônomos e pequenos negócios. Funcionam no celular e não pedem cadastro.
+            </p>
+          </section>
+
+          <Convite
+            texto="Quer que seus clientes achem você?"
+            link="Faça uma página com o seu WhatsApp →"
+            href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=home"
+          />
         </div>
       </main>
 

@@ -7,6 +7,27 @@
   --brand-dark: #0A1C82;
   --brand-grey: #6E7191;
   --brand-white: #FFFFFF;
+
+  /* Tokens do chrome (mesmos nomes e valores da vitrine unumpeople.app) */
+  --ui-bg: #ffffff;
+  --ui-surface: #f7f8fc;
+  --ui-canvas: #0a0b1a;
+  --ui-ink: #14142b;
+  --ui-muted: #63668a;
+  --ui-muted-on-canvas: #a9adcb;
+  --ui-line: #e4e5ef;
+  --ui-line-strong: #8a8db0;
+  --ui-brand-blue: #0a1c82;
+  --ui-brand-purple: #6b00d7;
+  --ui-brand-orange: #ff3d00;
+
+  /* Estados do resultado (sempre escritos no selo, nunca só cor) */
+  --ui-ok: #0b6b3a;
+  --ui-ok-bg: #e9f6ef;
+  --ui-atencao: #8a5a00;
+  --ui-atencao-bg: #fff4dc;
+  --ui-erro: #b42318;
+  --ui-erro-bg: #fdecea;
 }
 
 body {
@@ -23,6 +44,24 @@ body {
   --color-brand-dark: var(--brand-dark);
   --color-brand-grey: var(--brand-grey);
   --color-brand-white: var(--brand-white);
+
+  --color-ui-bg: var(--ui-bg);
+  --color-ui-surface: var(--ui-surface);
+  --color-ui-canvas: var(--ui-canvas);
+  --color-ui-ink: var(--ui-ink);
+  --color-ui-muted: var(--ui-muted);
+  --color-ui-muted-on-canvas: var(--ui-muted-on-canvas);
+  --color-ui-line: var(--ui-line);
+  --color-ui-line-strong: var(--ui-line-strong);
+  --color-ui-brand-blue: var(--ui-brand-blue);
+  --color-ui-brand-purple: var(--ui-brand-purple);
+  --color-ui-brand-orange: var(--ui-brand-orange);
+  --color-ui-ok: var(--ui-ok);
+  --color-ui-ok-bg: var(--ui-ok-bg);
+  --color-ui-atencao: var(--ui-atencao);
+  --color-ui-atencao-bg: var(--ui-atencao-bg);
+  --color-ui-erro: var(--ui-erro);
+  --color-ui-erro-bg: var(--ui-erro-bg);
 
   @keyframes slide-in-right {
     from { transform: translateX(100%); }
