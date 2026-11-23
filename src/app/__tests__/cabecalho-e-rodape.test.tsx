@@ -60,14 +60,13 @@ describe('ferramentas "Vale a pena anunciar?" e "Quais serviços compensam"', ()
   it('Viabilidade não tem o botão Ajuda provisório', () => {
     render(<ViabilidadePage />);
     expect(screen.queryByRole('button', { name: 'Ajuda' })).not.toBeInTheDocument();
+    expect(within(screen.getAllByRole('banner')[0]).queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it.each([
-    ['Portfólio', PortfolioPage],
-  ])('%s mantém o botão Ajuda no topo do miolo, e não no cabeçalho', (_n, Pagina) => {
-    render(<Pagina />);
-    const ajuda = screen.getByRole('button', { name: 'Ajuda' });
-    expect(screen.getByRole('main')).toContainElement(ajuda);
+  // F3b: sai o botão "Ajuda" provisório (a ajuda fica sempre visível na tela)
+  it('Portfólio não tem mais o botão Ajuda, nem no miolo nem no cabeçalho', () => {
+    render(<PortfolioPage />);
+    expect(screen.queryByRole('button', { name: 'Ajuda' })).not.toBeInTheDocument();
     expect(within(screen.getAllByRole('banner')[0]).queryByRole('button')).not.toBeInTheDocument();
   });
 });
