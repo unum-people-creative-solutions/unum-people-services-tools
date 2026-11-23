@@ -4,31 +4,41 @@ import { GuiaPortfolio, EXEMPLO_PORTFOLIO } from '../GuiaPortfolio';
 import PortfolioView from '../../../app/portfolio-analises/PortfolioView';
 import { quadranteDe } from '../../ServiceCharts';
 import type { Service } from '../../../types';
+import { regrasDoGuia, textoDe, topico } from './regras';
 
-const TOPICOS = [
-  'Para que serve',
-  'Como a conta é feita',
-  'Exemplo com números',
-  'Como ler o resultado',
-  'Erros comuns',
-  'Perguntas frequentes',
-  'Aviso',
-  'Quem fez',
-];
+regrasDoGuia({
+  nome: 'GuiaPortfolio',
+  guia: () => <GuiaPortfolio />,
+  titulo: 'Como descobrir quais serviços compensam',
+  rotulosDoPasso: [
+    'Adicionar serviço',
+    'Dá muito trabalho?',
+    'É difícil de fazer?',
+    'Dá para repetir sempre igual?',
+    'Dá lucro?',
+    'Como se chama este serviço?',
+    'Salvar serviço',
+    'Nota geral',
+    'Trabalho',
+    'Retorno',
+  ],
+  selos: [
+    'Leve e simples',
+    'Pesado e difícil',
+    'Difícil, mas rápido',
+    'Pesado, mas simples',
+    'Vender mais',
+    'Padronizar',
+    'Lucro baixo',
+    'Repensar',
+    'Nota geral',
+    'Trabalho',
+    'Retorno',
+  ],
+  perguntas: ['Meus dados ficam salvos?'],
+});
 
-// F3b: a ferramenta renomeou os quadrantes (RF-F3b-02). O guia ainda usa os nomes antigos
-// (a F4 o reescreve); o teste traduz o nome do guia para o nome que a ferramenta mostra.
-const NOME_NA_FERRAMENTA: Record<string, string> = {
-  Eficiente: 'Leve e simples',
-  Crítico: 'Pesado e difícil',
-  Estrela: 'Vender mais',
-  Oportunidade: 'Padronizar',
-};
-
-const textoDe = (el: Element) => (el.textContent ?? '').replace(/ /g, ' ');
-const contarPalavras = (el: Element) => textoDe(el).split(/\s+/).filter(Boolean).length;
-
-describe('GuiaPortfolio', () => {
+describe('GuiaPortfolio: exemplo e ferramenta real', () => {
   beforeEach(() => {
     window.localStorage.clear();
     vi.useFakeTimers();
@@ -37,32 +47,20 @@ describe('GuiaPortfolio', () => {
     vi.useRealTimers();
   });
 
-  it('tem um título e os oito tópicos, na ordem', () => {
+  it('mostra no exemplo as notas, os quadrantes e a nota geral dos dois serviços', () => {
     render(<GuiaPortfolio />);
-    expect(screen.getByRole('heading', { level: 2, name: /Guia do Mapeamento Estratégico de Portfólio/ })).toBeInTheDocument();
-    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(TOPICOS);
-    expect(screen.getByRole('region', { name: /Guia do Mapeamento Estratégico de Portfólio/ }).tagName).toBe('SECTION');
-  });
-
-  it('tem pelo menos 600 palavras', () => {
-    const { container } = render(<GuiaPortfolio />);
-    expect(contarPalavras(container)).toBeGreaterThanOrEqual(600);
-  });
-
-  it('mostra no exemplo as notas, os quadrantes e a atratividade dos dois serviços', () => {
-    render(<GuiaPortfolio />);
-    const exemplo = textoDe(screen.getByRole('heading', { name: 'Exemplo com números' }).parentElement!);
+    const exemplo = textoDe(topico('Exemplo com números'));
     expect(exemplo).toContain('17%, 17%, 83% e 67%');
-    expect(exemplo).toContain('Eficiente');
-    expect(exemplo).toContain('Estrela');
-    expect(exemplo).toContain('79,2%');
+    expect(exemplo).toContain('Leve e simples');
+    expect(exemplo).toContain('Vender mais');
+    expect(exemplo).toContain('79,2');
     expect(exemplo).toContain('83%, 83%, 17% e 50%');
-    expect(exemplo).toContain('Crítico');
-    expect(exemplo).toContain('Oportunidade');
-    expect(exemplo).toContain('25%');
+    expect(exemplo).toContain('Pesado e difícil');
+    expect(exemplo).toContain('Padronizar');
+    expect(exemplo).toContain('25,0');
   });
 
-  it('com as respostas do exemplo, a ferramenta real dá a mesma atratividade', () => {
+  it('com as respostas do exemplo, a ferramenta real dá a mesma nota geral, o mesmo trabalho e retorno', () => {
     render(<PortfolioView />);
     act(() => {
       vi.runAllTimers();
@@ -75,7 +73,7 @@ describe('GuiaPortfolio', () => {
         sim.slice(0, servico.sim[eixo]).forEach((botao) => fireEvent.click(botao));
         fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
       }
-      // Resumo da gaveta antes de salvar: as notas que o guia cita (grupos com os nomes novos)
+      // Resumo da gaveta antes de salvar: as notas que o guia cita
       expect(screen.getByText(`Esforço: ${servico.notas.esforco}%`)).toBeInTheDocument();
       expect(screen.getByText(`Dificuldade: ${servico.notas.complexidade}%`)).toBeInTheDocument();
       expect(screen.getByText(`Repetição: ${servico.notas.padronizacao}%`)).toBeInTheDocument();
@@ -84,18 +82,20 @@ describe('GuiaPortfolio', () => {
       fireEvent.click(screen.getByRole('button', { name: /salvar serviço/i }));
     }
 
-    // A ferramenta mostra a "Nota geral" (0 a 100) com uma casa decimal e vírgula
-    const notaDe = (nome: string) =>
-      within(screen.getByRole('listitem', { name: nome })).getByText('Nota geral').nextElementSibling;
-    expect(notaDe('Adesivo de vitrine')).toHaveTextContent('79,2');
-    expect(notaDe('Fachada em ACM')).toHaveTextContent('25,0');
+    // A ferramenta mostra a "Nota geral" (0 a 100) com uma casa decimal e vírgula, e "Trabalho" e "Retorno" em %
+    const item = (nome: string) => within(screen.getByRole('listitem', { name: nome }));
+    for (const servico of EXEMPLO_PORTFOLIO.servicos) {
+      expect(item(servico.nome).getByText('Nota geral').nextElementSibling).toHaveTextContent(servico.notaGeral);
+      expect(item(servico.nome).getByText('Trabalho').nextElementSibling).toHaveTextContent(servico.trabalho);
+      expect(item(servico.nome).getByText('Retorno').nextElementSibling).toHaveTextContent(servico.retorno);
+    }
 
     // Quadrantes: as notas exatas que a ferramenta gravou, na regra dos gráficos
     const gravados: Service[] = JSON.parse(window.localStorage.getItem('portfolio_services') ?? '[]');
     for (const servico of EXEMPLO_PORTFOLIO.servicos) {
       const s = gravados.find((g) => g.nome === servico.nome)!;
-      expect(quadranteDe(s.esforco, s.complexidade, 'operacao')).toBe(NOME_NA_FERRAMENTA[servico.operacao]);
-      expect(quadranteDe(s.padronizacao, s.lucratividade, 'decisao')).toBe(NOME_NA_FERRAMENTA[servico.decisao]);
+      expect(quadranteDe(s.esforco, s.complexidade, 'operacao')).toBe(servico.trabalhoQuadrante);
+      expect(quadranteDe(s.padronizacao, s.lucratividade, 'decisao')).toBe(servico.retornoQuadrante);
     }
   });
 });

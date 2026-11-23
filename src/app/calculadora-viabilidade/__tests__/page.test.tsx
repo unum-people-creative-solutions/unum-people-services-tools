@@ -13,7 +13,7 @@ describe('página de Vale a pena anunciar?', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Vale a pena anunciar?' })).toBeInTheDocument();
     const detalhes = screen.getByText('Como funciona esta conta').closest('details') as HTMLDetailsElement;
     expect(detalhes.open).toBe(false);
-    expect(detalhes).toHaveTextContent('Guia da Calculadora de Viabilidade');
+    expect(detalhes).toHaveTextContent('Como saber se vale a pena anunciar');
   });
 
   it('usa o título e a descrição da spec (RF-F3a-13), sem repetir o sufixo do site', () => {

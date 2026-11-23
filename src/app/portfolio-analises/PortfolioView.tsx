@@ -63,7 +63,7 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
 
         {children && (
           <Recolhivel titulo="Como funciona esta conta" variante="cartao">
-            <div className="[&_[data-guia]]:mb-4 [&_[data-guia]]:mt-2">{children}</div>
+            <div>{children}</div>
           </Recolhivel>
         )}
 
