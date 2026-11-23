@@ -19,7 +19,7 @@ export function Subtotal({ linhas, destaque = false }: SubtotalProps) {
           <dt>{linha.rotulo}</dt>
           <dd
             className={clsx(
-              'm-0 [font-variant-numeric:tabular-nums]',
+              'm-0 whitespace-nowrap [font-variant-numeric:tabular-nums]',
               destaque ? 'text-lg font-bold text-ui-ink' : 'font-semibold text-ui-ink',
             )}
           >
