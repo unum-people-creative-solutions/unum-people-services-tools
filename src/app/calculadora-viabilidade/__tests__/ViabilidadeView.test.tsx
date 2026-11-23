@@ -9,16 +9,16 @@ vi.mock('../../../components/Header', () => ({
 vi.mock('../../../components/Footer', () => ({
   Footer: () => <div data-testid="footer" />
 }));
-vi.mock('../../../components/AdUnit', () => ({
-  AdUnit: ({ slot }: { slot?: string }) => <div data-testid="ad-unit" data-ad-slot={slot} />
-}));
 
 // true quando `depois` vem depois de `antes` na ordem do documento
 const vemDepois = (antes: Element, depois: Element) =>
   Boolean(antes.compareDocumentPosition(depois) & Node.DOCUMENT_POSITION_FOLLOWING);
 
-// Os blocos de anúncio (AdUnit simulado), na ordem do documento
-const anunciosNaTela = () => screen.queryAllByTestId('ad-unit');
+// Anúncio do Google (<ins>) ou o marcador de anúncio de desenvolvimento
+const anunciosNaTela = () => [
+  ...Array.from(document.querySelectorAll('ins')),
+  ...screen.queryAllByText(/AdSense|Publicidade/i),
+];
 
 vi.mock('../../../components/WelcomeModal', () => ({
   WelcomeModal: () => <div data-testid="welcome-modal" />
@@ -184,25 +184,19 @@ describe('ViabilidadeView', () => {
     });
   });
 
-  it('põe um anúncio entre a ferramenta e o guia e outro depois do guia', () => {
+  it('o guia vem logo depois da ferramenta, sem anúncio no meio nem no fim', () => {
     render(<ViabilidadeView><p>GUIA-TESTE</p></ViabilidadeView>);
 
     const titulo = screen.getByRole('heading', { level: 1 });
     const pergunta = screen.getByText('O QUE VOCÊ DESEJA DESCOBRIR?');
     const ultimaOpcao = screen.getByText(/Tenho uma meta/i);
     const guia = screen.getByText('GUIA-TESTE');
-    const anuncios = anunciosNaTela();
 
-    expect(anuncios).toHaveLength(2);
-    const [meio, fim] = anuncios;
-    expect(meio).toHaveAttribute('data-ad-slot', '1270666901');
-    expect(fim).toHaveAttribute('data-ad-slot', '7715444307');
-    expect(vemDepois(titulo, meio)).toBe(true);
-    expect(vemDepois(pergunta, meio)).toBe(true);
-    expect(vemDepois(ultimaOpcao, meio)).toBe(true);
-    expect(vemDepois(meio, guia)).toBe(true);
-    expect(vemDepois(guia, fim)).toBe(true);
+    expect(anunciosNaTela()).toHaveLength(0);
+    expect(vemDepois(titulo, guia)).toBe(true);
+    expect(vemDepois(pergunta, guia)).toBe(true);
+    expect(vemDepois(ultimaOpcao, guia)).toBe(true);
     expect(screen.getByRole('main')).toContainElement(guia);
-    expect(vemDepois(fim, screen.getByTestId('footer'))).toBe(true);
+    expect(vemDepois(guia, screen.getByTestId('footer'))).toBe(true);
   });
 });

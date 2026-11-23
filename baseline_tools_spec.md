@@ -28,7 +28,7 @@
 - **Shared Components**:
   - `Header`: Consistent with `toolName` prop.
   - `Footer`: Institutional footer.
-  - `CookieBanner`: Mandatory in `layout.tsx`.
+  - No `CookieBanner`: the site has no ads and no tracking cookies since 23/11/2026 (F1 sem anúncios); only functional localStorage, explained in `/privacidade` and in the footer line.
 
 ## Architecture
 - Tool-based routing under `src/app/`.

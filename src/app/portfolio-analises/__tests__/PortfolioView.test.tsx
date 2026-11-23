@@ -13,16 +13,16 @@ vi.mock('../../../components/Header', () => ({
 vi.mock('../../../components/Footer', () => ({
   Footer: () => <div data-testid="footer" />
 }));
-vi.mock('../../../components/AdUnit', () => ({
-  AdUnit: ({ slot }: { slot?: string }) => <div data-testid="ad-unit" data-ad-slot={slot} />
-}));
 
 // true quando `depois` vem depois de `antes` na ordem do documento
 const vemDepois = (antes: Element, depois: Element) =>
   Boolean(antes.compareDocumentPosition(depois) & Node.DOCUMENT_POSITION_FOLLOWING);
 
-// Os blocos de anúncio (AdUnit simulado), na ordem do documento
-const anunciosNaTela = () => screen.queryAllByTestId('ad-unit');
+// Anúncio do Google (<ins>) ou o marcador de anúncio de desenvolvimento
+const anunciosNaTela = () => [
+  ...Array.from(document.querySelectorAll('ins')),
+  ...screen.queryAllByText(/AdSense|Publicidade/i),
+];
 
 // Mock crypto.randomUUID
 if (!global.crypto) {
@@ -78,19 +78,16 @@ describe('PortfolioView', () => {
     expect(screen.getAllByText('Serviço de Teste')[0]).toBeInTheDocument();
   });
 
-  it('enquanto carrega, mostra o guia e só o anúncio que vem depois dele', () => {
+  it('enquanto carrega, mostra o guia, sem anúncio', () => {
     render(<PortfolioView><p>GUIA-TESTE</p></PortfolioView>);
 
     const guia = screen.getByText('GUIA-TESTE');
-    const anuncios = anunciosNaTela();
-    expect(anuncios).toHaveLength(1);
-    expect(anuncios[0]).toHaveAttribute('data-ad-slot', '7715444307');
-    expect(vemDepois(guia, anuncios[0])).toBe(true);
+    expect(anunciosNaTela()).toHaveLength(0);
     expect(screen.getByRole('main')).toContainElement(guia);
-    expect(vemDepois(anuncios[0], screen.getByTestId('footer'))).toBe(true);
+    expect(vemDepois(guia, screen.getByTestId('footer'))).toBe(true);
   });
 
-  it('carregada, põe um anúncio entre a ferramenta e o guia e outro depois do guia', () => {
+  it('carregada, o guia vem logo depois da ferramenta, sem anúncio no meio nem no fim', () => {
     render(<PortfolioView><p>GUIA-TESTE</p></PortfolioView>);
     act(() => {
       vi.runAllTimers();
@@ -100,19 +97,13 @@ describe('PortfolioView', () => {
     const botao = screen.getByRole('button', { name: /novo serviço/i });
     const fimDaFerramenta = screen.getByRole('link', { name: /CONHECER UNUM PEOPLE/i });
     const guia = screen.getByText('GUIA-TESTE');
-    const anuncios = anunciosNaTela();
 
-    expect(anuncios).toHaveLength(2);
-    const [meio, fim] = anuncios;
-    expect(meio).toHaveAttribute('data-ad-slot', '1270666901');
-    expect(fim).toHaveAttribute('data-ad-slot', '7715444307');
-    expect(vemDepois(titulo, meio)).toBe(true);
-    expect(vemDepois(botao, meio)).toBe(true);
-    expect(vemDepois(fimDaFerramenta, meio)).toBe(true);
-    expect(vemDepois(meio, guia)).toBe(true);
-    expect(vemDepois(guia, fim)).toBe(true);
+    expect(anunciosNaTela()).toHaveLength(0);
+    expect(vemDepois(titulo, guia)).toBe(true);
+    expect(vemDepois(botao, guia)).toBe(true);
+    expect(vemDepois(fimDaFerramenta, guia)).toBe(true);
     expect(screen.getByRole('main')).toContainElement(guia);
-    expect(vemDepois(fim, screen.getByTestId('footer'))).toBe(true);
+    expect(vemDepois(guia, screen.getByTestId('footer'))).toBe(true);
   });
 
   it('não abre a ajuda sozinha na primeira visita, e o botão Ajuda abre', () => {
