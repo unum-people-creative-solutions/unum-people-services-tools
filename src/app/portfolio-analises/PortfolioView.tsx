@@ -8,7 +8,6 @@ import { ServiceDrawer } from '../../components/ServiceDrawer';
 import { WelcomeModal } from '../../components/WelcomeModal';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { AdUnit } from '../../components/AdUnit';
 import { LayoutGrid } from 'lucide-react';
 
 export default function PortfolioView({ children }: { children?: React.ReactNode }) {
@@ -89,16 +88,12 @@ export default function PortfolioView({ children }: { children?: React.ReactNode
                   CONHECER UNUM PEOPLE
                 </a>
               </div>
-
-              <AdUnit className="mb-8" slot="1270666901" />
             </>
           )}
 
           {children}
         </div>
       </main>
-
-      <AdUnit className="mb-8" slot="7715444307" />
 
       <Footer />
 

@@ -4,7 +4,6 @@ import React from 'react';
 import { usePricing } from '../../hooks/usePricing';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { AdUnit } from '../../components/AdUnit';
 import { WelcomeModal } from '../../components/WelcomeModal';
 import { CurrencyInput } from '../../components/CurrencyInput';
 import { 
@@ -471,16 +470,12 @@ export default function PrecificacaoView({ children }: { children?: React.ReactN
                   CONHECER UNUM PEOPLE
                 </a>
               </div>
-
-              <AdUnit className="my-10" slot="1270666901" />
             </>
           )}
 
           {children}
         </div>
       </main>
-
-      <AdUnit className="mb-8" slot="7715444307" />
 
       <Footer />
     </div>

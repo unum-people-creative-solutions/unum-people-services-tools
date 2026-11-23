@@ -8,14 +8,12 @@ vi.mock('next/image', () => ({
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
-vi.mock('../../components/AdUnit', () => ({
-  AdUnit: () => <div data-testid="ad-unit" />,
-}));
 
 describe('Home', () => {
   it('não exibe anúncio (tela de navegação)', () => {
-    render(<Home />);
-    expect(screen.queryAllByTestId('ad-unit')).toHaveLength(0);
+    const { container } = render(<Home />);
+    expect(container.querySelectorAll('ins')).toHaveLength(0);
+    expect(screen.queryByText(/AdSense|Publicidade/i)).not.toBeInTheDocument();
   });
 
   it('não exibe ferramenta "Em breve"', () => {

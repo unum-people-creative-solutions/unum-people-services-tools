@@ -34,4 +34,11 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: 'Termos' })).toHaveAttribute('href', 'https://unumpeople.com.br/termos');
     expect(screen.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
   });
+
+  it('avisa que os dados ficam no aparelho e leva à privacidade', () => {
+    render(<Footer />);
+    expect(screen.getByText('Seus dados ficam neste aparelho.')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Privacidade' })).toHaveLength(1);
+    expect(screen.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
+  });
 });

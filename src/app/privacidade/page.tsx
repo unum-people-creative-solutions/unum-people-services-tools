@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
-import { ShieldCheck, Lock, Eye, FileText, Megaphone } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'Política de Privacidade | Unum People',
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
               Política de Privacidade
             </h1>
             <p className="text-brand-grey font-medium uppercase tracking-widest text-xs">
-              Última atualização: Outubro de 2026
+              Última atualização: 23 de novembro de 2026
             </p>
           </header>
 
@@ -28,86 +28,53 @@ export default function PrivacyPage() {
             <section className="mb-10">
               <div className="flex items-center gap-3 mb-4 text-brand-blue">
                 <ShieldCheck size={24} />
-                <h2 className="text-2xl font-bold m-0 text-brand-blue">Nosso Compromisso</h2>
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">Em poucas palavras</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                A Unum People Creative Solutions valoriza a sua privacidade. Esta política descreve como tratamos as informações coletadas em nossas ferramentas estratégicas, em total conformidade com a Lei Geral de Proteção de Dados (LGPD).
+                As ferramentas da Unum People funcionam no seu navegador. O que você digita fica guardado neste aparelho e não é enviado para nós. Este site não tem anúncios e não usa cookies de rastreamento.
               </p>
             </section>
 
             <section className="mb-10">
               <div className="flex items-center gap-3 mb-4 text-brand-blue">
                 <Lock size={24} />
-                <h2 className="text-2xl font-bold m-0 text-brand-blue">Coleta de Dados</h2>
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">O que fica guardado no seu aparelho</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                Nossas ferramentas de análise (como o Mapeamento de Portfólio) operam prioritariamente com <strong>armazenamento local (Local Storage)</strong>. Isso significa que os dados dos serviços inseridos ficam armazenados no seu navegador e não em nossos servidores, garantindo que você tenha controle total sobre sua estratégia.
+                Para você não perder o que já preencheu, algumas ferramentas guardam os dados no próprio navegador:
               </p>
               <ul className="list-disc pl-5 text-brand-grey space-y-2 mt-4">
-                <li>Dados de navegação anônimos para melhoria da ferramenta.</li>
-                <li>Preferências de interface.</li>
-                <li>Dados de portfólio (armazenados localmente no seu dispositivo).</li>
+                <li>os serviços que você cadastra em &quot;Quais serviços compensam&quot;;</li>
+                <li>os custos e valores do simulador de preço.</li>
               </ul>
+              <p className="text-brand-grey leading-relaxed mt-4">
+                A calculadora de anúncios não guarda nada: ao fechar a página, os números somem.
+              </p>
+              <p className="text-brand-grey leading-relaxed">
+                Esses dados ficam só neste aparelho e neste navegador. Para apagar, limpe os dados de navegação do seu navegador.
+              </p>
             </section>
 
             <section className="mb-10">
               <div className="flex items-center gap-3 mb-4 text-brand-blue">
                 <Eye size={24} />
-                <h2 className="text-2xl font-bold m-0 text-brand-blue">Uso das Informações</h2>
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">O que a hospedagem registra</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                As informações coletadas são utilizadas exclusivamente para:
+                Como qualquer site, a empresa que hospeda estas páginas (Netlify) registra dados técnicos de acesso, como endereço IP, navegador e página visitada, para manter o site no ar e seguro. Não usamos esses registros para identificar você nem para publicidade.
               </p>
-              <ul className="list-disc pl-5 text-brand-grey space-y-2 mt-4">
-                <li>Prover as funcionalidades da ferramenta.</li>
-                <li>Analisar o uso técnico para correções de bugs.</li>
-                <li>Melhorar a experiência do usuário.</li>
-              </ul>
-            </section>
-
-            <section id="anuncios" className="mb-10 scroll-mt-28">
-              <div className="flex items-center gap-3 mb-4 text-brand-blue">
-                <Megaphone size={24} />
-                <h2 className="text-2xl font-bold m-0 text-brand-blue">Anúncios e cookies</h2>
-              </div>
-              <div className="space-y-4 text-brand-grey leading-relaxed">
-                <p>
-                  Este site exibe anúncios do Google AdSense. Fornecedores terceiros, incluindo o Google, usam cookies para exibir anúncios com base em visitas anteriores do usuário a este site ou a outros sites.
-                </p>
-                <p>
-                  O uso de cookies de publicidade permite que o Google e os parceiros dele exibam anúncios para você com base nas suas visitas a este site e/ou a outros sites na internet.
-                </p>
-                <p>
-                  Você pode desativar a publicidade personalizada nas{' '}
-                  <a href="https://adssettings.google.com" className="text-brand-blue font-bold hover:underline">Configurações de anúncios do Google</a>.
-                  Também pode recusar o uso de cookies de publicidade personalizada de outros fornecedores em{' '}
-                  <a href="https://www.aboutads.info" className="text-brand-blue font-bold hover:underline">www.aboutads.info</a>.
-                </p>
-                <p>
-                  Outras redes de anúncios certificadas pelo Google também podem exibir anúncios aqui, com cookies próprios. A{' '}
-                  <a href="https://support.google.com/adsense/answer/94149" className="text-brand-blue font-bold hover:underline">lista de redes certificadas</a>{' '}
-                  fica na Central de Ajuda do Google AdSense, e cada rede explica no próprio site como recusar os cookies dela.
-                </p>
-                <p>
-                  Para entender o que o Google faz com essas informações, veja{' '}
-                  <a href="https://policies.google.com/technologies/ads" className="text-brand-blue font-bold hover:underline">Como o Google usa cookies em publicidade</a>.
-                </p>
-              </div>
             </section>
 
             <section className="mb-10">
               <div className="flex items-center gap-3 mb-4 text-brand-blue">
                 <FileText size={24} />
-                <h2 className="text-2xl font-bold m-0 text-brand-blue">Seus Direitos</h2>
+                <h2 className="text-2xl font-bold m-0 text-brand-blue">Seus direitos</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                Como titular dos dados, você tem direito a solicitar acesso, correção ou exclusão de quaisquer dados pessoais que possamos ter. Como utilizamos armazenamento local, você mesmo pode excluir seus dados limpando o cache/dados de navegação do seu browser.
+                Pela Lei Geral de Proteção de Dados (LGPD), você pode pedir informação, correção ou exclusão de dados pessoais. Como as ferramentas não enviam o que você digita, quase sempre basta limpar os dados do navegador. Para qualquer dúvida, escreva para{' '}
+                <a href="mailto:contato@unumpeople.com.br" className="text-brand-blue font-bold hover:underline">contato@unumpeople.com.br</a>.
               </p>
             </section>
-
-            <footer className="mt-12 pt-8 border-t border-gray-100 text-sm text-brand-grey italic">
-              Dúvidas sobre privacidade? Entre em contato pelo e-mail: <a href="mailto:contato@unumpeople.com.br" className="text-brand-blue font-bold not-italic hover:underline">contato@unumpeople.com.br</a>
-            </footer>
           </div>
         </div>
       </main>
