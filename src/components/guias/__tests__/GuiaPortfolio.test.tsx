@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GuiaPortfolio, EXEMPLO_PORTFOLIO } from '../GuiaPortfolio';
 import PortfolioView from '../../../app/portfolio-analises/PortfolioView';
@@ -15,6 +15,15 @@ const TOPICOS = [
   'Aviso',
   'Quem fez',
 ];
+
+// F3b: a ferramenta renomeou os quadrantes (RF-F3b-02). O guia ainda usa os nomes antigos
+// (a F4 o reescreve); o teste traduz o nome do guia para o nome que a ferramenta mostra.
+const NOME_NA_FERRAMENTA: Record<string, string> = {
+  Eficiente: 'Leve e simples',
+  Crítico: 'Pesado e difícil',
+  Estrela: 'Vender mais',
+  Oportunidade: 'Padronizar',
+};
 
 const textoDe = (el: Element) => (el.textContent ?? '').replace(/ /g, ' ');
 const contarPalavras = (el: Element) => textoDe(el).split(/\s+/).filter(Boolean).length;
@@ -60,31 +69,33 @@ describe('GuiaPortfolio', () => {
     });
 
     for (const servico of EXEMPLO_PORTFOLIO.servicos) {
-      fireEvent.click(screen.getByRole('button', { name: /novo serviço/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Adicionar serviço' }));
       for (const eixo of ['esforco', 'complexidade', 'padronizacao', 'lucratividade'] as const) {
-        const sim = screen.getAllByRole('button', { name: 'SIM' });
+        const sim = screen.getAllByRole('radio', { name: 'Sim' });
         sim.slice(0, servico.sim[eixo]).forEach((botao) => fireEvent.click(botao));
         fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
       }
-      // Resumo do drawer antes de salvar: as notas que o guia cita
+      // Resumo da gaveta antes de salvar: as notas que o guia cita (grupos com os nomes novos)
       expect(screen.getByText(`Esforço: ${servico.notas.esforco}%`)).toBeInTheDocument();
-      expect(screen.getByText(`Complexidade: ${servico.notas.complexidade}%`)).toBeInTheDocument();
-      expect(screen.getByText(`Padronização: ${servico.notas.padronizacao}%`)).toBeInTheDocument();
-      expect(screen.getByText(`Lucratividade: ${servico.notas.lucratividade}%`)).toBeInTheDocument();
-      fireEvent.change(screen.getByPlaceholderText(/Ex: Consultoria Técnica/i), { target: { value: servico.nome } });
+      expect(screen.getByText(`Dificuldade: ${servico.notas.complexidade}%`)).toBeInTheDocument();
+      expect(screen.getByText(`Repetição: ${servico.notas.padronizacao}%`)).toBeInTheDocument();
+      expect(screen.getByText(`Lucro: ${servico.notas.lucratividade}%`)).toBeInTheDocument();
+      fireEvent.change(screen.getByLabelText('Nome do serviço'), { target: { value: servico.nome } });
       fireEvent.click(screen.getByRole('button', { name: /salvar serviço/i }));
     }
 
-    // A ferramenta mostra a atratividade com uma casa decimal e ponto
-    expect(screen.getAllByText('79.2%').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('25.0%').length).toBeGreaterThan(0);
+    // A ferramenta mostra a "Nota geral" (0 a 100) com uma casa decimal e vírgula
+    const notaDe = (nome: string) =>
+      within(screen.getByRole('listitem', { name: nome })).getByText('Nota geral').nextElementSibling;
+    expect(notaDe('Adesivo de vitrine')).toHaveTextContent('79,2');
+    expect(notaDe('Fachada em ACM')).toHaveTextContent('25,0');
 
     // Quadrantes: as notas exatas que a ferramenta gravou, na regra dos gráficos
     const gravados: Service[] = JSON.parse(window.localStorage.getItem('portfolio_services') ?? '[]');
     for (const servico of EXEMPLO_PORTFOLIO.servicos) {
       const s = gravados.find((g) => g.nome === servico.nome)!;
-      expect(quadranteDe(s.esforco, s.complexidade, 'operacao')).toBe(servico.operacao);
-      expect(quadranteDe(s.padronizacao, s.lucratividade, 'decisao')).toBe(servico.decisao);
+      expect(quadranteDe(s.esforco, s.complexidade, 'operacao')).toBe(NOME_NA_FERRAMENTA[servico.operacao]);
+      expect(quadranteDe(s.padronizacao, s.lucratividade, 'decisao')).toBe(NOME_NA_FERRAMENTA[servico.decisao]);
     }
   });
 });

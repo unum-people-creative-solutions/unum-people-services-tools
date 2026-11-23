@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 
+// O título já traz o nome do site; `absolute` evita repetir o sufixo do template do layout raiz.
 export const metadata: Metadata = {
-  title: 'Calculadora de Viabilidade | Unum People',
-  description: 'Calcule ROI e CAC para validar a viabilidade de suas campanhas.',
+  title: {
+    absolute: 'Vale a pena anunciar? Calculadora grátis de anúncio | Unum People Tools',
+  },
+  description:
+    'Veja quantas vendas pagam o seu anúncio no Google ou no Instagram antes de gastar. Grátis, sem cadastro.',
 };
 
 export default function ViabilidadeLayout({

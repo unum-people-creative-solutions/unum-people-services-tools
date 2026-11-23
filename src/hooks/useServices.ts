@@ -37,9 +37,14 @@ export function useServices() {
     setServices((prev) => [...prev, service]);
   };
 
+  // Substitui o serviço de mesmo id (edição); id desconhecido não cria serviço novo.
+  const updateService = (service: Service) => {
+    setServices((prev) => prev.map((s) => (s.id === service.id ? service : s)));
+  };
+
   const removeService = (id: string) => {
     setServices((prev) => prev.filter((s) => s.id !== id));
   };
 
-  return { services, addService, removeService, isLoaded };
+  return { services, addService, updateService, removeService, isLoaded };
 }
