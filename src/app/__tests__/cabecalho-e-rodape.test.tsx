@@ -56,8 +56,13 @@ describe.each(paginas)('página %s', (_nome, Pagina, ehFerramenta) => {
 });
 
 describe('ferramentas "Vale a pena anunciar?" e "Quais serviços compensam"', () => {
+  // F3a: "Vale a pena anunciar?" não tem mais o botão Ajuda provisório (RF-F3a-02)
+  it('Viabilidade não tem o botão Ajuda provisório', () => {
+    render(<ViabilidadePage />);
+    expect(screen.queryByRole('button', { name: 'Ajuda' })).not.toBeInTheDocument();
+  });
+
   it.each([
-    ['Viabilidade', ViabilidadePage],
     ['Portfólio', PortfolioPage],
   ])('%s mantém o botão Ajuda no topo do miolo, e não no cabeçalho', (_n, Pagina) => {
     render(<Pagina />);
