@@ -11,6 +11,16 @@ describe('Header (RF-F2-05 e RF-F2-07)', () => {
     expect(marca).toHaveAttribute('href', '/');
   });
 
+  it('a marca leva o símbolo oficial como única imagem, decorativa', () => {
+    render(<Header />);
+    const marca = screen.getByRole('link', { name: 'Unum People Tools' });
+    const imagens = marca.querySelectorAll('img');
+    expect(imagens).toHaveLength(1);
+    expect(decodeURIComponent(imagens[0].getAttribute('src') ?? '')).toContain('logo_simbolo.png');
+    expect(imagens[0]).toHaveAttribute('alt', '');
+    expect(imagens[0]).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('não tem mais a barra de abas Portfólio / Precificação / Viabilidade', () => {
     render(<Header />);
     expect(screen.queryByRole('navigation', { name: 'Ferramentas' })).not.toBeInTheDocument();

@@ -36,10 +36,20 @@ describe('Footer (RF-F2-06)', () => {
     expect(depois(nav, direitos)).toBe(true);
   });
 
-  it('não tem mais o P2P nem as logos', () => {
+  it('abre com o nome oficial da Unum People em imagem, ligado ao site', () => {
+    render(<Footer />);
+    const link = screen.getByRole('link', { name: 'Unum People' });
+    expect(link).toHaveAttribute('href', 'https://unumpeople.com.br/');
+    const imagem = within(link).getByRole('img', { name: 'Unum People' });
+    expect(decodeURIComponent(imagem.getAttribute('src') ?? '')).toContain('logo_texto_compact.png');
+    const aviso = screen.getByText('Seus dados ficam neste aparelho.');
+    expect(Boolean(link.compareDocumentPosition(aviso) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  });
+
+  it('não tem mais o P2P e a única imagem é o nome oficial', () => {
     render(<Footer />);
     expect(screen.queryByText(/People to People/)).not.toBeInTheDocument();
     expect(screen.queryByText(/P2P/)).not.toBeInTheDocument();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('img')).toHaveLength(1);
   });
 });
