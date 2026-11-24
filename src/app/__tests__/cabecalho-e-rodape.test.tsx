@@ -33,6 +33,18 @@ describe.each(paginas)('página %s', (_nome, Pagina, ehFerramenta) => {
     expect(screen.queryByRole('link', { name: 'Viabilidade' })).not.toBeInTheDocument();
   });
 
+  it('mostra o símbolo oficial no cabeçalho e o nome oficial no rodapé', () => {
+    render(<Pagina />);
+    const banner = screen.getAllByRole('banner')[0];
+    const simbolo = within(banner).getByRole('link', { name: 'Unum People Tools' }).querySelector('img');
+    expect(simbolo).not.toBeNull();
+    expect(decodeURIComponent(simbolo?.getAttribute('src') ?? '')).toContain('logo_simbolo.png');
+    const rodape = screen.getByRole('contentinfo');
+    const nome = within(rodape).getByRole('img', { name: 'Unum People' });
+    expect(decodeURIComponent(nome.getAttribute('src') ?? '')).toContain('logo_texto_compact.png');
+    expect(nome.closest('a')).toHaveAttribute('href', 'https://unumpeople.com.br/');
+  });
+
   it('tem o rodapé com os textos e links de RF-F2-06 e sem "P2P"', () => {
     render(<Pagina />);
     const rodape = screen.getByRole('contentinfo');
