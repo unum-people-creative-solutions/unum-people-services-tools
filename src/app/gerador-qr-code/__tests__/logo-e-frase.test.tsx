@@ -56,6 +56,7 @@ let imagensDesenhadas: number;
 
 beforeEach(() => {
   window.localStorage.clear();
+  window.sessionStorage.clear();
   alturas = [];
   textos = [];
   imagensDesenhadas = 0;
@@ -212,13 +213,30 @@ describe('Logo no centro (RF-QR-34, T21)', () => {
   });
 
   it('o logo nunca vai para o localStorage', async () => {
+    const gravacoes: [string, string][] = [];
+    const gravar = window.localStorage.setItem.bind(window.localStorage);
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation((chave: string, valor: string) => {
+      gravacoes.push([chave, valor]);
+      gravar(chave, valor);
+    });
     render(<QrCodeView />);
     preencherPix();
     enviarLogo(arquivoDoLogo());
     await screen.findByRole('button', { name: 'Tirar o logo' });
     fireEvent.click(screen.getByRole('radio', { name: 'Roxo' }));
-    const tudo = JSON.stringify(Object.fromEntries([[CHAVE_DO_QR, window.localStorage.getItem(CHAVE_DO_QR)]]));
-    expect(tudo).not.toContain('data:image');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Colocar uma frase embaixo' }));
+    digitar('Frase', 'Obrigado pela preferência');
+    // percorre TODAS as chaves gravadas, não só a do QR (o localStorage do setup é um mock
+    // sem `key()`/`length`, então o que foi gravado vem do espião de `setItem`)
+    expect(gravacoes.length).toBeGreaterThan(0);
+    for (const [chave, valor] of gravacoes) {
+      expect(valor, `localStorage ${chave}`).not.toContain('data:image');
+    }
+    expect(window.sessionStorage.length).toBe(0);
+    for (let i = 0; i < window.sessionStorage.length; i++) {
+      const chave = window.sessionStorage.key(i)!;
+      expect(window.sessionStorage.getItem(chave), `sessionStorage ${chave}`).not.toContain('data:image');
+    }
     expect(Object.keys(JSON.parse(window.localStorage.getItem(CHAVE_DO_QR)!)).sort()).toEqual([
       'campos',
       'cor',
