@@ -10,6 +10,7 @@ import {
   type TipoId,
 } from '../../utils/qr/conteudos';
 import type { TipoChavePix } from '../../utils/qr/pix';
+import { DICA_DO_CPF } from './PixCopiaECola';
 import { CaixaQr, CampoAreaQr, CampoListaQr, CampoTextoQr } from './CamposDoQr';
 
 interface Comum<T extends TipoId> {
@@ -42,6 +43,7 @@ function FormPix({ campos, erros, avisos, onChange, onBlur }: Comum<'pix'>) {
       />
       <CampoTextoQr
         rotulo="Chave Pix"
+        ajuda={campos.tipoChave === 'cpf' ? DICA_DO_CPF : undefined}
         valor={campos.chave}
         placeholder={EXEMPLO_DA_CHAVE[campos.tipoChave]}
         erro={erros.chave}

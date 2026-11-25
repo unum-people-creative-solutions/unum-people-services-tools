@@ -6,10 +6,13 @@ import { Footer } from '../../components/Footer';
 import { Bloco } from '../../components/ui/Bloco';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
+import { PreviaDoQr } from '../../components/qr/PreviaDoQr';
+import { AvisoDoPix, PixCopiaECola } from '../../components/qr/PixCopiaECola';
 import { useQrCode } from '../../hooks/useQrCode';
-import { avisosDoPix, type TipoId } from '../../utils/qr/conteudos';
+import { avisosDoPix, TIPOS, type TipoId } from '../../utils/qr/conteudos';
 import { errosVisiveis } from '../../utils/qr/erros';
 import { conteudoDe } from '../../utils/qr/estado';
+import { gerarQr } from '../../utils/qr/gerar';
 
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
   const { estado, escolherTipo, mudarCampos } = useQrCode();
@@ -37,6 +40,14 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   const tocadosDoTipo = new Set([...tocados].filter((c) => c.startsWith(`${tipo}.`)).map((c) => c.slice(`${tipo}.`.length)));
   const erros = tipo && conteudo && !conteudo.ok ? errosVisiveis(tipo, estado.campos[tipo], conteudo.erros, tocadosDoTipo) : {};
   const avisos = tipo === 'pix' ? avisosDoPix(estado.campos.pix) : {};
+
+  const nomeDoTipo = TIPOS.find((t) => t.id === tipo)?.nome ?? '';
+  const textoDoQr = conteudo?.ok ? conteudo.texto : null;
+  const { cor, frase } = estado;
+  const qr = React.useMemo(
+    () => (textoDoQr === null ? null : gerarQr(textoDoQr, { cor, frase })),
+    [textoDoQr, cor, frase],
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
@@ -80,6 +91,18 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
               </Bloco>
             )}
           </div>
+
+          {tipo && (
+            <div className="flex flex-col gap-5 md:sticky md:top-4">
+              <PreviaDoQr
+                nomeDoTipo={nomeDoTipo}
+                svg={qr?.ok ? qr.svg : null}
+                alerta={qr && !qr.ok ? qr.erro : undefined}
+              />
+              {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
+              {tipo === 'pix' && <AvisoDoPix />}
+            </div>
+          )}
         </div>
 
         {children}
