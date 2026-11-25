@@ -178,11 +178,13 @@ describe('Imprimir plaquinha (DT-QR-10)', () => {
     // uma cópia na prévia (dentro da página) e outra no contêiner só de impressão (fora dela)
     expect(within(principal).getAllByText('Pague com Pix')).toHaveLength(1);
     expect(screen.getAllByText('Pague com Pix')).toHaveLength(2);
-    expect(estilos().some((css) => /@page\s*{\s*size:\s*A6;\s*margin:\s*0/.test(css))).toBe(true);
+    expect(estilos().some((css) => /@page\s*{\s*size:\s*105mm 148mm;\s*margin:\s*0/.test(css))).toBe(true);
 
     fireEvent.click(screen.getByRole('radio', { name: 'Cartaz (A4)' }));
-    expect(estilos().some((css) => /@page\s*{\s*size:\s*A4;\s*margin:\s*0/.test(css))).toBe(true);
-    expect(estilos().some((css) => /size:\s*A6/.test(css))).toBe(false);
+    expect(estilos().some((css) => /@page\s*{\s*size:\s*210mm 297mm;\s*margin:\s*0/.test(css))).toBe(true);
+    expect(estilos().some((css) => /size:\s*105mm/.test(css))).toBe(false);
+    // o Chrome não reconhece a palavra A6/A4 em @page e cai para Carta: só medidas
+    expect(estilos().some((css) => /@page[^}]*size:\s*A[46]/.test(css))).toBe(false);
   });
 
   it('a cópia de impressão não aparece para leitores de tela (a prévia já descreve a plaquinha)', () => {

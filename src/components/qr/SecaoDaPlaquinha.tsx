@@ -150,13 +150,14 @@ interface PlaquinhaParaImprimirProps {
 
 /**
  * Contêiner só de impressão (DT-QR-10): fora da tela principal, que some em `@media print`. Só a folha
- * sai no papel, no tamanho escolhido e sem margem de página. Na tela ele não existe (`hidden`).
+ * sai no papel, no tamanho escolhido e sem margem de página. O `@page` usa medidas em mm, não `A6`/`A4`
+ * (o Chrome não reconhece a palavra e cai para Carta). Na tela ele não existe (`hidden`).
  */
 export function PlaquinhaParaImprimir({ dados, svg, tamanho }: PlaquinhaParaImprimirProps) {
   const { larguraMm, alturaMm } = PAPEIS[tamanho];
   return (
     <div aria-hidden="true" className="hidden print:block">
-      <style>{`@page { size: ${tamanho}; margin: 0; }`}</style>
+      <style>{`@page { size: ${larguraMm}mm ${alturaMm}mm; margin: 0; }`}</style>
       {/* Meio milímetro a menos que a folha: altura exata faz alguns navegadores abrirem uma 2ª página em branco. */}
       <div style={{ width: `${larguraMm}mm`, height: `${alturaMm - 0.5}mm`, overflow: 'hidden' }}>
         <Plaquinha tamanho={tamanho} dados={dados} svg={svg} />
