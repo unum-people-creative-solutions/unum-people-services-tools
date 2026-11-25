@@ -63,7 +63,8 @@ function cnpjValido(cnpj: string): boolean {
   return cnpj[12] === String(dv1) && cnpj[13] === String(dv2);
 }
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** E-mail simples e estrito: sem espaço, `?`, `&`, `#` nem `/` (não quebram o mailto: nem a chave Pix). */
+export const EMAIL = /^[^\s@?&#/]+@[^\s@?&#/]+\.[^\s@?&#/]+$/;
 const ASCII_IMPRIMIVEL = /^[\x20-\x7E]+$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

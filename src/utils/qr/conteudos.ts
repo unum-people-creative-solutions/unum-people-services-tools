@@ -3,6 +3,7 @@
 
 import { formatarTelefone, linkDoWhatsapp, normalizarCelular } from '../whatsapp';
 import {
+  EMAIL,
   LIMITE_CIDADE_PIX,
   LIMITE_NOME_PIX,
   conferirChavePix,
@@ -116,7 +117,6 @@ export interface LinhaDeApoio {
 const ERRO_LINK = 'Confira o endereço. Exemplo: www.seunegocio.com.br';
 const ERRO_CELULAR = 'Digite o celular com DDD. Exemplo: (11) 98765-4321';
 const ERRO_EMAIL = 'Confira o e-mail. Exemplo: contato@seunegocio.com.br';
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function certo(texto: string, avisos: Record<string, string> = {}): ResultadoConteudo {
   return { ok: true, texto, avisos };

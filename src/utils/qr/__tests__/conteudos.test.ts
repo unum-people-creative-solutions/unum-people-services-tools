@@ -287,6 +287,16 @@ describe('montarConteudo: Salvar contato (RF-QR-13)', () => {
     );
   });
 
+  it.each(['a?b@x.com', 'a&b@x.com', 'a#b@x.com', 'a/b@x.com', 'a b@x.com'])(
+    'erro: e-mail com ? & # espaço ou / (%s)',
+    (email) => {
+      expect(montarConteudo('contato', com('contato', { email }))).toEqual({
+        ok: false,
+        erros: { email: 'Confira o e-mail. Exemplo: contato@seunegocio.com.br' },
+      });
+    },
+  );
+
   it('erro: sem celular e sem e-mail', () => {
     expect(montarConteudo('contato', { nome: 'Maria', negocio: '', celular: '', email: '', site: '' })).toEqual({
       ok: false,
@@ -334,6 +344,25 @@ describe('montarConteudo: E-mail (RF-QR-14)', () => {
       erros: { email: 'Confira o e-mail. Exemplo: contato@seunegocio.com.br' },
     });
   });
+
+  it('assunto e mensagem com & e ? saem como %26 e %3F (não quebram os parâmetros)', () => {
+    const r = montarConteudo('email', com('email', { assunto: 'Preço & prazo?', mensagem: 'Qual o valor? Pão & café' }));
+    expect(r.ok && r.texto).toBe(
+      'mailto:contato@seunegocio.com.br?subject=Pre%C3%A7o%20%26%20prazo%3F&body=Qual%20o%20valor%3F%20P%C3%A3o%20%26%20caf%C3%A9',
+    );
+    expect(r.ok && r.texto.split('?')).toHaveLength(2);
+    expect(r.ok && r.texto.split('&')).toHaveLength(2);
+  });
+
+  it.each(['a?b@x.com', 'a&b@x.com', 'a#b@x.com', 'a/b@x.com', 'a b@x.com', 'ab@x.com?subject=x', 'ab@x/y.com'])(
+    'recusa e-mail com ? & # espaço ou / (%s)',
+    (email) => {
+      expect(montarConteudo('email', com('email', { email }))).toEqual({
+        ok: false,
+        erros: { email: 'Confira o e-mail. Exemplo: contato@seunegocio.com.br' },
+      });
+    },
+  );
 });
 
 describe('montarConteudo: Ligação (RF-QR-15)', () => {

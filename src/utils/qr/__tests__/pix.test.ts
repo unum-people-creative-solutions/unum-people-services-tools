@@ -110,6 +110,13 @@ describe('conferirChavePix (RF-QR-17, T05)', () => {
       expect(conferirChavePix('email', `${'a'.repeat(70)}@exemplo.com`)).toEqual(erro);
     });
 
+    it.each(['a?b@x.com', 'a&b@x.com', 'a#b@x.com', 'a/b@x.com', 'a b@x.com'])(
+      'recusa e-mail com ? & # espaço ou / (%s)',
+      (email) => {
+        expect(conferirChavePix('email', email)).toEqual({ ok: false, erro: 'Confira o e-mail da chave.' });
+      },
+    );
+
     it('aceita exatamente 77 caracteres', () => {
       const email = `${'a'.repeat(77 - '@exemplo.com'.length)}@exemplo.com`;
       expect(email).toHaveLength(77);
