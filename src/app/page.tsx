@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { BarChart3, ChevronRight, CircleDollarSign, Megaphone } from 'lucide-react';
+import { BarChart3, ChevronRight, CircleDollarSign, Megaphone, QrCode } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { ConviteDaHome, VisitaDaHome } from '../components/MedicaoDaHome';
@@ -9,10 +9,21 @@ import { ConviteDaHome, VisitaDaHome } from '../components/MedicaoDaHome';
 export const metadata: Metadata = {
   title: { absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer' },
   description:
-    'Calculadoras grátis para MEI e pequenos negócios: quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
+    'Ferramentas grátis para MEI e pequenos negócios: QR code, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
 };
 
-const contasDoNegocio = [
+type Cartao = { nome: string; frase: string; href: string; icone: typeof QrCode };
+
+const venderNoWhatsapp: Cartao[] = [
+  {
+    nome: 'Gerador de QR code',
+    frase: 'Crie o QR do seu Pix, WhatsApp, Instagram ou Wi-Fi. Grátis e não expira.',
+    href: '/gerador-qr-code',
+    icone: QrCode,
+  },
+];
+
+const contasDoNegocio: Cartao[] = [
   {
     nome: 'Quanto cobrar pelo serviço',
     frase: 'Descubra o menor preço sem prejuízo e quanto sobra no bolso.',
@@ -32,6 +43,37 @@ const contasDoNegocio = [
     icone: BarChart3,
   },
 ];
+
+function GrupoDeFerramentas({ id, titulo, cartoes }: { id: string; titulo: string; cartoes: Cartao[] }) {
+  return (
+    <section aria-labelledby={id} className="flex flex-col gap-3">
+      <h2 id={id} className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-ui-muted">
+        {titulo}
+      </h2>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {cartoes.map(({ nome, frase, href, icone: Icone }) => (
+          <Link
+            key={href}
+            href={href}
+            className="flex min-h-11 items-center gap-3.5 rounded-xl border border-ui-line bg-ui-bg p-4 text-ui-ink no-underline shadow-[0_1px_2px_rgb(20_20_43/0.06)] hover:border-ui-line-strong"
+          >
+            <span
+              aria-hidden="true"
+              className="flex size-11 flex-none items-center justify-center rounded-[10px] bg-[#eef0fb] text-ui-brand-blue"
+            >
+              <Icone size={22} strokeWidth={2} />
+            </span>
+            <span className="flex flex-1 flex-col gap-0.5">
+              <span className="text-base font-semibold tracking-[-0.01em]">{nome}</span>
+              <span className="text-sm leading-[1.45] text-ui-muted">{frase}</span>
+            </span>
+            <ChevronRight size={18} aria-hidden="true" className="flex-none text-ui-line-strong" />
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
@@ -58,32 +100,8 @@ export default function Home() {
         </section>
 
         <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-8 px-5 pb-2 pt-7 md:pt-10">
-          <section aria-labelledby="g-contas" className="flex flex-col gap-3">
-            <h2 id="g-contas" className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-ui-muted">
-              Contas do negócio
-            </h2>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              {contasDoNegocio.map(({ nome, frase, href, icone: Icone }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex min-h-11 items-center gap-3.5 rounded-xl border border-ui-line bg-ui-bg p-4 text-ui-ink no-underline shadow-[0_1px_2px_rgb(20_20_43/0.06)] hover:border-ui-line-strong"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="flex size-11 flex-none items-center justify-center rounded-[10px] bg-[#eef0fb] text-ui-brand-blue"
-                  >
-                    <Icone size={22} strokeWidth={2} />
-                  </span>
-                  <span className="flex flex-1 flex-col gap-0.5">
-                    <span className="text-base font-semibold tracking-[-0.01em]">{nome}</span>
-                    <span className="text-sm leading-[1.45] text-ui-muted">{frase}</span>
-                  </span>
-                  <ChevronRight size={18} aria-hidden="true" className="flex-none text-ui-line-strong" />
-                </Link>
-              ))}
-            </div>
-          </section>
+          <GrupoDeFerramentas id="g-whatsapp" titulo="Vender no WhatsApp" cartoes={venderNoWhatsapp} />
+          <GrupoDeFerramentas id="g-contas" titulo="Contas do negócio" cartoes={contasDoNegocio} />
 
           <section className="flex flex-col gap-2.5 rounded-xl border border-ui-line bg-ui-bg p-5">
             <h2 className="m-0 text-base font-semibold">Feitas para quem toca o próprio negócio</h2>

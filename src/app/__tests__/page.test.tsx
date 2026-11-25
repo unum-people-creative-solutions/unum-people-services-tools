@@ -44,7 +44,6 @@ describe('Home', () => {
     render(<Home />);
     expect(screen.queryByText(/Dispon[ií]vel/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Ecossistema/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Vender no WhatsApp/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Em breve/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Acessar Ferramenta/i)).not.toBeInTheDocument();
   });
@@ -87,7 +86,7 @@ describe('Home: metadados (RF-F2-12)', () => {
       absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer',
     });
     expect(metadata.description).toBe(
-      'Calculadoras grátis para MEI e pequenos negócios: quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
+      'Ferramentas grátis para MEI e pequenos negócios: QR code, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
     );
   });
 });

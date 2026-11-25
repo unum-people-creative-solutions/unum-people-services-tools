@@ -20,7 +20,7 @@ export default function PrivacyPage() {
               Política de Privacidade
             </h1>
             <p className="text-brand-grey font-medium uppercase tracking-widest text-xs">
-              Última atualização: 23 de novembro de 2026
+              Última atualização: 25 de novembro de 2026
             </p>
           </header>
 
@@ -45,6 +45,7 @@ export default function PrivacyPage() {
               </p>
               <ul className="list-disc pl-5 text-brand-grey space-y-2 mt-4">
                 <li>os serviços que você cadastra em &quot;Quais serviços compensam&quot;;</li>
+                <li>o último QR code que você criou, com o que digitou (inclusive a chave Pix). O logo não fica guardado. Para apagar, use o botão &quot;Apagar o que eu digitei&quot; no gerador;</li>
                 <li>os custos e valores do simulador de preço.</li>
               </ul>
               <p className="text-brand-grey leading-relaxed mt-4">
@@ -61,7 +62,7 @@ export default function PrivacyPage() {
                 <h2 className="text-2xl font-bold m-0 text-brand-blue">O que contamos</h2>
               </div>
               <p className="text-brand-grey leading-relaxed">
-                Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.
+                Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.
               </p>
             </section>
 
