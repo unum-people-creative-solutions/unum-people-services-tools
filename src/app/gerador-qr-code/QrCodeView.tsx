@@ -102,7 +102,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     <>
       {/* Com a plaquinha na página, na impressão só ela sai (contêiner `PlaquinhaParaImprimir`, DT-QR-10). */}
       <div className={clsx('flex min-h-screen flex-col bg-ui-surface text-ui-ink', dadosDaPlaquinha && 'print:hidden')}>
-        <Header ferramenta />
+        <Header ferramenta larguraDaFerramenta="larga" />
 
         <main className="mx-auto flex w-full max-w-[1120px] flex-1 flex-col gap-5 px-5 pb-10 pt-2">
           <div className="flex flex-col gap-2">
