@@ -83,6 +83,14 @@ describe('Passo 1: tipo (RF-QR-04, RF-QR-05)', () => {
     expect(screen.getByLabelText('Telefone com DDD')).toHaveFocus();
   });
 
+  it('o tipo marcado mostra um sinal de visto além da cor (RF-QR-05)', () => {
+    montar();
+    escolher('Receber Pix');
+    const marcado = screen.getByRole('radio', { name: 'Receber Pix' }).closest('label') as HTMLElement;
+    const naoMarcado = screen.getByRole('radio', { name: 'Link do site' }).closest('label') as HTMLElement;
+    expect(marcado.querySelectorAll('svg')).toHaveLength(naoMarcado.querySelectorAll('svg').length + 1);
+  });
+
   it('no Pix, o primeiro campo é "Tipo da chave"', () => {
     montar();
     escolher('Receber Pix');
