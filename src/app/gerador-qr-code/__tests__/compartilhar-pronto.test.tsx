@@ -3,9 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import QrCodeView from '../QrCodeView';
 import { EXEMPLOS } from '@/utils/qr/__tests__/exemplos';
 
-vi.mock('next/image', () => ({
-  default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
-}));
+// O logo do cabeçalho não importa aqui (e `<img>` solto na suíte acende o lint).
+vi.mock('next/image', () => ({ default: () => null }));
 
 const escolher = (nome: string) => fireEvent.click(screen.getByRole('radio', { name: nome }));
 const digitar = (rotulo: string, valor: string) =>

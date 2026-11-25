@@ -6,6 +6,11 @@ export function nomeDoArquivoDoQr(tipo: TipoId, extensao: 'png' | 'svg'): string
   return `qr-code-${tipo}.${extensao}`;
 }
 
+/** Arquivo da plaquinha (RF-QR-36): sempre PNG. */
+export function nomeDoArquivoDaPlaquinha(tipo: TipoId): string {
+  return `plaquinha-${tipo}.png`;
+}
+
 /** Baixa o arquivo por um `<a download>` temporário. Lança erro se o navegador não conseguir. */
 export function baixarArquivo(blob: Blob, nome: string): void {
   const url = URL.createObjectURL(blob);

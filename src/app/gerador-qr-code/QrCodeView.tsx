@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import clsx from 'clsx';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { Botao } from '../../components/ui/Botao';
@@ -10,6 +11,7 @@ import { Recolhivel } from '../../components/ui/Recolhivel';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
 import { CaraDoNegocio } from '../../components/qr/CaraDoNegocio';
+import { PlaquinhaParaImprimir, SecaoDaPlaquinha } from '../../components/qr/SecaoDaPlaquinha';
 import { AcoesDoQr } from '../../components/qr/AcoesDoQr';
 import { PreviaDoQr } from '../../components/qr/PreviaDoQr';
 import { AvisoDoPix, PixCopiaECola } from '../../components/qr/PixCopiaECola';
@@ -19,7 +21,9 @@ import { avisosDoPix, TIPOS, type TipoId } from '../../utils/qr/conteudos';
 import { errosVisiveis } from '../../utils/qr/erros';
 import { chamadaDoEstado, conteudoDe } from '../../utils/qr/estado';
 import type { LogoLido } from '../../utils/qr/logo';
+import { svgDoQr } from '../../utils/qr/desenho';
 import { gerarQr } from '../../utils/qr/gerar';
+import { dadosDaPlaquinha as montarDadosDaPlaquinha } from '../../utils/qr/plaquinha';
 
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
   const { estado, escolherTipo, mudarCampos, mudarAparencia, apagar } = useQrCode();
@@ -79,6 +83,15 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     [textoDoQr, cor, frase, logo],
   );
 
+  // Plaquinha (RF-QR-36): só existe com QR válido. O QR dela leva cor e logo, mas não a frase embaixo.
+  const matrizDoQr = qr?.ok ? qr.matriz : null;
+  const svgDaPlaquinha = React.useMemo(
+    () => (matrizDoQr ? svgDoQr(matrizDoQr, { cor, logo: logo?.dataUrl }) : null),
+    [matrizDoQr, cor, logo],
+  );
+  const dadosDaPlaquinha =
+    tipo && matrizDoQr ? montarDadosDaPlaquinha(tipo, estado.campos, estado.nomeDoNegocio, cor) : null;
+
   // O primeiro QR válido. Quem só voltou e olha o QR restaurado não conta (o hook exige "comecou" antes).
   const temQr = qr?.ok === true;
   React.useEffect(() => {
@@ -86,124 +99,157 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   }, [temQr, comecou, marcar]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
-      <Header ferramenta />
+    <>
+      {/* Com a plaquinha na página, na impressão só ela sai (contêiner `PlaquinhaParaImprimir`, DT-QR-10). */}
+      <div className={clsx('flex min-h-screen flex-col bg-ui-surface text-ui-ink', dadosDaPlaquinha && 'print:hidden')}>
+        <Header ferramenta />
 
-      <main className="mx-auto flex w-full max-w-[1120px] flex-1 flex-col gap-5 px-5 pb-10 pt-2">
-        <div className="flex flex-col gap-2">
-          <h1 className="m-0 text-[28px] font-bold leading-[1.15] tracking-[-0.03em] text-ui-ink">
-            Gerador de QR code grátis
-          </h1>
-          <p className="m-0 text-base leading-normal text-ui-muted">
-            Nunca expira. Sem cadastro e sem anúncio. Fica pronto aqui no seu celular.
-          </p>
-        </div>
+        <main className="mx-auto flex w-full max-w-[1120px] flex-1 flex-col gap-5 px-5 pb-10 pt-2">
+          <div className="flex flex-col gap-2">
+            <h1 className="m-0 text-[28px] font-bold leading-[1.15] tracking-[-0.03em] text-ui-ink">
+              Gerador de QR code grátis
+            </h1>
+            <p className="m-0 text-base leading-normal text-ui-muted">
+              Nunca expira. Sem cadastro e sem anúncio. Fica pronto aqui no seu celular.
+            </p>
+          </div>
 
-        {/* No celular, tudo em uma coluna na ordem da tela; de md em diante, duas colunas (blueprint §2). */}
-        <div className="grid gap-5 md:grid-cols-2 md:items-start md:gap-6">
-          <div className="flex flex-col gap-5">
-            <Bloco numero={1} titulo={TITULO_DO_PASSO_1}>
-              <EscolhaDoTipo
-                tipo={tipo}
-                aberta={tipo === null || trocando}
-                onEscolher={escolher}
-                onTrocar={() => setTrocando(true)}
-              />
-            </Bloco>
+          {/*
+            Uma grade só, com os blocos soltos: no celular eles seguem a ordem da tela (blueprint §1: QR logo depois
+            dos campos, depois "cara do negócio" e plaquinha). De md em diante são duas colunas (blueprint §2):
+            passos e "cara do negócio" à esquerda, o cartão do QR (preso no topo) e a plaquinha à direita.
+          */}
+          <div className="grid gap-5 md:grid-cols-2 md:items-start md:gap-6">
+            <div className="md:col-start-1 md:row-start-1">
+              <Bloco numero={1} titulo={TITULO_DO_PASSO_1}>
+                <EscolhaDoTipo
+                  tipo={tipo}
+                  aberta={tipo === null || trocando}
+                  onEscolher={escolher}
+                  onTrocar={() => setTrocando(true)}
+                />
+              </Bloco>
+            </div>
 
             {tipo && (
-              <Bloco numero={2} titulo="Preencha os dados">
-                <div ref={formulario} className="flex flex-col gap-[18px]">
-                  <FormularioDoTipo
-                    key={tipo}
-                    tipo={tipo}
-                    campos={estado.campos}
-                    erros={erros}
-                    avisos={avisos}
-                    onChange={mudarCampos}
-                    onBlur={(campo) => setTocados((atual) => new Set(atual).add(`${tipo}.${campo}`))}
-                  />
-                </div>
-              </Bloco>
+              <div className="md:col-start-1 md:row-start-2">
+                <Bloco numero={2} titulo="Preencha os dados">
+                  <div ref={formulario} className="flex flex-col gap-[18px]">
+                    <FormularioDoTipo
+                      key={tipo}
+                      tipo={tipo}
+                      campos={estado.campos}
+                      erros={erros}
+                      avisos={avisos}
+                      onChange={mudarCampos}
+                      onBlur={(campo) => setTocados((atual) => new Set(atual).add(`${tipo}.${campo}`))}
+                    />
+                  </div>
+                </Bloco>
+              </div>
             )}
 
             {tipo && (
-              <CaraDoNegocio
-                key={apagados}
-                cor={cor}
-                onCor={(nova) => mudarAparencia({ cor: nova })}
-                logo={logo}
-                onLogo={setLogo}
-                frase={frase}
-                onFrase={(nova) => mudarAparencia({ frase: nova })}
-                chamada={chamadaDoEstado(estado) ?? ''}
-              />
+              <div className="flex flex-col gap-5 md:sticky md:top-4 md:col-start-2 md:row-span-3 md:row-start-1">
+                <PreviaDoQr
+                  nomeDoTipo={nomeDoTipo}
+                  svg={qr?.ok ? qr.svg : null}
+                  alerta={qr && !qr.ok ? qr.erro : undefined}
+                >
+                  {qr?.ok && (
+                    <AcoesDoQr
+                      // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
+                      key={tipo}
+                      tipo={tipo}
+                      matriz={qr.matriz}
+                      svg={qr.svg}
+                      desenho={{ cor, frase, logo: logo ?? undefined }}
+                      aoBaixar={() => marcar('baixou')}
+                    />
+                  )}
+                </PreviaDoQr>
+                {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
+                {tipo === 'pix' && <AvisoDoPix />}
+              </div>
+            )}
+
+            {tipo && (
+              <div className="md:col-start-1 md:row-start-3">
+                <CaraDoNegocio
+                  key={apagados}
+                  cor={cor}
+                  onCor={(nova) => mudarAparencia({ cor: nova })}
+                  logo={logo}
+                  onLogo={setLogo}
+                  frase={frase}
+                  onFrase={(nova) => mudarAparencia({ frase: nova })}
+                  chamada={chamadaDoEstado(estado) ?? ''}
+                />
+              </div>
+            )}
+
+            {tipo && qr?.ok && svgDaPlaquinha && dadosDaPlaquinha && (
+              <div className="md:col-start-2 md:row-start-4">
+                <SecaoDaPlaquinha
+                  // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
+                  key={tipo}
+                  tipo={tipo}
+                  matriz={qr.matriz}
+                  svg={svgDaPlaquinha}
+                  dados={dadosDaPlaquinha}
+                  tamanho={estado.tamanho}
+                  logo={logo ?? undefined}
+                  nomeDoNegocio={estado.nomeDoNegocio}
+                  onNomeDoNegocio={(nome) => mudarAparencia({ nomeDoNegocio: nome })}
+                  onTamanho={(tamanho) => mudarAparencia({ tamanho })}
+                  aoBaixar={() => marcar('baixou')}
+                />
+              </div>
             )}
           </div>
 
-          {tipo && (
-            <div className="flex flex-col gap-5 md:sticky md:top-4">
-              <PreviaDoQr
-                nomeDoTipo={nomeDoTipo}
-                svg={qr?.ok ? qr.svg : null}
-                alerta={qr && !qr.ok ? qr.erro : undefined}
-              >
-                {qr?.ok && (
-                  <AcoesDoQr
-                    // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
-                    key={tipo}
-                    tipo={tipo}
-                    matriz={qr.matriz}
-                    svg={qr.svg}
-                    desenho={{ cor, frase, logo: logo ?? undefined }}
-                    aoBaixar={() => marcar('baixou')}
-                  />
-                )}
-              </PreviaDoQr>
-              {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
-              {tipo === 'pix' && <AvisoDoPix />}
-            </div>
-          )}
-        </div>
-
-        <section aria-label="Apagar dados" className="flex flex-col gap-3">
-          {confirmando ? (
-            <div className="flex max-w-[640px] flex-col gap-3 rounded-lg bg-ui-bg p-3.5">
-              <p className="m-0 text-[15px] font-medium text-ui-ink">Apagar tudo o que você digitou neste aparelho?</p>
-              <div className="flex gap-3">
-                <Botao onClick={apagarTudo}>Sim, apagar</Botao>
-                <Botao variante="contorno" autoFocus onClick={() => setConfirmando(false)}>
-                  Cancelar
-                </Botao>
+          <section aria-label="Apagar dados" className="flex flex-col gap-3">
+            {confirmando ? (
+              <div className="flex max-w-[640px] flex-col gap-3 rounded-lg bg-ui-bg p-3.5">
+                <p className="m-0 text-[15px] font-medium text-ui-ink">Apagar tudo o que você digitou neste aparelho?</p>
+                <div className="flex gap-3">
+                  <Botao onClick={apagarTudo}>Sim, apagar</Botao>
+                  <Botao variante="contorno" autoFocus onClick={() => setConfirmando(false)}>
+                    Cancelar
+                  </Botao>
+                </div>
               </div>
-            </div>
-          ) : (
-            <Botao variante="link" onClick={() => setConfirmando(true)}>
-              Apagar o que eu digitei
-            </Botao>
+            ) : (
+              <Botao variante="link" onClick={() => setConfirmando(true)}>
+                Apagar o que eu digitei
+              </Botao>
+            )}
+            {apagou && (
+              <p role="status" className="m-0 text-sm font-medium text-ui-ok">
+                Pronto, apagamos tudo.
+              </p>
+            )}
+          </section>
+
+          {children && (
+            <Recolhivel titulo="Como usar o seu QR code" variante="cartao" onAbrir={() => marcar('guia')}>
+              <div>{children}</div>
+            </Recolhivel>
           )}
-          {apagou && (
-            <p role="status" className="m-0 text-sm font-medium text-ui-ok">
-              Pronto, apagamos tudo.
-            </p>
-          )}
-        </section>
 
-        {children && (
-          <Recolhivel titulo="Como usar o seu QR code" variante="cartao" onAbrir={() => marcar('guia')}>
-            <div>{children}</div>
-          </Recolhivel>
-        )}
+          <Convite
+            texto="Ainda não tem uma página do seu negócio? Crie a sua e coloque o link no QR code."
+            link="Criar minha página"
+            href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=qr-code"
+            onClick={() => marcar('convite')}
+          />
+        </main>
 
-        <Convite
-          texto="Ainda não tem uma página do seu negócio? Crie a sua e coloque o link no QR code."
-          link="Criar minha página"
-          href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=qr-code"
-          onClick={() => marcar('convite')}
-        />
-      </main>
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+      {dadosDaPlaquinha && svgDaPlaquinha && (
+        <PlaquinhaParaImprimir dados={dadosDaPlaquinha} svg={svgDaPlaquinha} tamanho={estado.tamanho} />
+      )}
+    </>
   );
 }
