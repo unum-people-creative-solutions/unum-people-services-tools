@@ -5,6 +5,14 @@ import { useCallback, useRef, useState } from 'react';
 export type Ferramenta = 'home' | 'quanto-cobrar' | 'vale-anunciar' | 'servicos-compensam';
 export type EventoDeUso = 'visita' | 'comecou' | 'resultado' | 'convite' | 'guia' | 'planilha';
 
+/** Única origem que a API de medição aceita (`TOOLS_ORIGENS` da Lambda de jornada). */
+export const ORIGEM_DA_MEDICAO = 'https://tools.unumpeople.com.br';
+
+/** Igualdade exata (sem `includes`, `endsWith` nem regex): origens parecidas não medem. */
+export function origemPodeMedir(origem: string): boolean {
+  return origem === ORIGEM_DA_MEDICAO;
+}
+
 /**
  * Medição de uso: uma soma por dia no servidor, sem saber quem usou (privacidade, "O que contamos").
  * Cada evento é enviado uma vez por carregamento da página: o controle é um Set na memória do
@@ -14,6 +22,10 @@ export type EventoDeUso = 'visita' | 'comecou' | 'resultado' | 'convite' | 'guia
  * olha o resultado não conta nenhum dos dois, e o funil nunca tem mais "viram o resultado" do que
  * "começaram". Por isso o hook devolve `comecou` (estado): a View reavalia a condição do resultado
  * quando ele muda, e o resultado já visível é marcado logo depois do `comecou`.
+ *
+ * A origem da página também é conferida: a API só aceita `ORIGEM_DA_MEDICAO`, e em qualquer outro
+ * endereço (prévia de PR, `*.vercel.app`, `next dev`) o envio só geraria recusa no log. Fora dela nada
+ * sai, mas `comecou` continua valendo, porque a interface depende dele.
  */
 export function useMedicao(ferramenta: Ferramenta) {
   const jaEnviados = useRef<Set<EventoDeUso>>(new Set());
@@ -30,6 +42,7 @@ export function useMedicao(ferramenta: Ferramenta) {
       // Lida na hora do envio (o Next a troca pelo valor no build; os testes a definem a cada caso).
       const url = process.env.NEXT_PUBLIC_TOOLS_USO_URL;
       if (!url) return;
+      if (typeof window === 'undefined' || !origemPodeMedir(window.location.origin)) return;
 
       // O silêncio dos catch abaixo é intencional: é medição, não ação do usuário. Se o envio falhar
       // (bloqueador de rastreio, sem rede, navegador antigo), não há nada a mostrar nem a refazer, e
