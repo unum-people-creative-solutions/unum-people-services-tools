@@ -69,6 +69,15 @@ describe('linkDoWhatsapp', () => {
     );
   });
 
+  it('escapa & ? # da mensagem (encodeURIComponent, não encodeURI)', () => {
+    const link = linkDoWhatsapp('11987654321', 'Pão & café? Mesa #5');
+    expect(link).toBe('https://wa.me/5511987654321?text=P%C3%A3o%20%26%20caf%C3%A9%3F%20Mesa%20%235');
+    expect(link).toContain('%26');
+    expect(link).toContain('%3F');
+    expect(link).toContain('%23');
+    expect(new URL(link).searchParams.get('text')).toBe('Pão & café? Mesa #5');
+  });
+
   it('mensagem vazia ou só espaços não gera text', () => {
     expect(linkDoWhatsapp('11987654321', '')).toBe('https://wa.me/5511987654321');
     expect(linkDoWhatsapp('11987654321', '   ')).toBe('https://wa.me/5511987654321');
