@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { lerQr } from '@/test/qr';
 import { criarMatriz } from '../matriz';
-import { CORES_DO_QR, contrasteComBranco, svgDoQr } from '../desenho';
+import { CONTRASTE_MINIMO, CORES_DO_QR, contrasteComBranco, svgDoQr } from '../desenho';
 
 const TEXTO = 'https://www.seunegocio.com.br/cardapio';
 
@@ -124,6 +124,14 @@ describe('contrasteComBranco e CORES_DO_QR (T10, RF-QR-33)', () => {
   it('#000000 é aceito e #ffcc00 é recusado pelo mínimo de 4,5:1', () => {
     expect(contrasteComBranco('#000000')).toBeGreaterThanOrEqual(4.5);
     expect(contrasteComBranco('#ffcc00')).toBeLessThan(4.5);
+  });
+
+  it('o mínimo é 4,5:1 e a fronteira passa entre #767676 (aceito) e #777777 (recusado)', () => {
+    expect(CONTRASTE_MINIMO).toBe(4.5);
+    expect(contrasteComBranco('#767676')).toBeGreaterThanOrEqual(CONTRASTE_MINIMO);
+    expect(contrasteComBranco('#767676')).toBeCloseTo(4.54, 2);
+    expect(contrasteComBranco('#777777')).toBeLessThan(CONTRASTE_MINIMO);
+    expect(contrasteComBranco('#777777')).toBeCloseTo(4.48, 2);
   });
 
   it('aceita maiúsculas e a forma curta #rgb', () => {

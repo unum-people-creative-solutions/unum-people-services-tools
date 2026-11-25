@@ -145,6 +145,20 @@ describe('Cor do QR code (RF-QR-32, RF-QR-33, T20)', () => {
     expect(JSON.parse(window.localStorage.getItem(CHAVE_DO_QR)!).cor).toBe('#4b0f9e');
   });
 
+  it('na fronteira do contraste: #777777 (4,48:1) é recusada e #767676 (4,54:1) é aceita', () => {
+    render(<QrCodeView />);
+    preencherPix();
+    const seletor = screen.getByLabelText('Outra cor') as HTMLInputElement;
+
+    fireEvent.change(seletor, { target: { value: '#777777' } });
+    expect(screen.getByRole('alert')).toHaveTextContent('Essa cor é clara demais');
+    expect(corDoQrNaTela()).toBe('#000000');
+
+    fireEvent.change(seletor, { target: { value: '#767676' } });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(corDoQrNaTela()).toBe('#767676');
+  });
+
   it('o alerta some quando a pessoa escolhe uma cor boa depois', () => {
     render(<QrCodeView />);
     preencherPix();
