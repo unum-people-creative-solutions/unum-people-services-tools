@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { Header } from '../Header';
 import { describe, it, expect } from 'vitest';
 
@@ -41,6 +41,16 @@ describe('Header (RF-F2-05 e RF-F2-07)', () => {
     const banner = screen.getByRole('banner');
     expect(banner).not.toContainElement(link);
     expect(Boolean(banner.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  });
+
+  it('largura da ferramenta: sem a prop é "estreita" (render igual ao das outras ferramentas) e "larga" muda o contêiner do link', () => {
+    const padrao = render(<Header ferramenta />).container.innerHTML;
+    const estreita = render(<Header ferramenta larguraDaFerramenta="estreita" />).container.innerHTML;
+    const larga = render(<Header ferramenta larguraDaFerramenta="larga" />);
+    expect(estreita).toBe(padrao);
+    expect(larga.container.innerHTML).not.toBe(padrao);
+    // o link é o mesmo, só muda a largura do contêiner dele
+    expect(within(larga.container).getByRole('link', { name: 'Todas as ferramentas' })).toHaveAttribute('href', '/');
   });
 
   it('não leva mais o botão Ajuda nem o nome da ferramenta (a ajuda mora no miolo da ferramenta)', () => {

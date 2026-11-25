@@ -27,6 +27,14 @@ O ecossistema de ferramentas da **Unum People** foi projetado para eliminar o "a
 - **Destaque:** Simula cenários baseados em orçamento disponível ou meta de clientes desejada.
 - **Caminho:** `/calculadora-viabilidade`
 
+### 4. Gerador de QR code
+- **O que faz:** cria o QR code de 11 tipos: Pix (BR Code estático do Banco Central, com o copia e cola), WhatsApp, Instagram e outras redes, link, Wi-Fi, avaliação no Google, como chegar, contato (vCard), e-mail, ligação e texto.
+- **Destaque:** o QR é estático e nunca expira. Pode levar cor, logo e frase, e tem uma plaquinha para imprimir (A6 ou A4, impressão ou PNG a 300 DPI). Tudo é gerado no navegador.
+- **Guardar:** o último QR fica no `localStorage` (`tools-qr-code:v1`), sem o logo, e há um botão para apagar.
+- **Código:** `src/utils/qr/` (lógica pura e testes que leem o QR de volta com `jsqr`), `src/components/qr/`, `src/app/gerador-qr-code/`.
+- **Medição:** ferramenta `qr-code`, com o evento próprio `baixou`.
+- **Caminho:** `/gerador-qr-code`
+
 ## 🛠️ Stack Técnica
 
 - **Framework:** [Next.js](https://nextjs.org) (App Router)
@@ -34,6 +42,7 @@ O ecossistema de ferramentas da **Unum People** foi projetado para eliminar o "a
 - **Estilização:** Tailwind CSS
 - **Ícones:** Lucide React
 - **Gráficos:** Recharts
+- **QR code:** `qrcode` (só a matriz; o desenho em SVG e canvas é nosso)
 - **Testes:** Vitest + React Testing Library
 
 ## 📦 Desenvolvimento

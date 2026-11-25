@@ -5,9 +5,14 @@ import { ChevronLeft } from 'lucide-react';
 interface HeaderProps {
   /** Páginas de ferramenta: mostra "Todas as ferramentas" abaixo do cabeçalho. */
   ferramenta?: boolean;
+  /**
+   * Largura do contêiner do link "Todas as ferramentas": `estreita` (padrão, as ferramentas de uma coluna)
+   * ou `larga`, para a página que usa a largura inteira do site e precisa alinhar o link ao título.
+   */
+  larguraDaFerramenta?: 'estreita' | 'larga';
 }
 
-export function Header({ ferramenta = false }: HeaderProps) {
+export function Header({ ferramenta = false, larguraDaFerramenta = 'estreita' }: HeaderProps) {
   return (
     <>
       <header className="bg-ui-canvas">
@@ -29,7 +34,9 @@ export function Header({ ferramenta = false }: HeaderProps) {
         </div>
       </header>
       {ferramenta && (
-        <div className="mx-auto w-full max-w-[640px] px-5 pt-5">
+        <div
+          className={`mx-auto w-full px-5 pt-5 ${larguraDaFerramenta === 'larga' ? 'max-w-[1120px]' : 'max-w-[640px]'}`}
+        >
           <Link
             href="/"
             className="flex min-h-11 items-center gap-1 self-start text-sm font-medium text-ui-brand-blue no-underline hover:text-ui-brand-purple"

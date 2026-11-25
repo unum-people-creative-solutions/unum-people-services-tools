@@ -15,7 +15,7 @@ describe('Política de Privacidade', () => {
   it('mostra o título e a data da nova versão', () => {
     render(<PrivacyPage />);
     expect(screen.getByRole('heading', { level: 1, name: 'Política de Privacidade' })).toBeInTheDocument();
-    expect(screen.getByText('Última atualização: 23 de novembro de 2026')).toBeInTheDocument();
+    expect(screen.getByText('Última atualização: 25 de novembro de 2026')).toBeInTheDocument();
   });
 
   it('tem as cinco seções do texto aprovado', () => {
@@ -40,6 +40,11 @@ describe('Política de Privacidade', () => {
     expect(texto).toContain('Este site não tem anúncios e não usa cookies de rastreamento.');
     expect(texto).toContain('Para você não perder o que já preencheu, algumas ferramentas guardam os dados no próprio navegador:');
     expect(screen.getByText('os serviços que você cadastra em "Quais serviços compensam";')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'o último QR code que você criou, com o que digitou (inclusive a chave Pix). O logo não fica guardado. Para apagar, use o botão "Apagar o que eu digitei" no gerador;',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText('os custos e valores do simulador de preço.')).toBeInTheDocument();
     expect(texto).toContain('A calculadora de anúncios não guarda nada: ao fechar a página, os números somem.');
     expect(texto).toContain(
@@ -58,7 +63,7 @@ describe('Política de Privacidade', () => {
     const texto = textoDaPagina();
     expect(texto).toContain('Contamos só quantas vezes as ferramentas são usadas, sem saber quem usou.');
     expect(texto).toContain(
-      'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
+      'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
     );
   });
 
@@ -84,17 +89,18 @@ describe('Política de Privacidade', () => {
 // fica travado por inteiro, e a privacidade também não pode ter anúncio.
 const TEXTO_APROVADO = [
   'Política de Privacidade',
-  'Última atualização: 23 de novembro de 2026',
+  'Última atualização: 25 de novembro de 2026',
   'Em poucas palavras',
   'As ferramentas da Unum People funcionam no seu navegador. O que você digita fica guardado neste aparelho e não é enviado para nós. Este site não tem anúncios e não usa cookies de rastreamento. Contamos só quantas vezes as ferramentas são usadas, sem saber quem usou.',
   'O que fica guardado no seu aparelho',
   'Para você não perder o que já preencheu, algumas ferramentas guardam os dados no próprio navegador:',
   'os serviços que você cadastra em "Quais serviços compensam";',
+  'o último QR code que você criou, com o que digitou (inclusive a chave Pix). O logo não fica guardado. Para apagar, use o botão "Apagar o que eu digitei" no gerador;',
   'os custos e valores do simulador de preço.',
   'A calculadora de anúncios não guarda nada: ao fechar a página, os números somem.',
   'Esses dados ficam só neste aparelho e neste navegador. Para apagar, limpe os dados de navegação do seu navegador.',
   'O que contamos',
-  'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
+  'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
   'O que a hospedagem registra',
   'Como qualquer site, a empresa que hospeda estas páginas (Netlify) registra dados técnicos de acesso, como endereço IP, navegador e página visitada, para manter o site no ar e seguro. Não usamos esses registros para identificar você nem para publicidade.',
   'Seus direitos',
