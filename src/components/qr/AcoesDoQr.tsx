@@ -3,7 +3,7 @@
 import React from 'react';
 import { Botao } from '../ui/Botao';
 import { Recolhivel } from '../ui/Recolhivel';
-import type { TipoId } from '../../utils/qr/conteudos';
+import { TIPOS, type TipoId } from '../../utils/qr/conteudos';
 import type { MatrizQr } from '../../utils/qr/matriz';
 import { baixarArquivo, nomeDoArquivoDoQr } from '../../utils/qr/arquivo';
 import { gerarPng } from '../../utils/qr/png';
@@ -45,6 +45,7 @@ export function AcoesDoQr({ tipo, matriz, svg, desenho, aoBaixar }: AcoesDoQrPro
   const [erro, setErro] = React.useState<string | null>(null);
   // O PNG é feito antes do toque: o compartilhamento do iPhone exige o File em mãos dentro do gesto (RT-QR-1).
   const nomeDoPng = nomeDoArquivoDoQr(tipo, 'png');
+  const nomeDoTipo = TIPOS.find((t) => t.id === tipo)?.nome ?? '';
   const png = usePngPronto(matriz, desenho, nomeDoPng);
   const preparando = png.situacao === 'preparando';
   // PNG que não saiu: o erro aparece já (o botão de baixar tenta de novo); nada fica em silêncio.
@@ -71,7 +72,7 @@ export function AcoesDoQr({ tipo, matriz, svg, desenho, aoBaixar }: AcoesDoQrPro
     setOcupado(true);
     let promessa: Promise<void>;
     try {
-      promessa = navigator.share({ files: [png.arquivo] });
+      promessa = navigator.share({ files: [png.arquivo], title: `QR code de ${nomeDoTipo}` });
     } catch (e) {
       promessa = Promise.reject(e);
     }

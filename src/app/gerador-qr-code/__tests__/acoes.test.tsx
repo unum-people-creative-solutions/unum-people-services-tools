@@ -132,6 +132,15 @@ describe('Ações (RF-QR-25 a 27)', () => {
     expect(canvas).toEqual([{ largura: 1024, altura: 1024 }]);
   });
 
+  it('o compartilhamento leva o título "QR code de {nome do tipo}" (DT-QR-08)', async () => {
+    const { compartilhar } = ligarCompartilhamento(async () => undefined);
+    render(<QrCodeView />);
+    preencherPix();
+    fireEvent.click(await screen.findByRole('button', { name: 'Compartilhar' }));
+    await waitFor(() => expect(compartilhar).toHaveBeenCalledTimes(1));
+    expect(compartilhar.mock.calls[0][0].title).toBe('QR code de Receber Pix');
+  });
+
   it('cancelar o compartilhamento (AbortError) não mostra nada', async () => {
     const { compartilhar } = ligarCompartilhamento(async () => {
       throw new DOMException('cancelado', 'AbortError');
