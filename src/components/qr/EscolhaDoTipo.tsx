@@ -74,7 +74,7 @@ function Cartao({ item, marcado, onEscolher }: { item: TipoDeQr; marcado: boolea
 /** Passo 1 (RF-QR-04 e RF-QR-05): os 11 tipos à vista, numa grade de 3 colunas que não recolhe depois da escolha. */
 export function EscolhaDoTipo({ tipo, onEscolher }: EscolhaDoTipoProps) {
   return (
-    <div role="radiogroup" aria-label={TITULO_DO_PASSO_1} className="grid grid-cols-3 gap-2">
+    <div role="radiogroup" aria-label={TITULO_DO_PASSO_1} className="grid grid-cols-2 gap-2 min-[360px]:grid-cols-3">
       {TIPOS.map((t) => (
         <Cartao key={t.id} item={t} marcado={t.id === tipo} onEscolher={() => onEscolher(t.id)} />
       ))}
