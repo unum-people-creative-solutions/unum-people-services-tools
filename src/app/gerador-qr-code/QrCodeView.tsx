@@ -17,7 +17,8 @@ import { useMedicao } from '../../hooks/useMedicao';
 import { useQrCode } from '../../hooks/useQrCode';
 import { avisosDoPix, TIPOS, type TipoId } from '../../utils/qr/conteudos';
 import { errosVisiveis } from '../../utils/qr/erros';
-import { conteudoDe } from '../../utils/qr/estado';
+import { chamadaDoEstado, conteudoDe } from '../../utils/qr/estado';
+import type { LogoLido } from '../../utils/qr/logo';
 import { gerarQr } from '../../utils/qr/gerar';
 
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
@@ -31,6 +32,8 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   const [apagou, setApagou] = React.useState(false);
   // Cada "Apagar" recomeça os controles da cara do negócio (inclusive o aviso de cor recusada).
   const [apagados, setApagados] = React.useState(0);
+  // O logo nunca entra no estado guardado (DT-QR-11): fica só na memória da página.
+  const [logo, setLogo] = React.useState<LogoLido | null>(null);
   const formulario = React.useRef<HTMLDivElement>(null);
 
   const { tipo } = estado;
@@ -60,6 +63,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     setConfirmando(false);
     setApagou(true);
     setApagados((n) => n + 1);
+    setLogo(null);
   };
 
   const conteudo = conteudoDe(estado);
@@ -71,8 +75,8 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   const textoDoQr = conteudo?.ok ? conteudo.texto : null;
   const { cor, frase } = estado;
   const qr = React.useMemo(
-    () => (textoDoQr === null ? null : gerarQr(textoDoQr, { cor, frase })),
-    [textoDoQr, cor, frase],
+    () => (textoDoQr === null ? null : gerarQr(textoDoQr, { cor, frase, logo: logo?.dataUrl })),
+    [textoDoQr, cor, frase, logo],
   );
 
   // O primeiro QR válido. Quem só voltou e olha o QR restaurado não conta (o hook exige "comecou" antes).
@@ -123,7 +127,18 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
               </Bloco>
             )}
 
-            {tipo && <CaraDoNegocio key={apagados} cor={cor} onCor={(nova) => mudarAparencia({ cor: nova })} />}
+            {tipo && (
+              <CaraDoNegocio
+                key={apagados}
+                cor={cor}
+                onCor={(nova) => mudarAparencia({ cor: nova })}
+                logo={logo}
+                onLogo={setLogo}
+                frase={frase}
+                onFrase={(nova) => mudarAparencia({ frase: nova })}
+                chamada={chamadaDoEstado(estado) ?? ''}
+              />
+            )}
           </div>
 
           {tipo && (
@@ -140,7 +155,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
                     tipo={tipo}
                     matriz={qr.matriz}
                     svg={qr.svg}
-                    desenho={{ cor, frase }}
+                    desenho={{ cor, frase, logo: logo ?? undefined }}
                     aoBaixar={() => marcar('baixou')}
                   />
                 )}

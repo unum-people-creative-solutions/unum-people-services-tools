@@ -2,7 +2,7 @@
 // Cor, frase, nome do negócio e tamanho já têm lugar aqui para a F2 usar sem mexer no formato.
 // O logo NUNCA entra neste estado: fica só na memória da página (DT-QR-11).
 
-import { camposVazios, montarConteudo, type CamposPorTipo, type ResultadoConteudo, type TipoId } from './conteudos';
+import { camposVazios, chamadaDoTipo, montarConteudo, type CamposPorTipo, type ResultadoConteudo, type TipoId } from './conteudos';
 
 export type TamanhoDaPlaquinha = 'A6' | 'A4';
 
@@ -38,4 +38,22 @@ export function estadoVazio(): EstadoQr {
 export function conteudoDe(estado: EstadoQr): ResultadoConteudo | null {
   if (!estado.tipo) return null;
   return montarConteudo(estado.tipo, estado.campos[estado.tipo]);
+}
+
+/** Chamada do tipo escolhido (a frase sugerida), ou `null` se ainda não há tipo. */
+export function chamadaDoEstado(estado: EstadoQr): string | null {
+  if (!estado.tipo) return null;
+  return chamadaDoTipo(estado.tipo, estado.campos[estado.tipo]);
+}
+
+/**
+ * A frase embaixo do QR nasce com a chamada do tipo (RF-QR-35). Se a pessoa não mexeu nela e a
+ * mudança (outro tipo, outra rede) troca a chamada, a frase acompanha. Frase escrita pela pessoa
+ * não é tocada.
+ */
+export function acompanharChamada(antes: EstadoQr, depois: EstadoQr): EstadoQr {
+  if (depois.frase !== antes.frase || antes.frase === '') return depois;
+  if (antes.frase !== chamadaDoEstado(antes)) return depois;
+  const nova = chamadaDoEstado(depois);
+  return nova === null ? depois : { ...depois, frase: nova };
 }

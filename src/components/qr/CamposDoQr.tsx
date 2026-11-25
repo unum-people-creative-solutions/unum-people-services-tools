@@ -25,6 +25,8 @@ interface CampoTextoQrProps extends Base {
   /** Texto fixo antes do valor, ex.: "R$". */
   prefixo?: string;
   disabled?: boolean;
+  /** Limite de caracteres do campo. */
+  maxLength?: number;
 }
 
 interface CampoAreaQrProps extends Base {
@@ -98,7 +100,7 @@ const descricao = (id: string, { ajuda, aviso, erro }: Base, rodape?: string) =>
 
 export function CampoTextoQr(props: CampoTextoQrProps) {
   const id = React.useId();
-  const { valor, onChange, onBlur, placeholder, inputMode, prefixo, disabled } = props;
+  const { valor, onChange, onBlur, placeholder, inputMode, prefixo, disabled, maxLength } = props;
   return (
     <Estrutura id={id} {...props}>
       <div className={caixa(Boolean(props.erro), disabled)}>
@@ -115,6 +117,7 @@ export function CampoTextoQr(props: CampoTextoQrProps) {
           value={valor}
           placeholder={placeholder}
           disabled={disabled}
+          maxLength={maxLength}
           aria-invalid={props.erro ? true : undefined}
           aria-describedby={descricao(id, props)}
           onChange={(e) => onChange(e.target.value)}

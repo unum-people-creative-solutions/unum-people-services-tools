@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type { CamposPorTipo, TipoId } from '../utils/qr/conteudos';
 import { apagarEstado, gravarEstado, lerEstadoDoTexto, lerTextoGuardado } from '../utils/qr/armazenamento';
-import { estadoVazio, type EstadoQr } from '../utils/qr/estado';
+import { acompanharChamada, estadoVazio, type EstadoQr } from '../utils/qr/estado';
 
 // O armazenamento não muda sozinho durante a visita: não há o que assinar.
 const semAssinatura = () => () => undefined;
@@ -32,7 +32,11 @@ export function useQrCode() {
   }, [editado]);
 
   const escolherTipo = useCallback(
-    (tipo: TipoId) => setEditado((atual) => ({ ...(atual ?? guardado), tipo })),
+    (tipo: TipoId) =>
+      setEditado((atual) => {
+        const base = atual ?? guardado;
+        return acompanharChamada(base, { ...base, tipo });
+      }),
     [guardado],
   );
 
@@ -40,7 +44,10 @@ export function useQrCode() {
     <T extends TipoId>(tipo: T, parcial: Partial<CamposPorTipo[T]>) =>
       setEditado((atual) => {
         const base = atual ?? guardado;
-        return { ...base, campos: { ...base.campos, [tipo]: { ...base.campos[tipo], ...parcial } } };
+        return acompanharChamada(base, {
+          ...base,
+          campos: { ...base.campos, [tipo]: { ...base.campos[tipo], ...parcial } },
+        });
       }),
     [guardado],
   );
