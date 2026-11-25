@@ -5,6 +5,8 @@ import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { Botao } from '../../components/ui/Botao';
 import { Bloco } from '../../components/ui/Bloco';
+import { Convite } from '../../components/ui/Convite';
+import { Recolhivel } from '../../components/ui/Recolhivel';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
 import { AcoesDoQr } from '../../components/qr/AcoesDoQr';
@@ -166,7 +168,18 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
           )}
         </section>
 
-        {children}
+        {children && (
+          <Recolhivel titulo="Como usar o seu QR code" variante="cartao" onAbrir={() => marcar('guia')}>
+            <div>{children}</div>
+          </Recolhivel>
+        )}
+
+        <Convite
+          texto="Ainda não tem uma página do seu negócio? Crie a sua e coloque o link no QR code."
+          link="Criar minha página"
+          href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=qr-code"
+          onClick={() => marcar('convite')}
+        />
       </main>
 
       <Footer />

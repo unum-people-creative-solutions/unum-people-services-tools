@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import QrCodeView from './QrCodeView';
+import { GuiaQrCode } from '../../components/guias/GuiaQrCode';
 
 export const metadata: Metadata = {
   title: {
@@ -10,5 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <QrCodeView />;
+  return (
+    <QrCodeView>
+      <GuiaQrCode />
+    </QrCodeView>
+  );
 }
