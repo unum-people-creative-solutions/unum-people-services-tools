@@ -46,7 +46,7 @@ function Cartao({ item, marcado, onEscolher }: { item: TipoDeQr; marcado: boolea
   return (
     <label
       className={clsx(
-        'relative flex min-h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl px-1.5 py-2.5 text-center text-sm font-semibold leading-[1.2] text-ui-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1 has-[:focus-visible]:outline-ui-brand-blue',
+        'relative flex min-h-[84px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl px-1 py-2.5 text-center text-[13px] font-semibold sm:text-sm leading-[1.2] text-ui-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-1 has-[:focus-visible]:outline-ui-brand-blue',
         marcado
           ? 'border-2 border-ui-brand-blue bg-ui-brand-blue/[0.06]'
           : 'border border-ui-line bg-ui-bg hover:border-ui-line-strong',
@@ -65,7 +65,7 @@ function Cartao({ item, marcado, onEscolher }: { item: TipoDeQr; marcado: boolea
         className="sr-only"
       />
       <Icone size={24} aria-hidden="true" className="flex-none text-ui-brand-blue" />
-      <span className="line-clamp-2">{item.nome}</span>
+      <span className="[overflow-wrap:anywhere]">{item.nome}</span>
       {marcado && <Check size={16} aria-hidden="true" className="absolute right-1.5 top-1.5 text-ui-brand-blue" />}
     </label>
   );
