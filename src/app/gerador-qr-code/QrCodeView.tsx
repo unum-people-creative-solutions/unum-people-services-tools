@@ -3,12 +3,14 @@
 import React from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
+import { Botao } from '../../components/ui/Botao';
 import { Bloco } from '../../components/ui/Bloco';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
 import { AcoesDoQr } from '../../components/qr/AcoesDoQr';
 import { PreviaDoQr } from '../../components/qr/PreviaDoQr';
 import { AvisoDoPix, PixCopiaECola } from '../../components/qr/PixCopiaECola';
+import { useMedicao } from '../../hooks/useMedicao';
 import { useQrCode } from '../../hooks/useQrCode';
 import { avisosDoPix, TIPOS, type TipoId } from '../../utils/qr/conteudos';
 import { errosVisiveis } from '../../utils/qr/erros';
@@ -16,11 +18,14 @@ import { conteudoDe } from '../../utils/qr/estado';
 import { gerarQr } from '../../utils/qr/gerar';
 
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
-  const { estado, escolherTipo, mudarCampos } = useQrCode();
+  const { estado, escolherTipo, mudarCampos, apagar } = useQrCode();
+  const { marcar, comecou } = useMedicao('qr-code');
   const [trocando, setTrocando] = React.useState(false);
   // Campos de que a pessoa já saiu, por tipo ("pix.chave"): é o que libera o erro do campo.
   const [tocados, setTocados] = React.useState<ReadonlySet<string>>(new Set());
   const [pedidosDeFoco, setPedidosDeFoco] = React.useState(0);
+  const [confirmando, setConfirmando] = React.useState(false);
+  const [apagou, setApagou] = React.useState(false);
   const formulario = React.useRef<HTMLDivElement>(null);
 
   const { tipo } = estado;
@@ -31,10 +36,24 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     formulario.current?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus();
   }, [pedidosDeFoco]);
 
+  React.useEffect(() => {
+    marcar('visita');
+  }, [marcar]);
+
   const escolher = (novo: TipoId) => {
     escolherTipo(novo);
     setTrocando(false);
+    setApagou(false);
     setPedidosDeFoco((n) => n + 1);
+    marcar('comecou');
+  };
+
+  const apagarTudo = () => {
+    apagar();
+    setTocados(new Set());
+    setTrocando(false);
+    setConfirmando(false);
+    setApagou(true);
   };
 
   const conteudo = conteudoDe(estado);
@@ -49,6 +68,12 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     () => (textoDoQr === null ? null : gerarQr(textoDoQr, { cor, frase })),
     [textoDoQr, cor, frase],
   );
+
+  // O primeiro QR válido. Quem só voltou e olha o QR restaurado não conta (o hook exige "comecou" antes).
+  const temQr = qr?.ok === true;
+  React.useEffect(() => {
+    if (temQr && comecou) marcar('resultado');
+  }, [temQr, comecou, marcar]);
 
   return (
     <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
@@ -108,7 +133,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
                     matriz={qr.matriz}
                     svg={qr.svg}
                     desenho={{ cor, frase }}
-                    aoBaixar={() => undefined}
+                    aoBaixar={() => marcar('baixou')}
                   />
                 )}
               </PreviaDoQr>
@@ -117,6 +142,29 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             </div>
           )}
         </div>
+
+        <section aria-label="Apagar dados" className="flex flex-col gap-3">
+          {confirmando ? (
+            <div className="flex max-w-[640px] flex-col gap-3 rounded-lg bg-ui-bg p-3.5">
+              <p className="m-0 text-[15px] font-medium text-ui-ink">Apagar tudo o que você digitou neste aparelho?</p>
+              <div className="flex gap-3">
+                <Botao onClick={apagarTudo}>Sim, apagar</Botao>
+                <Botao variante="contorno" autoFocus onClick={() => setConfirmando(false)}>
+                  Cancelar
+                </Botao>
+              </div>
+            </div>
+          ) : (
+            <Botao variante="link" onClick={() => setConfirmando(true)}>
+              Apagar o que eu digitei
+            </Botao>
+          )}
+          {apagou && (
+            <p role="status" className="m-0 text-sm font-medium text-ui-ok">
+              Pronto, apagamos tudo.
+            </p>
+          )}
+        </section>
 
         {children}
       </main>

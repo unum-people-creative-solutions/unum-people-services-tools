@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from 'react';
 
-export type Ferramenta = 'home' | 'quanto-cobrar' | 'vale-anunciar' | 'servicos-compensam';
-export type EventoDeUso = 'visita' | 'comecou' | 'resultado' | 'convite' | 'guia' | 'planilha';
+export type Ferramenta = 'home' | 'quanto-cobrar' | 'vale-anunciar' | 'servicos-compensam' | 'qr-code';
+export type EventoDeUso = 'visita' | 'comecou' | 'resultado' | 'convite' | 'guia' | 'planilha' | 'baixou';
 
 /** Única origem que a API de medição aceita (`TOOLS_ORIGENS` da Lambda de jornada). */
 export const ORIGEM_DA_MEDICAO = 'https://tools.unumpeople.com.br';
