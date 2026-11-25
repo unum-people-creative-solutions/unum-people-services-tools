@@ -73,7 +73,8 @@ export function geometriaDoLogo(tamanho: number): {
   };
 }
 
-const PILHA_DE_FONTES = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
+/** Fonte da frase no SVG e no PNG: do sistema, porque SVG em `<img>` não carrega a fonte do site. */
+export const PILHA_DE_FONTES = "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif";
 
 function numero(valor: number): string {
   return String(Number(valor.toFixed(3)));
@@ -108,6 +109,22 @@ function caminhoDosModulos(matriz: MatrizQr): string {
 }
 
 /**
+ * Medidas do desenho, em módulos (o SVG e o PNG usam as mesmas): `lado` com a margem,
+ * `altura` com o espaço da frase e `fonte` da frase (0 sem frase).
+ */
+export function medidasDoQr(tamanho: number, frase?: string): {
+  lado: number;
+  altura: number;
+  fonte: number;
+  frase: string;
+} {
+  const lado = tamanho + 2 * MARGEM_EM_MODULOS;
+  const texto = frase?.trim() ?? '';
+  const fonte = texto ? Math.min(2.2, (lado * 0.9) / (Array.from(texto).length * 0.6)) : 0;
+  return { lado, altura: texto ? lado + fonte * 2.4 : lado, fonte, frase: texto };
+}
+
+/**
  * SVG do QR, em unidades de módulo. `logo` é um data URL de imagem (`data:image/…`);
  * qualquer outro valor é ignorado. `frase` entra embaixo, centralizada, na cor do QR.
  */
@@ -115,12 +132,8 @@ export function svgDoQr(
   matriz: MatrizQr,
   opcoes: { cor: string; frase?: string; logo?: string },
 ): string {
-  const lado = matriz.tamanho + 2 * MARGEM_EM_MODULOS;
-  const frase = opcoes.frase?.trim() ?? '';
+  const { lado, altura, fonte, frase } = medidasDoQr(matriz.tamanho, opcoes.frase);
   const cor = escaparXml(opcoes.cor);
-
-  const fonte = frase ? Math.min(2.2, (lado * 0.9) / (Array.from(frase).length * 0.6)) : 0;
-  const altura = frase ? lado + fonte * 2.4 : lado;
 
   const partes = [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${numero(lado)} ${numero(altura)}" shape-rendering="crispEdges">`,

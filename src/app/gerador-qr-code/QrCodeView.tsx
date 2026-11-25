@@ -6,6 +6,7 @@ import { Footer } from '../../components/Footer';
 import { Bloco } from '../../components/ui/Bloco';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
+import { AcoesDoQr } from '../../components/qr/AcoesDoQr';
 import { PreviaDoQr } from '../../components/qr/PreviaDoQr';
 import { AvisoDoPix, PixCopiaECola } from '../../components/qr/PixCopiaECola';
 import { useQrCode } from '../../hooks/useQrCode';
@@ -98,7 +99,19 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
                 nomeDoTipo={nomeDoTipo}
                 svg={qr?.ok ? qr.svg : null}
                 alerta={qr && !qr.ok ? qr.erro : undefined}
-              />
+              >
+                {qr?.ok && (
+                  <AcoesDoQr
+                    // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
+                    key={tipo}
+                    tipo={tipo}
+                    matriz={qr.matriz}
+                    svg={qr.svg}
+                    desenho={{ cor, frase }}
+                    aoBaixar={() => undefined}
+                  />
+                )}
+              </PreviaDoQr>
               {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
               {tipo === 'pix' && <AvisoDoPix />}
             </div>
