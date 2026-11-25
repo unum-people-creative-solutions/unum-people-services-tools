@@ -8,6 +8,11 @@ vi.mock('next/image', () => ({
 }));
 
 const escolher = (nome: string) => fireEvent.click(screen.getByRole('radio', { name: nome }));
+/** O PNG é feito antes do toque (F2-000): o botão só libera quando o arquivo está pronto. */
+const baixarImagemPronto = () =>
+  waitFor(() => expect(screen.getByRole('button', { name: 'Baixar imagem' })).toBeEnabled()).then(() =>
+    screen.getByRole('button', { name: 'Baixar imagem' }),
+  );
 const digitar = (rotulo: string, valor: string) =>
   fireEvent.change(screen.getByLabelText(rotulo), { target: { value: valor } });
 
@@ -152,7 +157,7 @@ describe('Ações (RF-QR-25 a 27)', () => {
   it('"Baixar imagem" baixa o PNG com o nome do tipo', async () => {
     render(<QrCodeView />);
     preencherPix();
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     await waitFor(() => expect(baixados).toHaveLength(1));
     expect(baixados[0]).toEqual({ nome: 'qr-code-pix.png', href: 'blob:teste/1' });
     expect(blobs[0].type).toBe('image/png');
@@ -164,7 +169,7 @@ describe('Ações (RF-QR-25 a 27)', () => {
     render(<QrCodeView />);
     escolher('Chamar no WhatsApp');
     digitar('Número do WhatsApp com DDD', '11987654321');
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     await waitFor(() => expect(baixados).toHaveLength(1));
     expect(baixados[0].nome).toBe('qr-code-whatsapp.png');
   });
@@ -173,7 +178,7 @@ describe('Ações (RF-QR-25 a 27)', () => {
     toBlobDevolve = 'nulo';
     render(<QrCodeView />);
     preencherPix();
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     expect(await screen.findByRole('alert')).toHaveTextContent('Não deu para baixar a imagem. Tente de novo.');
     expect(baixados).toHaveLength(0);
   });

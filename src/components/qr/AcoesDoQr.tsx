@@ -6,7 +6,8 @@ import { Recolhivel } from '../ui/Recolhivel';
 import type { TipoId } from '../../utils/qr/conteudos';
 import type { MatrizQr } from '../../utils/qr/matriz';
 import { baixarArquivo, nomeDoArquivoDoQr } from '../../utils/qr/arquivo';
-import { gerarPng, type OpcoesDoPng } from '../../utils/qr/png';
+import { gerarPng } from '../../utils/qr/png';
+import { usePngPronto, type OpcoesDoPngPronto } from '../../hooks/usePngPronto';
 
 export const ERRO_AO_COMPARTILHAR = 'Não deu para compartilhar. Use Baixar imagem.';
 export const ERRO_AO_BAIXAR_A_IMAGEM = 'Não deu para baixar a imagem. Tente de novo.';
@@ -17,7 +18,7 @@ interface AcoesDoQrProps {
   /** SVG igual ao da prévia. */
   svg: string;
   /** O que o PNG desenha além da matriz: cor, e na F2 frase e logo. */
-  desenho: Omit<OpcoesDoPng, 'lado' | 'x' | 'y'>;
+  desenho: OpcoesDoPngPronto;
   /** Compartilhou, baixou o PNG ou baixou o SVG (medição `baixou`). */
   aoBaixar: () => void;
 }
@@ -42,6 +43,12 @@ export function AcoesDoQr({ tipo, matriz, svg, desenho, aoBaixar }: AcoesDoQrPro
   const podeCompartilhar = React.useSyncExternalStore(semAssinatura, podeCompartilharArquivo, () => false);
   const [ocupado, setOcupado] = React.useState(false);
   const [erro, setErro] = React.useState<string | null>(null);
+  // O PNG é feito antes do toque: o compartilhamento do iPhone exige o File em mãos dentro do gesto (RT-QR-1).
+  const nomeDoPng = nomeDoArquivoDoQr(tipo, 'png');
+  const png = usePngPronto(matriz, desenho, nomeDoPng);
+  const preparando = png.situacao === 'preparando';
+  // PNG que não saiu: o erro aparece já (o botão de baixar tenta de novo); nada fica em silêncio.
+  const mensagemDeErro = erro ?? (podeCompartilhar && png.situacao === 'falhou' ? ERRO_AO_COMPARTILHAR : null);
 
   const executar = async (acao: () => Promise<void>, mensagemDeErro: string) => {
     setErro(null);
@@ -57,17 +64,30 @@ export function AcoesDoQr({ tipo, matriz, svg, desenho, aoBaixar }: AcoesDoQrPro
     }
   };
 
-  const compartilhar = () =>
-    executar(async () => {
-      const png = await gerarPng(matriz, desenho);
-      const arquivo = new File([png], nomeDoArquivoDoQr(tipo, 'png'), { type: 'image/png' });
-      await navigator.share({ files: [arquivo] });
-      aoBaixar();
-    }, ERRO_AO_COMPARTILHAR);
+  // Sem `await` antes de `share`: o navegador conta o toque do usuário só até a primeira espera.
+  const compartilhar = () => {
+    if (!png.arquivo) return;
+    setErro(null);
+    setOcupado(true);
+    let promessa: Promise<void>;
+    try {
+      promessa = navigator.share({ files: [png.arquivo] });
+    } catch (e) {
+      promessa = Promise.reject(e);
+    }
+    promessa
+      .then(aoBaixar)
+      .catch((e) => {
+        // Cancelar o compartilhamento não é falha.
+        if ((e as { name?: string } | null)?.name !== 'AbortError') setErro(ERRO_AO_COMPARTILHAR);
+      })
+      .finally(() => setOcupado(false));
+  };
 
   const baixarImagem = () =>
     executar(async () => {
-      baixarArquivo(await gerarPng(matriz, desenho), nomeDoArquivoDoQr(tipo, 'png'));
+      // Se o PNG antecipado falhou, tenta de novo agora; o erro dessa tentativa aparece na tela.
+      baixarArquivo(png.arquivo ?? (await gerarPng(matriz, desenho)), nomeDoPng);
       aoBaixar();
     }, ERRO_AO_BAIXAR_A_IMAGEM);
 
@@ -80,21 +100,21 @@ export function AcoesDoQr({ tipo, matriz, svg, desenho, aoBaixar }: AcoesDoQrPro
   return (
     <div className="flex flex-col gap-3">
       {podeCompartilhar && (
-        <Botao className="w-full" disabled={ocupado} onClick={compartilhar}>
-          Compartilhar
+        <Botao className="w-full" disabled={ocupado || !png.arquivo} onClick={compartilhar}>
+          {preparando ? 'Preparando para compartilhar…' : 'Compartilhar'}
         </Botao>
       )}
       <Botao
         variante={podeCompartilhar ? 'contorno' : 'principal'}
         className="w-full"
-        disabled={ocupado}
+        disabled={ocupado || preparando}
         onClick={baixarImagem}
       >
         Baixar imagem
       </Botao>
-      {erro && (
+      {mensagemDeErro && (
         <p role="alert" className="m-0 text-sm font-medium leading-[1.45] text-ui-erro">
-          {erro}
+          {mensagemDeErro}
         </p>
       )}
       <Recolhivel titulo="Mais formatos" variante="linha">

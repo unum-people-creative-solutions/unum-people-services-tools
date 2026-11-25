@@ -14,6 +14,11 @@ const FERRAMENTA = 'qr-code';
 const escolher = (nome: string) => fireEvent.click(screen.getByRole('radio', { name: nome }));
 const digitar = (rotulo: string, valor: string) =>
   fireEvent.change(screen.getByLabelText(rotulo), { target: { value: valor } });
+/** O PNG é feito antes do toque (F2-000): o botão só libera quando o arquivo está pronto. */
+const baixarImagemPronto = () =>
+  waitFor(() => expect(screen.getByRole('button', { name: 'Baixar imagem' })).toBeEnabled()).then(() =>
+    screen.getByRole('button', { name: 'Baixar imagem' }),
+  );
 const eventos = (sendBeacon: ReturnType<typeof ligarMedicao>) => enviados(sendBeacon).map((x) => x.e);
 
 describe('Gerador de QR code: medição de uso (RF-QR-39)', () => {
@@ -100,9 +105,9 @@ describe('Gerador de QR code: medição de uso (RF-QR-39)', () => {
     render(<QrCodeView />);
     escolher('Link do site');
     digitar('Endereço do site', 'www.um.com.br');
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     await waitFor(() => expect(eventos(sendBeacon)).toContain('baixou'));
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     await waitFor(() => expect(URL.createObjectURL).toHaveBeenCalledTimes(2));
     expect(eventos(sendBeacon).filter((e) => e === 'baixou')).toHaveLength(1);
   });
@@ -143,7 +148,7 @@ describe('Gerador de QR code: medição de uso (RF-QR-39)', () => {
     render(<QrCodeView />);
     escolher('Link do site');
     digitar('Endereço do site', 'www.um.com.br');
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar imagem' }));
+    fireEvent.click(await baixarImagemPronto());
     await screen.findByRole('alert');
     expect(eventos(sendBeacon)).not.toContain('baixou');
   });
