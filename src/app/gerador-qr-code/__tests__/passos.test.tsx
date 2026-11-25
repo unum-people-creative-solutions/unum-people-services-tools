@@ -6,60 +6,89 @@ vi.mock('next/image', () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
 }));
 
-const NOMES_DOS_6 = [
+const NOMES_DOS_11 = [
   'Receber Pix',
   'Chamar no WhatsApp',
   'Instagram e redes',
   'Link do site',
   'Wi-Fi da loja',
   'Avaliar no Google',
+  'Como chegar',
+  'Salvar contato',
+  'E-mail',
+  'Ligação',
+  'Texto',
 ];
-const NOMES_DE_MAIS_OPCOES = ['Como chegar', 'Salvar contato', 'E-mail', 'Ligação', 'Texto'];
+const grupoDeTipos = () => screen.getByRole('radiogroup', { name: 'Para que é o seu QR code?' });
+const nomesDosRadios = () =>
+  within(grupoDeTipos())
+    .getAllByRole('radio')
+    .map((r) => r.closest('label')?.textContent);
 
+// "Texto" é o nome de um tipo (radio) e também o rótulo do campo: o campo nunca é o radio.
+const campo = (rotulo: string) =>
+  screen.getByLabelText(rotulo, { selector: 'input:not([type="radio"]), select, textarea' });
 const montar = () => render(<QrCodeView />);
 const escolher = (nome: string) => fireEvent.click(screen.getByRole('radio', { name: nome }));
 const digitar = (rotulo: string, valor: string) =>
-  fireEvent.change(screen.getByLabelText(rotulo), { target: { value: valor } });
-const sair = (rotulo: string) => fireEvent.blur(screen.getByLabelText(rotulo));
+  fireEvent.change(campo(rotulo), { target: { value: valor } });
+const sair = (rotulo: string) => fireEvent.blur(campo(rotulo));
 
 beforeEach(() => {
   window.localStorage.clear();
 });
 
 describe('Passo 1: tipo (RF-QR-04, RF-QR-05)', () => {
-  it('tem o h2 e um radiogroup com o mesmo nome, com os 6 mais usados na ordem', () => {
+  it('tem o h2 e um radiogroup com o mesmo nome, com os 11 tipos à vista na ordem', () => {
     montar();
     expect(screen.getByRole('heading', { level: 2, name: 'Para que é o seu QR code?' })).toBeInTheDocument();
-    const grupo = screen.getByRole('radiogroup', { name: 'Para que é o seu QR code?' });
-    const radios = within(grupo).getAllByRole('radio');
-    expect(radios.slice(0, 6).map((r) => r.getAttribute('aria-label') ?? r.closest('label')?.textContent)).toEqual(
-      NOMES_DOS_6,
-    );
+    expect(nomesDosRadios()).toEqual(NOMES_DOS_11);
+    for (const radio of within(grupoDeTipos()).getAllByRole('radio')) {
+      expect(radio.closest('details')).toBeNull();
+    }
   });
 
-  it('põe os outros 5 em "Mais opções"', () => {
+  it('não esconde nada: sem "Mais opções"', () => {
     montar();
-    const detalhes = screen.getByText('Mais opções').closest('details') as HTMLDetailsElement;
-    expect(detalhes.open).toBe(false);
-    const nomes = within(detalhes)
-      .getAllByRole('radio')
-      .map((r) => r.closest('label')?.textContent);
-    expect(nomes).toEqual(NOMES_DE_MAIS_OPCOES);
+    expect(screen.queryByText('Mais opções')).not.toBeInTheDocument();
+    expect(document.querySelector('details')).toBeNull();
   });
 
-  it('antes de escolher, não mostra campos nem "QR code para:"', () => {
+  it('antes de escolher, não mostra campos, "QR code para:" nem "Trocar"', () => {
     montar();
     expect(screen.queryByText(/^QR code para:/)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Trocar' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Chave Pix')).not.toBeInTheDocument();
+    for (const radio of within(grupoDeTipos()).getAllByRole('radio')) {
+      expect(radio).not.toBeChecked();
+    }
   });
 
-  it('ao escolher, recolhe a grade, mostra "QR code para: …" e põe o foco no primeiro campo', () => {
+  it('ao escolher, a grade continua com os 11, o escolhido marcado e o foco no primeiro campo', () => {
     montar();
     escolher('Chamar no WhatsApp');
-    expect(screen.getByText('QR code para: Chamar no WhatsApp')).toBeInTheDocument();
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(nomesDosRadios()).toEqual(NOMES_DOS_11);
+    expect(screen.getByRole('radio', { name: 'Chamar no WhatsApp' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Receber Pix' })).not.toBeChecked();
+    expect(screen.queryByText(/^QR code para:/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Trocar' })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Número do WhatsApp com DDD')).toHaveFocus();
+  });
+
+  it('escolher um dos antigos "Mais opções" também deixa os 11 à vista', () => {
+    montar();
+    escolher('Ligação');
+    expect(nomesDosRadios()).toEqual(NOMES_DOS_11);
+    expect(screen.getByRole('radio', { name: 'Ligação' })).toBeChecked();
+    expect(screen.getByLabelText('Telefone com DDD')).toHaveFocus();
+  });
+
+  it('o tipo marcado mostra um sinal de visto além da cor (RF-QR-05)', () => {
+    montar();
+    escolher('Receber Pix');
+    const marcado = screen.getByRole('radio', { name: 'Receber Pix' }).closest('label') as HTMLElement;
+    const naoMarcado = screen.getByRole('radio', { name: 'Link do site' }).closest('label') as HTMLElement;
+    expect(marcado.querySelectorAll('svg')).toHaveLength(naoMarcado.querySelectorAll('svg').length + 1);
   });
 
   it('no Pix, o primeiro campo é "Tipo da chave"', () => {
@@ -68,44 +97,31 @@ describe('Passo 1: tipo (RF-QR-04, RF-QR-05)', () => {
     expect(screen.getByLabelText('Tipo da chave')).toHaveFocus();
   });
 
-  it('"Trocar" reabre a grade com o tipo atual marcado', () => {
+  it('tocar em outro tipo troca a marcação direto, sem passar por botão', () => {
     montar();
     escolher('Wi-Fi da loja');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
-    expect(screen.getByRole('radiogroup', { name: 'Para que é o seu QR code?' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'Wi-Fi da loja' })).toBeChecked();
-    expect(screen.getByRole('radio', { name: 'Receber Pix' })).not.toBeChecked();
+    escolher('Receber Pix');
+    expect(screen.getByRole('radio', { name: 'Receber Pix' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Wi-Fi da loja' })).not.toBeChecked();
   });
 
-  it('com um tipo de "Mais opções", reabre a grade com o recolhível aberto', () => {
-    montar();
-    escolher('Ligação');
-    expect(screen.getByText('QR code para: Ligação')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
-    const detalhes = screen.getByText('Mais opções').closest('details') as HTMLDetailsElement;
-    expect(detalhes.open).toBe(true);
-    expect(screen.getByRole('radio', { name: 'Ligação' })).toBeChecked();
-  });
-
-  it('tocar de novo no tipo já marcado também recolhe a grade', () => {
+  it('tocar de novo no tipo já marcado mantém a marcação e leva o foco ao primeiro campo', () => {
     montar();
     escolher('Link do site');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
+    screen.getByRole('radio', { name: 'Link do site' }).focus();
     escolher('Link do site');
-    expect(screen.getByText('QR code para: Link do site')).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Link do site' })).toBeChecked();
+    expect(screen.getByLabelText('Endereço do site')).toHaveFocus();
   });
 
   it('trocar de tipo preserva os campos de todos os tipos', () => {
     montar();
     escolher('Receber Pix');
     digitar('Nome de quem recebe', 'Maria da Silva');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Chamar no WhatsApp');
     digitar('Número do WhatsApp com DDD', '11987654321');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Receber Pix');
     expect(screen.getByLabelText('Nome de quem recebe')).toHaveValue('Maria da Silva');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Chamar no WhatsApp');
     expect(screen.getByLabelText('Número do WhatsApp com DDD')).toHaveValue('11987654321');
   });
@@ -133,7 +149,7 @@ describe('Passo 2: os 11 formulários (RF-QR-06 a 16)', () => {
     montar();
     escolher(tipo);
     for (const rotulo of rotulos) {
-      expect(screen.getByLabelText(rotulo), rotulo).toBeInTheDocument();
+      expect(campo(rotulo), rotulo).toBeInTheDocument();
     }
   });
 
@@ -141,7 +157,7 @@ describe('Passo 2: os 11 formulários (RF-QR-06 a 16)', () => {
     montar();
     escolher(tipo);
     const comExemplo = rotulos
-      .map((r) => screen.getByLabelText(r))
+      .map((r) => campo(r))
       .filter((el) => el.tagName !== 'SELECT' && (el as HTMLInputElement).type !== 'checkbox');
     for (const campo of comExemplo) {
       expect((campo as HTMLInputElement).placeholder, campo.id).not.toBe('');
