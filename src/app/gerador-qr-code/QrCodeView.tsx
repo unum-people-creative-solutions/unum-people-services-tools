@@ -9,6 +9,7 @@ import { Convite } from '../../components/ui/Convite';
 import { Recolhivel } from '../../components/ui/Recolhivel';
 import { EscolhaDoTipo, TITULO_DO_PASSO_1 } from '../../components/qr/EscolhaDoTipo';
 import { FormularioDoTipo } from '../../components/qr/FormularioDoTipo';
+import { CaraDoNegocio } from '../../components/qr/CaraDoNegocio';
 import { AcoesDoQr } from '../../components/qr/AcoesDoQr';
 import { PreviaDoQr } from '../../components/qr/PreviaDoQr';
 import { AvisoDoPix, PixCopiaECola } from '../../components/qr/PixCopiaECola';
@@ -20,7 +21,7 @@ import { conteudoDe } from '../../utils/qr/estado';
 import { gerarQr } from '../../utils/qr/gerar';
 
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
-  const { estado, escolherTipo, mudarCampos, apagar } = useQrCode();
+  const { estado, escolherTipo, mudarCampos, mudarAparencia, apagar } = useQrCode();
   const { marcar, comecou } = useMedicao('qr-code');
   const [trocando, setTrocando] = React.useState(false);
   // Campos de que a pessoa já saiu, por tipo ("pix.chave"): é o que libera o erro do campo.
@@ -28,6 +29,8 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   const [pedidosDeFoco, setPedidosDeFoco] = React.useState(0);
   const [confirmando, setConfirmando] = React.useState(false);
   const [apagou, setApagou] = React.useState(false);
+  // Cada "Apagar" recomeça os controles da cara do negócio (inclusive o aviso de cor recusada).
+  const [apagados, setApagados] = React.useState(0);
   const formulario = React.useRef<HTMLDivElement>(null);
 
   const { tipo } = estado;
@@ -56,6 +59,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
     setTrocando(false);
     setConfirmando(false);
     setApagou(true);
+    setApagados((n) => n + 1);
   };
 
   const conteudo = conteudoDe(estado);
@@ -118,6 +122,8 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
                 </div>
               </Bloco>
             )}
+
+            {tipo && <CaraDoNegocio key={apagados} cor={cor} onCor={(nova) => mudarAparencia({ cor: nova })} />}
           </div>
 
           {tipo && (

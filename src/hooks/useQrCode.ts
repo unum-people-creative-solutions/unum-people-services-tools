@@ -45,7 +45,14 @@ export function useQrCode() {
     [guardado],
   );
 
+  /** Cor, frase, nome do negócio e tamanho da plaquinha (F2). */
+  const mudarAparencia = useCallback(
+    (parcial: Partial<Pick<EstadoQr, 'cor' | 'frase' | 'nomeDoNegocio' | 'tamanho'>>) =>
+      setEditado((atual) => ({ ...(atual ?? guardado), ...parcial })),
+    [guardado],
+  );
+
   const apagar = useCallback(() => setEditado(estadoVazio()), []);
 
-  return { estado, escolherTipo, mudarCampos, apagar };
+  return { estado, escolherTipo, mudarCampos, mudarAparencia, apagar };
 }
