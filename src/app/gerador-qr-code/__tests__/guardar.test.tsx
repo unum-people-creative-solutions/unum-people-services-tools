@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import QrCodeView from '../QrCodeView';
 import { lerQrDoSvg } from '@/test/qrNaTela';
@@ -44,14 +44,17 @@ describe('Guardar no aparelho e voltar (RF-QR-28)', () => {
     vazia.unmount();
   });
 
-  it('ao voltar, restaura o tipo e os campos, com a grade recolhida e o QR pronto', () => {
+  it('ao voltar, restaura o tipo e os campos, com a grade à vista e o tipo marcado, e o QR pronto', () => {
     const primeira = render(<QrCodeView />);
     escolher('Chamar no WhatsApp');
     digitar('Número do WhatsApp com DDD', '11987654321');
     primeira.unmount();
 
     render(<QrCodeView />);
-    expect(screen.getByText('QR code para: Chamar no WhatsApp')).toBeInTheDocument();
+    const grupo = screen.getByRole('radiogroup', { name: 'Para que é o seu QR code?' });
+    expect(within(grupo).getAllByRole('radio')).toHaveLength(11);
+    expect(within(grupo).getByRole('radio', { name: 'Chamar no WhatsApp' })).toBeChecked();
+    expect(screen.queryByText(/^QR code para:/)).not.toBeInTheDocument();
     expect(screen.getByLabelText('Número do WhatsApp com DDD')).toHaveValue('11987654321');
     expect(screen.getByRole('img', { name: 'QR code de Chamar no WhatsApp' })).toBeInTheDocument();
   });
@@ -66,14 +69,12 @@ describe('Guardar no aparelho e voltar (RF-QR-28)', () => {
     const primeira = render(<QrCodeView />);
     escolher('Receber Pix');
     digitar('Nome de quem recebe', 'Maria da Silva');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Link do site');
     digitar('Endereço do site', 'www.um.com.br');
     primeira.unmount();
 
     render(<QrCodeView />);
     expect(screen.getByLabelText('Endereço do site')).toHaveValue('www.um.com.br');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Receber Pix');
     expect(screen.getByLabelText('Nome de quem recebe')).toHaveValue('Maria da Silva');
   });

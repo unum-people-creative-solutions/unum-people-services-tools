@@ -28,7 +28,6 @@ import { dadosDaPlaquinha as montarDadosDaPlaquinha } from '../../utils/qr/plaqu
 export default function QrCodeView({ children }: { children?: React.ReactNode }) {
   const { estado, escolherTipo, mudarCampos, mudarAparencia, apagar } = useQrCode();
   const { marcar, comecou } = useMedicao('qr-code');
-  const [trocando, setTrocando] = React.useState(false);
   // Campos de que a pessoa já saiu, por tipo ("pix.chave"): é o que libera o erro do campo.
   const [tocados, setTocados] = React.useState<ReadonlySet<string>>(new Set());
   const [pedidosDeFoco, setPedidosDeFoco] = React.useState(0);
@@ -54,7 +53,6 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
 
   const escolher = (novo: TipoId) => {
     escolherTipo(novo);
-    setTrocando(false);
     setApagou(false);
     setPedidosDeFoco((n) => n + 1);
     marcar('comecou');
@@ -63,7 +61,6 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
   const apagarTudo = () => {
     apagar();
     setTocados(new Set());
-    setTrocando(false);
     setConfirmando(false);
     setApagou(true);
     setApagados((n) => n + 1);
@@ -122,12 +119,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
           <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2 md:items-start md:gap-6">
             <div className="min-w-0 md:col-start-1 md:row-start-1">
               <Bloco numero={1} titulo={TITULO_DO_PASSO_1}>
-                <EscolhaDoTipo
-                  tipo={tipo}
-                  aberta={tipo === null || trocando}
-                  onEscolher={escolher}
-                  onTrocar={() => setTrocando(true)}
-                />
+                <EscolhaDoTipo tipo={tipo} onEscolher={escolher} />
               </Bloco>
             </div>
 

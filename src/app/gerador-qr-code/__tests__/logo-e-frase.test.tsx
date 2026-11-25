@@ -357,12 +357,10 @@ describe('Frase embaixo do QR (RF-QR-35, T22)', () => {
     render(<QrCodeView />);
     preencherPix();
     fireEvent.click(caixa());
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Chamar no WhatsApp');
     expect(screen.getByLabelText('Frase')).toHaveValue('Chame no WhatsApp');
 
     digitar('Frase', 'Fale comigo');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Link do site');
     expect(screen.getByLabelText('Frase')).toHaveValue('Fale comigo');
   });

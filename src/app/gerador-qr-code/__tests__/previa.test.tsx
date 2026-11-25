@@ -103,7 +103,6 @@ describe('Pix: copia e cola e avisos (RF-QR-21, RF-QR-22)', () => {
     escolher('Receber Pix');
     expect(screen.getByText(AVISO_DO_PIX)).toBeInTheDocument();
     expect(screen.queryByText('Pix copia e cola')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Link do site');
     expect(screen.queryByText(AVISO_DO_PIX)).not.toBeInTheDocument();
   });

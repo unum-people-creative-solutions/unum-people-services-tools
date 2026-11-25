@@ -59,7 +59,6 @@ describe('Gerador de QR code: medição de uso (RF-QR-39)', () => {
     render(<QrCodeView />);
     expect(eventos(sendBeacon)).not.toContain('comecou');
     escolher('Link do site');
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Receber Pix');
     expect(eventos(sendBeacon).filter((e) => e === 'comecou')).toHaveLength(1);
   });
@@ -96,7 +95,6 @@ describe('Gerador de QR code: medição de uso (RF-QR-39)', () => {
     estado.campos.link.endereco = 'www.um.com.br';
     window.localStorage.setItem(CHAVE_DO_QR, JSON.stringify(estado));
     render(<QrCodeView />);
-    fireEvent.click(screen.getByRole('button', { name: 'Trocar' }));
     escolher('Link do site');
     expect(eventos(sendBeacon)).toEqual(['visita', 'comecou', 'resultado']);
   });
