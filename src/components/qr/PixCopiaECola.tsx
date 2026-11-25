@@ -38,12 +38,12 @@ export function PixCopiaECola({ codigo }: { codigo: string }) {
   return (
     <section
       aria-labelledby={idTitulo}
-      className="flex flex-col gap-3 rounded-xl border border-ui-line bg-ui-bg p-5"
+      className="flex min-w-0 flex-col gap-3 rounded-xl border border-ui-line bg-ui-bg p-5"
     >
       <h2 id={idTitulo} className="m-0 text-lg font-semibold text-ui-ink">
         Pix copia e cola
       </h2>
-      <p className="m-0 select-all break-all rounded-lg bg-ui-surface p-3 font-mono text-[13px] leading-[1.45] text-ui-ink">
+      <p className="m-0 select-all break-all [overflow-wrap:anywhere] rounded-lg bg-ui-surface p-3 font-mono text-[13px] leading-[1.45] text-ui-ink">
         {codigo}
       </p>
       <Botao variante="contorno" onClick={copiar}>

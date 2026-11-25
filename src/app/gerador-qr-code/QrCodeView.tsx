@@ -119,8 +119,8 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             dos campos, depois "cara do negócio" e plaquinha). De md em diante são duas colunas (blueprint §2):
             passos e "cara do negócio" à esquerda, o cartão do QR (preso no topo) e a plaquinha à direita.
           */}
-          <div className="grid gap-5 md:grid-cols-2 md:items-start md:gap-6">
-            <div className="md:col-start-1 md:row-start-1">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2 md:items-start md:gap-6">
+            <div className="min-w-0 md:col-start-1 md:row-start-1">
               <Bloco numero={1} titulo={TITULO_DO_PASSO_1}>
                 <EscolhaDoTipo
                   tipo={tipo}
@@ -132,7 +132,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             </div>
 
             {tipo && (
-              <div className="md:col-start-1 md:row-start-2">
+              <div className="min-w-0 md:col-start-1 md:row-start-2">
                 <Bloco numero={2} titulo="Preencha os dados">
                   <div ref={formulario} className="flex flex-col gap-[18px]">
                     <FormularioDoTipo
@@ -150,7 +150,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             )}
 
             {tipo && (
-              <div className="flex flex-col gap-5 md:sticky md:top-4 md:col-start-2 md:row-span-3 md:row-start-1">
+              <div className="flex min-w-0 flex-col gap-5 md:sticky md:top-4 md:col-start-2 md:row-span-3 md:row-start-1">
                 <PreviaDoQr
                   nomeDoTipo={nomeDoTipo}
                   svg={qr?.ok ? qr.svg : null}
@@ -174,7 +174,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             )}
 
             {tipo && (
-              <div className="md:col-start-1 md:row-start-3">
+              <div className="min-w-0 md:col-start-1 md:row-start-3">
                 <CaraDoNegocio
                   key={apagados}
                   cor={cor}
@@ -189,7 +189,7 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
             )}
 
             {tipo && qr?.ok && svgDaPlaquinha && dadosDaPlaquinha && (
-              <div className="md:col-start-2 md:row-start-4">
+              <div className="min-w-0 md:col-start-2 md:row-start-4">
                 <SecaoDaPlaquinha
                   // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
                   key={tipo}
