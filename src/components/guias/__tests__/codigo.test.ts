@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 
@@ -41,6 +41,22 @@ describe('código dos guias e do sitemap', () => {
         `<loc>https://tools\\.unumpeople\\.com\\.br/${caminho}</loc>\\s*<lastmod>2026-11-23</lastmod>`,
       );
       expect(sitemap, caminho || 'home').toMatch(url);
+    }
+  });
+
+  it('RF-F4-12: toda página pública em src/app/*/page.tsx está no sitemap, e as duas ferramentas novas têm lastmod de 26/11/2026', () => {
+    const sitemap = readFileSync(path.join(RAIZ, 'public/sitemap.xml'), 'utf8');
+    const rotas = readdirSync(path.join(RAIZ, 'src/app'), { withFileTypes: true })
+      .filter((e) => e.isDirectory() && existsSync(path.join(RAIZ, 'src/app', e.name, 'page.tsx')))
+      .map((e) => e.name);
+    expect(rotas.length).toBeGreaterThan(0);
+    for (const rota of rotas) {
+      expect(sitemap, rota).toContain(`<loc>https://tools.unumpeople.com.br/${rota}</loc>`);
+    }
+    for (const rota of ['gerador-qr-code', 'gerador-link-whatsapp']) {
+      expect(sitemap, rota).toMatch(
+        new RegExp(`<loc>https://tools\\.unumpeople\\.com\\.br/${rota}</loc>\\s*<lastmod>2026-11-26</lastmod>`),
+      );
     }
   });
 });
