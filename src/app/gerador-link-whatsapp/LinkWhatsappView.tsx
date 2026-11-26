@@ -14,10 +14,12 @@ import { CartaoDoLink } from '../../components/linkWhatsapp/CartaoDoLink';
 import { QrDoLink } from '../../components/linkWhatsapp/QrDoLink';
 import { OndeColocar } from '../../components/linkWhatsapp/OndeColocar';
 import { useLinkWhatsapp } from '../../hooks/useLinkWhatsapp';
+import { useMedicao } from '../../hooks/useMedicao';
 import { formatarTelefone, linkDoWhatsapp, motivoDoNumero, normalizarCelular } from '../../utils/whatsapp';
 
 export default function LinkWhatsappView({ children }: { children?: React.ReactNode }) {
   const { numero, mensagem, mudarNumero, mudarMensagem, apagar } = useLinkWhatsapp();
+  const { marcar, comecou } = useMedicao('link-whatsapp');
   // O erro do número só aparece depois que a pessoa sai do campo com ele errado (RF-LW-07); a partir daí
   // acompanha a digitação.
   const [jaHouveErro, setJaHouveErro] = React.useState(false);
@@ -28,12 +30,25 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
   const motivo = motivoDoNumero(numero);
   const link = nacional ? linkDoWhatsapp(nacional, mensagem) : null;
 
+  React.useEffect(() => {
+    marcar('visita');
+  }, [marcar]);
+
+  // O primeiro link válido. Quem só voltou e olha o link restaurado não conta (o hook exige "comecou" antes).
+  const temLink = link !== null;
+  React.useEffect(() => {
+    if (temLink && comecou) marcar('resultado');
+  }, [temLink, comecou, marcar]);
+
+  // Número, mensagem ou atalho: qualquer toque da pessoa começa (restaurar do aparelho não passa por aqui).
   const digitarNumero = (novo: string) => {
     setApagou(false);
+    marcar('comecou');
     mudarNumero(novo);
   };
   const digitarMensagem = (nova: string) => {
     setApagou(false);
+    marcar('comecou');
     mudarMensagem(nova);
   };
   const apagarTudo = () => {
@@ -80,8 +95,8 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
 
           <div className="flex min-w-0 flex-col gap-5">
             {/* Outro link, outro cartão: o erro e o "Link copiado" de um não passam para o outro. */}
-            <CartaoDoLink key={link ?? 'sem-link'} link={link} aoLevar={() => undefined} />
-            {link && <QrDoLink link={link} numero={numero} mensagem={mensagem} aoBaixar={() => undefined} />}
+            <CartaoDoLink key={link ?? 'sem-link'} link={link} aoLevar={() => marcar('baixou')} />
+            {link && <QrDoLink link={link} numero={numero} mensagem={mensagem} aoBaixar={() => marcar('baixou')} />}
           </div>
         </div>
 
@@ -111,7 +126,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
         </section>
 
         {children && (
-          <Recolhivel titulo="Como usar o seu link" variante="cartao">
+          <Recolhivel titulo="Como usar o seu link" variante="cartao" onAbrir={() => marcar('guia')}>
             <div>{children}</div>
           </Recolhivel>
         )}
@@ -120,6 +135,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
           texto="Quer uma página com o seu WhatsApp, os serviços e o endereço? Crie a sua."
           link="Criar minha página"
           href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=link-whatsapp"
+          onClick={() => marcar('convite')}
         />
       </main>
 

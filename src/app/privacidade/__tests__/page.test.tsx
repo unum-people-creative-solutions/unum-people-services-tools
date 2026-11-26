@@ -45,6 +45,11 @@ describe('Política de Privacidade', () => {
         'o último QR code que você criou, com o que digitou (inclusive a chave Pix). O logo não fica guardado. Para apagar, use o botão "Apagar o que eu digitei" no gerador;',
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'o último link do WhatsApp que você criou, com o número e a mensagem. Para apagar, use o botão "Apagar o que eu digitei" no gerador de link;',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText('os custos e valores do simulador de preço.')).toBeInTheDocument();
     expect(texto).toContain('A calculadora de anúncios não guarda nada: ao fechar a página, os números somem.');
     expect(texto).toContain(
@@ -63,7 +68,7 @@ describe('Política de Privacidade', () => {
     const texto = textoDaPagina();
     expect(texto).toContain('Contamos só quantas vezes as ferramentas são usadas, sem saber quem usou.');
     expect(texto).toContain(
-      'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
+      'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code, copia ou testa um link do WhatsApp e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
     );
   });
 
@@ -96,11 +101,12 @@ const TEXTO_APROVADO = [
   'Para você não perder o que já preencheu, algumas ferramentas guardam os dados no próprio navegador:',
   'os serviços que você cadastra em "Quais serviços compensam";',
   'o último QR code que você criou, com o que digitou (inclusive a chave Pix). O logo não fica guardado. Para apagar, use o botão "Apagar o que eu digitei" no gerador;',
+  'o último link do WhatsApp que você criou, com o número e a mensagem. Para apagar, use o botão "Apagar o que eu digitei" no gerador de link;',
   'os custos e valores do simulador de preço.',
   'A calculadora de anúncios não guarda nada: ao fechar a página, os números somem.',
   'Esses dados ficam só neste aparelho e neste navegador. Para apagar, limpe os dados de navegação do seu navegador.',
   'O que contamos',
-  'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
+  'Para saber se as ferramentas ajudam, contamos quantas vezes cada uma é aberta, usada até o resultado, quantas vezes alguém baixa, compartilha ou imprime um QR code, copia ou testa um link do WhatsApp e quantas vezes alguém clica nos links para a Unum People. É só uma soma por dia: não guardamos quem foi, nem o seu endereço IP, nem o que você digitou, e não usamos cookies.',
   'O que a hospedagem registra',
   'Como qualquer site, a empresa que hospeda estas páginas (Netlify) registra dados técnicos de acesso, como endereço IP, navegador e página visitada, para manter o site no ar e seguro. Não usamos esses registros para identificar você nem para publicidade.',
   'Seus direitos',
