@@ -35,6 +35,14 @@ O ecossistema de ferramentas da **Unum People** foi projetado para eliminar o "a
 - **Medição:** ferramenta `qr-code`, com o evento próprio `baixou`.
 - **Caminho:** `/gerador-qr-code`
 
+### 5. Gerador de link do WhatsApp
+- **O que faz:** monta o link oficial `wa.me` com a mensagem já escrita. Confere o número com DDD e explica o erro em português. Oferece 5 mensagens prontas e mostra a prévia de como a mensagem chega.
+- **Destaque:** o link é do próprio WhatsApp e não expira, porque não passa por nenhum serviço nosso. A tela tem copiar, compartilhar, testar e o QR code do link, com um atalho que abre o gerador de QR já preenchido.
+- **Guardar:** o número e a mensagem ficam no `localStorage` (`tools-link-whatsapp:v1`), e há um botão para apagar.
+- **Código:** `src/utils/whatsapp.ts` (comum com o QR), `src/utils/linkWhatsapp/`, `src/components/linkWhatsapp/`, `src/app/gerador-link-whatsapp/`.
+- **Medição:** ferramenta `link-whatsapp`; `baixou` = copiou, compartilhou, testou ou baixou o QR.
+- **Caminho:** `/gerador-link-whatsapp`
+
 ## 🛠️ Stack Técnica
 
 - **Framework:** [Next.js](https://nextjs.org) (App Router)
