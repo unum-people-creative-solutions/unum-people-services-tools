@@ -95,7 +95,7 @@ function FormWhatsapp({ campos, erros, onChange, onBlur }: Comum<'whatsapp'>) {
         onChange={(numero) => onChange({ numero })}
         onBlur={() => onBlur('numero')}
       />
-      <CampoTextoQr
+      <CampoAreaQr
         rotulo="Mensagem que já chega escrita (opcional)"
         valor={campos.mensagem}
         placeholder="Olá! Vim pelo QR code e quero saber mais."

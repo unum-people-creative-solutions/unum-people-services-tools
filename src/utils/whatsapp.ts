@@ -34,3 +34,23 @@ export function linkDoWhatsapp(nacional: string, mensagem?: string): string {
   const texto = mensagem?.trim();
   return texto ? `${base}?text=${encodeURIComponent(texto)}` : base;
 }
+
+/**
+ * Por que o texto não é um número aceito, em português para a pessoa (RF-LW-07), ou `null` quando
+ * `normalizarCelular` o aceita. Segue a mesma ordem de `normalizarCelular`: tira o 55 do início
+ * (12 ou 13 dígitos) e o 0 de discagem, e só então conta os dígitos.
+ */
+export function motivoDoNumero(texto: string): string | null {
+  let digitos = texto.replace(/\D/g, '');
+  if (digitos === '') return 'Digite o seu número com DDD.';
+  if (digitos.startsWith('55') && (digitos.length === 12 || digitos.length === 13)) {
+    digitos = digitos.slice(2);
+  }
+  if (digitos.startsWith('0')) digitos = digitos.slice(1);
+  if (digitos.startsWith('0')) return 'Confira o DDD: ele não começa com 0.';
+
+  if (digitos.length < 10) return 'Falta número. Digite o DDD e o número. Exemplo: (11) 98765-4321';
+  if (digitos.length > 11) return 'Tem dígito a mais. Digite só o DDD e o número.';
+  if (digitos.length === 11 && digitos[2] !== '9') return 'Celular com 11 dígitos tem 9 depois do DDD. Confira o número.';
+  return null;
+}
