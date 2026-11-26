@@ -8,6 +8,7 @@ import { CampoDoNumero } from '../../components/linkWhatsapp/CampoDoNumero';
 import { MensagemDoCliente } from '../../components/linkWhatsapp/MensagemDoCliente';
 import { PreviaDaMensagem } from '../../components/linkWhatsapp/PreviaDaMensagem';
 import { CartaoDoLink } from '../../components/linkWhatsapp/CartaoDoLink';
+import { QrDoLink } from '../../components/linkWhatsapp/QrDoLink';
 import { useLinkWhatsapp } from '../../hooks/useLinkWhatsapp';
 import { formatarTelefone, linkDoWhatsapp, motivoDoNumero, normalizarCelular } from '../../utils/whatsapp';
 
@@ -59,6 +60,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
           <div className="flex min-w-0 flex-col gap-5">
             {/* Outro link, outro cartão: o erro e o "Link copiado" de um não passam para o outro. */}
             <CartaoDoLink key={link ?? 'sem-link'} link={link} aoLevar={() => undefined} />
+            {link && <QrDoLink link={link} numero={numero} mensagem={mensagem} aoBaixar={() => undefined} />}
           </div>
         </div>
 
