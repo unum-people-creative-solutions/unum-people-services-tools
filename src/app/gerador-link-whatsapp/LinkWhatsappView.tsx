@@ -7,8 +7,9 @@ import { Bloco } from '../../components/ui/Bloco';
 import { CampoDoNumero } from '../../components/linkWhatsapp/CampoDoNumero';
 import { MensagemDoCliente } from '../../components/linkWhatsapp/MensagemDoCliente';
 import { PreviaDaMensagem } from '../../components/linkWhatsapp/PreviaDaMensagem';
+import { CartaoDoLink } from '../../components/linkWhatsapp/CartaoDoLink';
 import { useLinkWhatsapp } from '../../hooks/useLinkWhatsapp';
-import { formatarTelefone, motivoDoNumero, normalizarCelular } from '../../utils/whatsapp';
+import { formatarTelefone, linkDoWhatsapp, motivoDoNumero, normalizarCelular } from '../../utils/whatsapp';
 
 export default function LinkWhatsappView({ children }: { children?: React.ReactNode }) {
   const { numero, mensagem, mudarNumero, mudarMensagem } = useLinkWhatsapp();
@@ -18,6 +19,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
 
   const nacional = normalizarCelular(numero);
   const motivo = motivoDoNumero(numero);
+  const link = nacional ? linkDoWhatsapp(nacional, mensagem) : null;
 
   return (
     <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
@@ -52,6 +54,11 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
               <MensagemDoCliente valor={mensagem} onChange={mudarMensagem} />
               <PreviaDaMensagem mensagem={mensagem} />
             </Bloco>
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-5">
+            {/* Outro link, outro cartão: o erro e o "Link copiado" de um não passam para o outro. */}
+            <CartaoDoLink key={link ?? 'sem-link'} link={link} aoLevar={() => undefined} />
           </div>
         </div>
 
