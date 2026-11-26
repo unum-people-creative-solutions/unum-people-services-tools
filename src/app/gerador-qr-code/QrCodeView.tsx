@@ -141,27 +141,33 @@ export default function QrCodeView({ children }: { children?: React.ReactNode })
               </div>
             )}
 
+            {/*
+              O cartão fica preso dentro de um invólucro que ocupa só as linhas 1–3. Um `sticky` direto na grade
+              ficaria preso até o fim dela e cobriria a plaquinha da linha 4 no computador.
+            */}
             {tipo && (
-              <div className="flex min-w-0 flex-col gap-5 md:sticky md:top-4 md:col-start-2 md:row-span-3 md:row-start-1">
-                <PreviaDoQr
-                  nomeDoTipo={nomeDoTipo}
-                  svg={qr?.ok ? qr.svg : null}
-                  alerta={qr && !qr.ok ? qr.erro : undefined}
-                >
-                  {qr?.ok && (
-                    <AcoesDoQr
-                      // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
-                      key={tipo}
-                      tipo={tipo}
-                      matriz={qr.matriz}
-                      svg={qr.svg}
-                      desenho={{ cor, frase, logo: logo ?? undefined }}
-                      aoBaixar={() => marcar('baixou')}
-                    />
-                  )}
-                </PreviaDoQr>
-                {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
-                {tipo === 'pix' && <AvisoDoPix />}
+              <div className="min-w-0 md:col-start-2 md:row-span-3 md:row-start-1 md:self-stretch">
+                <div className="flex min-w-0 flex-col gap-5 md:sticky md:top-4">
+                  <PreviaDoQr
+                    nomeDoTipo={nomeDoTipo}
+                    svg={qr?.ok ? qr.svg : null}
+                    alerta={qr && !qr.ok ? qr.erro : undefined}
+                  >
+                    {qr?.ok && (
+                      <AcoesDoQr
+                        // Outro tipo, outro arquivo: o erro de uma ação não passa de um QR para o outro.
+                        key={tipo}
+                        tipo={tipo}
+                        matriz={qr.matriz}
+                        svg={qr.svg}
+                        desenho={{ cor, frase, logo: logo ?? undefined }}
+                        aoBaixar={() => marcar('baixou')}
+                      />
+                    )}
+                  </PreviaDoQr>
+                  {tipo === 'pix' && textoDoQr && qr?.ok && <PixCopiaECola key={textoDoQr} codigo={textoDoQr} />}
+                  {tipo === 'pix' && <AvisoDoPix />}
+                </div>
               </div>
             )}
 
