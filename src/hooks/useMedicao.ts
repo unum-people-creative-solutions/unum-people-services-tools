@@ -2,7 +2,13 @@
 
 import { useCallback, useRef, useState } from 'react';
 
-export type Ferramenta = 'home' | 'quanto-cobrar' | 'vale-anunciar' | 'servicos-compensam' | 'qr-code';
+export type Ferramenta =
+  | 'home'
+  | 'quanto-cobrar'
+  | 'vale-anunciar'
+  | 'servicos-compensam'
+  | 'qr-code'
+  | 'link-whatsapp';
 export type EventoDeUso = 'visita' | 'comecou' | 'resultado' | 'convite' | 'guia' | 'planilha' | 'baixou';
 
 /** Única origem que a API de medição aceita (`TOOLS_ORIGENS` da Lambda de jornada). */

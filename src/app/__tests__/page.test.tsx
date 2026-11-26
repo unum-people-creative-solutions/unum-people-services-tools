@@ -86,7 +86,7 @@ describe('Home: metadados (RF-F2-12)', () => {
       absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer',
     });
     expect(metadata.description).toBe(
-      'Ferramentas grátis para MEI e pequenos negócios: QR code, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
+      'Ferramentas grátis para MEI e pequenos negócios: QR code, link do WhatsApp, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
     );
   });
 });

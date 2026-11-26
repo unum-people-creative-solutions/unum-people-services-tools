@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { BarChart3, ChevronRight, CircleDollarSign, Megaphone, QrCode } from 'lucide-react';
+import { BarChart3, ChevronRight, CircleDollarSign, Megaphone, MessageCircle, QrCode } from 'lucide-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { ConviteDaHome, VisitaDaHome } from '../components/MedicaoDaHome';
@@ -9,7 +9,7 @@ import { ConviteDaHome, VisitaDaHome } from '../components/MedicaoDaHome';
 export const metadata: Metadata = {
   title: { absolute: 'Unum People Tools — ferramentas grátis para o seu negócio crescer' },
   description:
-    'Ferramentas grátis para MEI e pequenos negócios: QR code, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
+    'Ferramentas grátis para MEI e pequenos negócios: QR code, link do WhatsApp, quanto cobrar, se vale a pena anunciar e quais serviços compensam. Sem cadastro.',
 };
 
 type Cartao = { nome: string; frase: string; href: string; icone: typeof QrCode };
@@ -20,6 +20,12 @@ const venderNoWhatsapp: Cartao[] = [
     frase: 'Crie o QR do seu Pix, WhatsApp, Instagram ou Wi-Fi. Grátis e não expira.',
     href: '/gerador-qr-code',
     icone: QrCode,
+  },
+  {
+    nome: 'Link do WhatsApp com mensagem',
+    frase: 'Crie o link para o cliente te chamar com a mensagem já escrita. Grátis e não expira.',
+    href: '/gerador-link-whatsapp',
+    icone: MessageCircle,
   },
 ];
 
