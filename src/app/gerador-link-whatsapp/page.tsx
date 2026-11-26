@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import LinkWhatsappView from './LinkWhatsappView';
+import { GuiaLinkWhatsapp } from '../../components/guias/GuiaLinkWhatsapp';
 
 // O título já traz o nome do site; `absolute` evita repetir o sufixo do template do layout raiz.
 export const metadata: Metadata = {
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <LinkWhatsappView />;
+  return (
+    <LinkWhatsappView>
+      <GuiaLinkWhatsapp />
+    </LinkWhatsappView>
+  );
 }

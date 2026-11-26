@@ -4,23 +4,44 @@ import React from 'react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { Bloco } from '../../components/ui/Bloco';
+import { Botao } from '../../components/ui/Botao';
+import { Convite } from '../../components/ui/Convite';
+import { Recolhivel } from '../../components/ui/Recolhivel';
 import { CampoDoNumero } from '../../components/linkWhatsapp/CampoDoNumero';
 import { MensagemDoCliente } from '../../components/linkWhatsapp/MensagemDoCliente';
 import { PreviaDaMensagem } from '../../components/linkWhatsapp/PreviaDaMensagem';
 import { CartaoDoLink } from '../../components/linkWhatsapp/CartaoDoLink';
 import { QrDoLink } from '../../components/linkWhatsapp/QrDoLink';
+import { OndeColocar } from '../../components/linkWhatsapp/OndeColocar';
 import { useLinkWhatsapp } from '../../hooks/useLinkWhatsapp';
 import { formatarTelefone, linkDoWhatsapp, motivoDoNumero, normalizarCelular } from '../../utils/whatsapp';
 
 export default function LinkWhatsappView({ children }: { children?: React.ReactNode }) {
-  const { numero, mensagem, mudarNumero, mudarMensagem } = useLinkWhatsapp();
+  const { numero, mensagem, mudarNumero, mudarMensagem, apagar } = useLinkWhatsapp();
   // O erro do número só aparece depois que a pessoa sai do campo com ele errado (RF-LW-07); a partir daí
   // acompanha a digitação.
   const [jaHouveErro, setJaHouveErro] = React.useState(false);
+  const [confirmando, setConfirmando] = React.useState(false);
+  const [apagou, setApagou] = React.useState(false);
 
   const nacional = normalizarCelular(numero);
   const motivo = motivoDoNumero(numero);
   const link = nacional ? linkDoWhatsapp(nacional, mensagem) : null;
+
+  const digitarNumero = (novo: string) => {
+    setApagou(false);
+    mudarNumero(novo);
+  };
+  const digitarMensagem = (nova: string) => {
+    setApagou(false);
+    mudarMensagem(nova);
+  };
+  const apagarTudo = () => {
+    apagar();
+    setJaHouveErro(false);
+    setConfirmando(false);
+    setApagou(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-ui-surface text-ui-ink">
@@ -42,7 +63,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
             <Bloco numero={1} titulo="Seu número do WhatsApp">
               <CampoDoNumero
                 valor={numero}
-                onChange={mudarNumero}
+                onChange={digitarNumero}
                 onBlur={() => {
                   if (motivo !== null) setJaHouveErro(true);
                 }}
@@ -52,7 +73,7 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
             </Bloco>
 
             <Bloco numero={2} titulo="O que o cliente vai mandar">
-              <MensagemDoCliente valor={mensagem} onChange={mudarMensagem} />
+              <MensagemDoCliente valor={mensagem} onChange={digitarMensagem} />
               <PreviaDaMensagem mensagem={mensagem} />
             </Bloco>
           </div>
@@ -64,7 +85,42 @@ export default function LinkWhatsappView({ children }: { children?: React.ReactN
           </div>
         </div>
 
-        {children}
+        {link && <OndeColocar />}
+
+        <section aria-label="Apagar dados" className="flex flex-col gap-3">
+          {confirmando ? (
+            <div className="flex max-w-[640px] flex-col gap-3 rounded-lg bg-ui-bg p-3.5">
+              <p className="m-0 text-[15px] font-medium text-ui-ink">Apagar tudo o que você digitou neste aparelho?</p>
+              <div className="flex gap-3">
+                <Botao onClick={apagarTudo}>Sim, apagar</Botao>
+                <Botao variante="contorno" autoFocus onClick={() => setConfirmando(false)}>
+                  Cancelar
+                </Botao>
+              </div>
+            </div>
+          ) : (
+            <Botao variante="link" onClick={() => setConfirmando(true)}>
+              Apagar o que eu digitei
+            </Botao>
+          )}
+          {apagou && (
+            <p role="status" className="m-0 text-sm font-medium text-ui-ok">
+              Pronto, apagamos tudo.
+            </p>
+          )}
+        </section>
+
+        {children && (
+          <Recolhivel titulo="Como usar o seu link" variante="cartao">
+            <div>{children}</div>
+          </Recolhivel>
+        )}
+
+        <Convite
+          texto="Quer uma página com o seu WhatsApp, os serviços e o endereço? Crie a sua."
+          link="Criar minha página"
+          href="https://unumpeople.app/?utm_source=tools&utm_medium=convite&utm_campaign=link-whatsapp"
+        />
       </main>
 
       <Footer />
